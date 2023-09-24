@@ -3,7 +3,6 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100vh;
     padding: 1rem;
     margin: 1rem;
 }
@@ -11,4 +10,9 @@
 .errors{
     color: red;
     font-weight: bold;
+}
+
+.googleSignIn{
+    border: 5px solid black;
+    font-size: 1rem;
 }

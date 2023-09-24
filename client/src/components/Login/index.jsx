@@ -1,14 +1,25 @@
 import React from 'react'
 import styles from './login.module.css'
 import {useForm} from 'react-hook-form'
+import {useDispatch } from 'react-redux'
+import {GoogleSignInAPIRedirect} from './../../firebase'
+import {useNavigate} from 'react-router-dom'
 
 const Login = () => {
 
   const {register, handleSubmit, formState} = useForm()
   const {errors} = formState
 
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
   const onSubmit = (data) =>{
     console.log(data)
+  }
+
+  const handleGoogleSignIn = () =>{
+    dispatch(GoogleSignInAPIRedirect())
+    navigate("/")
   }
 
   return (
@@ -45,9 +56,14 @@ const Login = () => {
           <button>Login</button>
           </div>
         </form>
+
+        <div className={styles.googleSignIn}>
+         <button onClick={handleGoogleSignIn}> Login with Google</button>
+        </div>
       
     </div>
   )
 }
 
 export default Login
+
