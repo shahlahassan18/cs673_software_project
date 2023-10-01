@@ -4,6 +4,9 @@ import {useForm} from 'react-hook-form'
 import {useDispatch } from 'react-redux'
 import {GoogleSignInAPIRedirect} from './../../firebase'
 import {useNavigate} from 'react-router-dom'
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+
+
 
 const Login = () => {
 
@@ -14,7 +17,19 @@ const Login = () => {
   const navigate = useNavigate()
 
   const onSubmit = (data) =>{
-    console.log(data)
+    const auth = getAuth();
+  
+  signInWithEmailAndPassword(auth, data.email, data.password)
+    .then((userCredential) => {
+      // Signed in successfully, navigate to /home
+      navigate("/");
+    })
+    .catch((error) => {
+      // An error occurred, handle it (e.g., show an error message)
+      console.error("Error signing in: ", error.message);
+      // Optionally, set an error state to show a user-friendly message
+      alert("Error signing in: " + error.message);
+    });
   }
 
   const handleGoogleSignIn = () =>{

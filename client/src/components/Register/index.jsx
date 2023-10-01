@@ -1,14 +1,38 @@
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import styles from './register.module.css';
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import styles from "./register.module.css";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+import "font-awesome/css/font-awesome.min.css";
 
 const Register = () => {
   const { register, handleSubmit, formState } = useForm();
   const { errors } = formState;
+  const navigate = useNavigate();
 
   const onSubmit = (data) => {
-    // Send data to the server or perform registration logic here
-    console.log(data);
+    const auth = getAuth();
+    const { email, password } = data;
+
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // The user was registered successfully
+        const user = userCredential.user;
+        console.log("Registered successfully!", user);
+        alert("Registered successfully! ");
+        navigate("/login");
+      })
+      .catch((error) => {
+        // An error occurred during registration
+        console.error("Error registering:", error.message);
+        alert("Error registering: " + error.message);
+      });
+  };
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -20,11 +44,11 @@ const Register = () => {
           <input
             type="email"
             id="email"
-            {...register('email', {
-              required: 'Email is required!',
+            {...register("email", {
+              required: "Email is required!",
               pattern: {
                 value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                message: 'Invalid email format',
+                message: "Invalid email format",
               },
             })}
           />
@@ -33,25 +57,23 @@ const Register = () => {
 
         <div className={styles.formGroup}>
           <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            id="password"
-            {...register('password', {
-                required: 'Password is required!',
+          <div className={styles.passwordContainer}>
+            <input
+              type={showPassword ? "text" : "password"}
+              id="password"
+              {...register("password", {
+                required: "Password is required!",
                 pattern: {
-                value: /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,}$/,
-                message:
-                    'Password must contain at least one lowercase letter, one uppercase letter, and one special character.',
+                  value:
+                    /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,}$/,
+                  message:
+                    "Password must contain at least one lowercase letter, one uppercase letter, one special character, and at least 8 digits without spaces.",
                 },
-            })}
-          />
+              })}
+              className={styles.passwordInput}
+            />
+          </div>
           <p className={styles.error}>{errors.password?.message}</p>
-        {/* Comment for Regex:  (?=.*[0-9]) means that the password must contain a single digit from 1 to 9
-                                (?=.*[a-z]) means that the password must contain one lowercase letter
-                                (?=.*[A-Z]) means that the password must contain one uppercase letter
-                                (?=.*\W) means that the password must contain one special character
-                                (?!.* ) means that the password must NOT contain spaces
-                                .{8,} means that the password must be at least 8 characters long */}
         </div>
 
         <div className={styles.formGroup}>
@@ -59,10 +81,10 @@ const Register = () => {
           <input
             type="password"
             id="confirmPassword"
-            {...register('confirmPassword', {
+            {...register("confirmPassword", {
               validate: (value) =>
-                value === document.getElementById('password').value ||
-                'Passwords do not match.',
+                value === document.getElementById("password").value ||
+                "Passwords do not match.",
             })}
           />
           <p className={styles.error}>{errors.confirmPassword?.message}</p>

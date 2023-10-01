@@ -6,11 +6,11 @@ const Home = () => {
   return (
     <div className={styles.container}>
       <div className={styles.logoContainer}>
-        <img src="/public/logo.jpg" alt="Your Logo" className={styles.logo} />
+        <img src="/public/logo.jpg" alt="Logo" className={styles.logo} />
       </div>
-      <div className={styles.linksContainer}>
-        <Link to="/register" className={styles.link}>Join in</Link>
-        <Link to="/login" className={styles.link}>Sign up</Link>
+      <div className={styles.loginContainer}>
+        <Link to="/register" className={styles.register}>Join now</Link>
+        <Link to="/login" className={styles.login}>Sign in</Link>
       </div>
     </div>
   )
