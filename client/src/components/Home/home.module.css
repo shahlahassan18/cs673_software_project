@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 .home{
     display: grid;
     grid-template-areas: "left feed right";
@@ -14,3 +15,66 @@
     }
     
 }
+=======
+.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  .logoContainer {
+    display: flex;
+    align-items: center;
+  }
+  
+  .logo {
+    width: 100px; /* or whatever size you want for the logo */
+    height: auto;
+  }
+  
+  .loginContainer {
+    display: flex;
+    align-items: center;
+  }
+  
+  .register {
+    color: #D4D2D5;
+    background-color: rgba(0, 0, 0, 0);
+    transition-duration: 167ms;
+    text-decoration: none;
+    padding: 10px 24px;
+    font-size: 16px;
+    border-radius: 24px;
+    line-height: 40px;
+    border: 1px solid transparent;
+    font-weight: 600;
+    &:hover {
+      background-color: rgba(112, 181, 249, 0.15);
+      color: #D4D2D5;
+      text-decoration: none;
+    }
+  }
+
+  .login {
+    box-shadow: inset 0 0 0 1px #0a66c2;
+    text-align: center;
+    margin-left: 8px;
+    background-color: rgba(0, 0, 0, 0);
+    color: #00FFC5;
+    transition-duration: 167ms;
+    text-decoration: none;
+    padding: 10px 24px;
+    font-size: 16px;
+    border-radius: 24px;
+    line-height: 40px;
+    border: 1px solid transparent;
+    font-weight: 600;
+    &:hover {
+      background-color: rgba(112, 181, 249, 0.15);
+      color: #00FFC5;
+      text-decoration: none;
+    }
+  }
+  
+>>>>>>> 19b58bd87cfb1fdf0ab480914cbfac4b09190f32

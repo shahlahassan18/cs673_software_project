@@ -1,21 +1,48 @@
 /* register.module.css */
 
-.registerContainer {
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-    background-color: #fff;
-  }
+  .registerContainer {
+      max-width: 400px;
+      margin: 50px auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 2 10px rgba(0, 0, 0, 0.1);
+      background-color: #f9f9f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center; 
+      justify-content: center; 
+    }
   
   .registerContainer h2 {
     text-align: center;
   }
   
   .formGroup {
+    position: relative;
+    display: inline-block; 
     margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .formGroup label {
+    margin-bottom: 5px;
+    font-weight: 600;
+  }
+
+  .formGroup input {
+    padding: 8px 10px;  
+    border: 1px solid #ccc;
+    border-radius: 4px;  
+    font-size: 16px;
+    transition: border-color 0.3s;  
+}
+
+  .formGroup input:focus {
+    border-color: #007BFF;  /* 获得焦点时的边框颜色，可以根据你的品牌颜色调整 */
+    outline: none;  /* 移除浏览器默认的轮廓 */
   }
   
   label {
@@ -54,4 +81,8 @@
   button:hover {
     background-color: #0056b3;
   }
-  
+
+  .passwordContainer {
+    position: relative;
+    display: inline-block; 
+  }
