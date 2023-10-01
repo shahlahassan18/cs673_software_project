@@ -1,0 +1,41 @@
+.addPost{
+    display: flex;
+    flex-direction: column;
+    background-color: white;   
+    padding: 1rem ;
+}
+
+.startPost{
+    display: flex;
+    gap:1rem;
+}
+
+.avatar{
+    width: 50px;
+    height: 50px;
+    border-radius: 100%;
+}
+
+.inputPostContainer{
+    width: 80%;
+}
+
+.inputPost{
+    width: 100%;
+    padding: 1rem;
+    border-radius: 1rem;
+    color: grey;
+}
+
+.btnOptions {
+    display: flex;
+    border-top: 2px solid lightgray;
+    margin: 1.5rem 0;
+}
+
+.option{
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
