@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import styles from "./register.module.css";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import "font-awesome/css/font-awesome.min.css";
+// import "font-awesome/css/font-awesome.min.css";
 
 const Register = () => {
   const { register, handleSubmit, formState } = useForm();
