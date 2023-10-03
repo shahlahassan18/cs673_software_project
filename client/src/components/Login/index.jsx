@@ -5,10 +5,13 @@ import {useDispatch } from 'react-redux'
 import {GoogleSignInAPIRedirect} from './../../firebase'
 import {useNavigate} from 'react-router-dom'
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { useUser } from '../../features/contexts/UserContext'
 
 
 
 const Login = () => {
+
+  const { user, setUser } = useUser();
 
   const {register, handleSubmit, formState} = useForm()
   const {errors} = formState
@@ -16,25 +19,29 @@ const Login = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  const onSubmit = (data) =>{
+  if (user) {
+    navigate("/feed");
+    return null; // or you can return a redirect or some message
+  }
+
+  const onSubmit = (data) => {
     const auth = getAuth();
   
-  signInWithEmailAndPassword(auth, data.email, data.password)
-    .then((userCredential) => {
-      // Signed in successfully, navigate to /home
-      navigate("/");
-    })
-    .catch((error) => {
-      // An error occurred, handle it (e.g., show an error message)
-      console.error("Error signing in: ", error.message);
-      // Optionally, set an error state to show a user-friendly message
-      alert("Error signing in: " + error.message);
-    });
+    signInWithEmailAndPassword(auth, data.email, data.password)
+      .then((userCredential) => {
+          setUser(userCredential.user);
+          navigate("/feed");
+      })
+      .catch((error) => {
+          console.error("Error signing in: ", error.message);
+          alert("Error signing in: " + error.message);
+      });
   }
+
 
   const handleGoogleSignIn = () =>{
     dispatch(GoogleSignInAPIRedirect())
-    navigate("/")
+    navigate("/feed")
   }
 
   return (

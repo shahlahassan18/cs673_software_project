@@ -1,8 +1,19 @@
-import React from 'react'
+import React, { useContext, useEffect } from 'react'
 import styles from './firstpage.module.css'
-import { Link } from 'react-router-dom' 
+import { Link, useNavigate} from 'react-router-dom' 
+import UserContext from '../../features/contexts/UserContext';
 
 const FirstPage = () => {
+  const { user } = useContext(UserContext);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      navigate('/feed');
+    }
+    
+  }, [user, navigate]);
+
   return (
     <div className={styles.container}>
       <div className={styles.logoContainer}>
