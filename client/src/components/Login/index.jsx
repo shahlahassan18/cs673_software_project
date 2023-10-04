@@ -6,6 +6,7 @@ import {GoogleSignInAPIRedirect} from './../../firebase'
 import {useNavigate} from 'react-router-dom'
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { useUser } from '../../features/contexts/UserContext'
+import LogoContainer from "./../LogoContainer"
 
 
 
@@ -46,10 +47,14 @@ const Login = () => {
 
   return (
     <div>
+       <LogoContainer />
+       <div>
+        <h1>Welcome back, We missed you</h1>
+       </div>
         <form className={styles.loginForm} onSubmit={handleSubmit(onSubmit)} noValidate>
-          <div>
+          <div className={styles.formContent}>
           <label>Email: </label>
-          <input type='email' id='email'
+          <input type='email' id='email' className={styles.formInput}
            {...register('email',{
             required:{
               value: true,
@@ -62,7 +67,7 @@ const Login = () => {
            })}></input>
           <p className={styles.errors}>{errors.email?.message}</p>
           <label>Password: </label>
-          <input type='password' id='password'
+          <input type='password' id='password' className={styles.formInput}
            {...register('password',{
             required:{
               value : true,
@@ -75,12 +80,18 @@ const Login = () => {
             
           })}></input>
           <p className={styles.errors}>{errors.password?.message}</p>
-          <button>Login</button>
+          <button className={styles.signInBtn}>Sign In</button>
           </div>
         </form>
 
+      <div className={styles.dividerContainer}>
+        <span className={styles.divider}></span>
+        <span className={styles.dividerContent}>or</span>
+        <span className={styles.divider}></span>
+      </div>
         <div className={styles.googleSignIn}>
-         <button onClick={handleGoogleSignIn}> Login with Google</button>
+         <img src='/public/flat-color-icons_google.svg' alt='google logo' />
+         <button onClick={handleGoogleSignIn}> Sign in with Google</button>
         </div>
       
     </div>

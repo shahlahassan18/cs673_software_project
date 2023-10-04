@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import styles from "./register.module.css";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import LogoContainer from "./../LogoContainer"
 // import "font-awesome/css/font-awesome.min.css";
 
 const Register = () => {
@@ -36,6 +37,8 @@ const Register = () => {
   };
 
   return (
+    <>
+    <LogoContainer />
     <div className={styles.registerContainer}>
       <h2>Register</h2>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -93,6 +96,8 @@ const Register = () => {
         <button type="submit">Register</button>
       </form>
     </div>
+    </>
+   
   );
 };
 

@@ -1,0 +1,15 @@
+import React from 'react'
+import styles from "./logocontainer.module.css";
+
+const LogoContainer = () => {
+  return (
+      <div className={styles.logoContainer}>
+        <img src="/public/logo.jpg" alt="Your Logo" className={styles.logo} />
+        <div className={styles.logoTitle}>
+          <h1>TAKE OFF</h1>
+        </div>
+      </div>
+  )
+}
+
+export default LogoContainer
