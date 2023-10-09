@@ -7,6 +7,8 @@ import {useNavigate} from 'react-router-dom'
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { useUser } from '../../features/contexts/UserContext'
 import LogoContainer from "./../LogoContainer"
+import Divider from "../Divider"
+import Button from 'react-bootstrap/Button';
 
 
 
@@ -81,14 +83,12 @@ const Login = () => {
           })}></input>
           <p className={styles.errors}>{errors.password?.message}</p>
           <button className={styles.signInBtn}>Sign In</button>
+          <Button className={styles.signInBtn}>Sign In</Button>
           </div>
         </form>
 
-      <div className={styles.dividerContainer}>
-        <span className={styles.divider}></span>
-        <span className={styles.dividerContent}>or</span>
-        <span className={styles.divider}></span>
-      </div>
+
+      <Divider />
         <div className={styles.googleSignIn}>
          <img src='/public/flat-color-icons_google.svg' alt='google logo' />
          <button onClick={handleGoogleSignIn}> Sign in with Google</button>

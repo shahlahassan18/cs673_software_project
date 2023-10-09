@@ -4,6 +4,8 @@ import styles from "./register.module.css";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import LogoContainer from "./../LogoContainer"
+import Button from 'react-bootstrap/Button';
+import Divider from "../Divider";
 // import "font-awesome/css/font-awesome.min.css";
 
 const Register = () => {
@@ -36,11 +38,17 @@ const Register = () => {
     setShowPassword(!showPassword);
   };
 
+
+  const handleGoogleSignIn = () =>{
+    console.log("Registered")
+  }
+
   return (
     <>
-    <LogoContainer />
+    <LogoContainer/>
     <div className={styles.registerContainer}>
-      <h2>Register</h2>
+      <h1>Elevate Your Professional Journey</h1>
+      <h6>Let’s start with a few details from you</h6>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <div className={styles.formGroup}>
           <label htmlFor="email">Email:</label>
@@ -92,8 +100,20 @@ const Register = () => {
           />
           <p className={styles.error}>{errors.confirmPassword?.message}</p>
         </div>
+          <Button variant="primary" size="lg" className="registerBtn" type="submit">
+            Register
+          </Button>
 
-        <button type="submit">Register</button>
+          <Divider />
+
+          <div className={styles.googleSignIn}>
+            <img src='/public/flat-color-icons_google.svg' alt='google logo' />
+            <button onClick={handleGoogleSignIn}> Sign in with Google</button>
+          </div>
+
+
+
+
       </form>
     </div>
     </>
