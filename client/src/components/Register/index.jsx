@@ -100,7 +100,7 @@ const Register = () => {
           />
           <p className={styles.error}>{errors.confirmPassword?.message}</p>
         </div>
-          <Button variant="primary" size="lg" className="registerBtn" type="submit">
+          <Button variant="primary" size="lg" className="registerBtn" type="submit" style={{backgroundColor : "#7F61A9"}}>
             Register
           </Button>
 
@@ -108,7 +108,7 @@ const Register = () => {
 
           <div className={styles.googleSignIn}>
             <img src='/public/flat-color-icons_google.svg' alt='google logo' />
-            <button onClick={handleGoogleSignIn}> Sign in with Google</button>
+            <button onClick={handleGoogleSignIn} className={styles.GSignInBtn}> Sign in with Google</button>
           </div>
 
 
