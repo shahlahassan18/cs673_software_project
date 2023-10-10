@@ -1,3 +1,4 @@
+
 import React,{useState} from 'react'
 import styles from './login.module.css'
 import {useForm} from 'react-hook-form'
@@ -22,10 +23,11 @@ const Login = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  if (user) {
-    navigate("/feed");
-    return null; // or you can return a redirect or some message
-  }
+  useEffect(() => {
+    if (user) {
+      navigate('/feed');
+    }
+  }, [user, navigate]);
 
   const onSubmit = (data) => {
     const auth = getAuth();

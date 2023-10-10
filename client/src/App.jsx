@@ -7,21 +7,22 @@ import FirstPage from "./components/FirstPage";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Home from "./components/Home";
+import Loading from "./components/LoadingContainer";
 
 const App = () => {
   const [user, setUser] = useState(null);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true); 
   const auth = getAuth();
 
   useEffect(() => {
-    // Subscribe to a user's login status
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser); 
-      setIsLoadingAuth(false);
+      setUser(currentUser);
+      setIsLoadingAuth(false); 
     });
-
-    // unsubscribe
     return () => unsubscribe();
   }, [auth]);
+
+  if (isLoadingAuth) return <Loading />;
 
   return (
     <UserContext.Provider value={{ user, setUser }}>
@@ -30,12 +31,11 @@ const App = () => {
           <Route path="/" element={<FirstPage />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/feed" element={<ProtectedRoute><Home /></ProtectedRoute>}/>
+          <Route path="/feed" element={<ProtectedRoute><Home /></ProtectedRoute>} />
         </Routes>
       </Router>
     </UserContext.Provider>
   );
 };
-
 
 export default App;
