@@ -4,7 +4,7 @@ import UserContext from '../contexts/UserContext';
 
 const ProtectedRoute = ({ children }) => {
   const { user, isLoadingAuth } = useContext(UserContext);
-  if (isLoadingAuth) return null; // or a loading spinner
+  if (isLoadingAuth) return null; 
 
   if (!user) {
     return <Navigate to="/login" replace />;
