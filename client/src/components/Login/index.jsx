@@ -1,54 +1,58 @@
-
-import React,{useState, useEffect} from 'react'
-import styles from './login.module.css'
-import {useForm} from 'react-hook-form'
-import {useDispatch } from 'react-redux'
-import {GoogleSignInAPIRedirect} from './../../firebase'
-import {useNavigate} from 'react-router-dom'
+import React, { useState, useEffect } from "react";
+import styles from "./login.module.css";
+import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import { GoogleSignInAPIRedirect } from "./../../firebase";
+import { useNavigate } from "react-router-dom";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { useUser } from '../../features/contexts/UserContext'
-import LogoContainer from "./../LogoContainer"
-import Divider from "../Divider"
-import Button from 'react-bootstrap/Button';
-
-
+import { useUser } from "../../features/contexts/UserContext";
+import LogoContainer from "./../LogoContainer";
+import Divider from "../Divider";
+import Button from "react-bootstrap/Button";
 
 const Login = () => {
-
   const { user, setUser } = useUser();
 
-  const {register, handleSubmit, formState} = useForm()
-  const {errors} = formState
+  const { register, handleSubmit, formState } = useForm();
+  const { errors } = formState;
 
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (user) {
-      navigate('/feed');
+      navigate("/feed");
     }
   }, [user, navigate]);
 
   const onSubmit = (data) => {
     const auth = getAuth();
-  
+
     signInWithEmailAndPassword(auth, data.email, data.password)
       .then((userCredential) => {
-          setUser(userCredential.user);
-          navigate("/feed");
+        setUser(userCredential.user);
+        navigate("/feed");
       })
       .catch((error) => {
-          console.error("Error signing in: ", error.message);
-          alert("Error signing in: " + error.message);
+        console.error("Error signing in: ", error.message);
+        alert("Error signing in: " + error.message);
       });
-  }
+  };
 
+  const handleGoogleSignIn = () => {
+    const provider = new GoogleAuthProvider();
+    const auth = getAuth();
 
-  const handleGoogleSignIn = () =>{
-    dispatch(GoogleSignInAPIRedirect())
-    navigate("/feed")
-  }
-
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        setUser(result.user);
+        navigate("/feed");
+      })
+      .catch((error) => {
+        console.error("Error signing in with Google: ", error.message);
+        alert("Error signing in with Google: " + error.message);
+      });
+  };
 
   const [showPassword, setShowPassword] = useState(false);
   return (
@@ -68,7 +72,7 @@ const Login = () => {
     //         },
     //         pattern:{
     //           value : /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-    //           message : "Invalid email format" 
+    //           message : "Invalid email format"
     //         }
     //        })}></input>
     //       <p className={styles.errors}>{errors.email?.message}</p>
@@ -83,7 +87,7 @@ const Login = () => {
     //             value : 8 ,
     //             message : "Password must be at least 8 characters long."
     //           }
-            
+
     //       })}></input>
     //       <p className={styles.errors}>{errors.password?.message}</p>
     //       <button className={styles.signInBtn}>Sign In</button>
@@ -91,77 +95,79 @@ const Login = () => {
     //       </div>
     //     </form>
 
-
     //   <Divider />
     //     <div className={styles.googleSignIn}>
     //      <img src='/public/flat-color-icons_google.svg' alt='google logo' />
     //      <button onClick={handleGoogleSignIn}> Sign in with Google</button>
     //     </div>
-      
+
     // </div>
     <>
-     <LogoContainer/>
-    <div className={styles.registerContainer}>
-      <h1>Welcome back, We missed you</h1>
-      <form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <div className={styles.formGroup}>
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            {...register("email", {
-              required: "Email is required!",
-              pattern: {
-                value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                message: "Invalid email format",
-              },
-            })}
-          />
-          <p className={styles.error}>{errors.email?.message}</p>
-        </div>
-
-        <div className={styles.formGroup}>
-          <label htmlFor="password">Password:</label>
-          <div className={styles.passwordContainer}>
+      <LogoContainer />
+      <div className={styles.registerContainer}>
+        <h1>Welcome back, We missed you</h1>
+        <form onSubmit={handleSubmit(onSubmit)} noValidate>
+          <div className={styles.formGroup}>
+            <label htmlFor="email">Email:</label>
             <input
-              type={showPassword ? "text" : "password"}
-              id="password"
-              {...register("password", {
-                required: "Password is required!",
+              type="email"
+              id="email"
+              {...register("email", {
+                required: "Email is required!",
                 pattern: {
-                  value:
-                    /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,}$/,
-                  message:
-                    "Password must contain at least one lowercase letter, one uppercase letter, one special character, and at least 8 digits without spaces.",
+                  value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                  message: "Invalid email format",
                 },
               })}
-              className={styles.passwordInput}
             />
+            <p className={styles.error}>{errors.email?.message}</p>
           </div>
-          <p className={styles.error}>{errors.password?.message}</p>
-        </div>
 
-       
-          <Button id="registerButton" variant="primary" size="lg" className={styles.registerBtn} type="submit"
-          style={{backgroundColor : "#7F61A9"}}>
+          <div className={styles.formGroup}>
+            <label htmlFor="password">Password:</label>
+            <div className={styles.passwordContainer}>
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                {...register("password", {
+                  required: "Password is required!",
+                  pattern: {
+                    value:
+                      /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,}$/,
+                    message:
+                      "Password must contain at least one lowercase letter, one uppercase letter, one special character, and at least 8 digits without spaces.",
+                  },
+                })}
+                className={styles.passwordInput}
+              />
+            </div>
+            <p className={styles.error}>{errors.password?.message}</p>
+          </div>
+
+          <Button
+            id="registerButton"
+            variant="primary"
+            size="lg"
+            className={styles.registerBtn}
+            type="submit"
+            style={{ backgroundColor: "#7F61A9" }}
+          >
             Sign In
           </Button>
 
           <Divider />
 
           <div className={styles.googleSignIn}>
-            <img src='/public/flat-color-icons_google.svg' alt='google logo' />
-            <button onClick={handleGoogleSignIn} className={styles.GSignInBtn}> Sign in with Google</button>
+            <img src="/public/flat-color-icons_google.svg" alt="google logo" />
+            <button onClick={handleGoogleSignIn} className={styles.GSignInBtn}>
+              {" "}
+              Sign in with Google
+            </button>
           </div>
-
-
-
-
-      </form>
-    </div>
+        </form>
+      </div>
     </>
-  )
-}
+  );
+};
 
-export default Login
-
+export default Login;
