@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { GoogleSignInAPIRedirect } from "./../../firebase";
 import { useNavigate } from "react-router-dom";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { useUser } from "../../features/contexts/UserContext";
 import LogoContainer from "./../LogoContainer";
 import Divider from "../Divider";
