@@ -1,7 +1,7 @@
 .home{
     display: grid;
     grid-template-areas: "left feed right";
-    grid-template-columns: minmax(0, 4fr) minmax(0, 10fr) minmax(300px, 5fr);
+    grid-template-columns: minmax(0, 4fr) minmax(0, 14fr) minmax(300px, 5fr);
     column-gap: 1.5rem;
     row-gap: 1.5rem;
 }
