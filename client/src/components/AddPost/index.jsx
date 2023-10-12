@@ -4,6 +4,7 @@ import {MdOutlinePermMedia} from "react-icons/md";
 import {FaSuitcase} from "react-icons/fa";
 import {RiArticleLine} from "react-icons/ri";
 import Modal from 'react-modal';
+import { addPostToFirestore } from '../../firebase';
 
 const customStyles = {
   content: {
@@ -19,12 +20,34 @@ const customStyles = {
 const AddPost = () => {
 
   const [modalIsOpen, setIsOpen] = useState(false);
+  const [postContent, setPostContent] = useState('');
   function openModal() {
     setIsOpen(true);
   }
 
   function closeModal() {
     setIsOpen(false);
+  }
+
+  // Use async with const allows us to wait for the Promise returned by addPostToFireStore (avoids callback hell)
+  const handlePostSubmit = async () => {
+    if (!postContent) return; // If content is empty, cannot submit
+
+    try {
+      await addPostToFirestore(firebase.auth().currentUser, postContent);
+      closeModal(); // Close the modal after posting
+      setPostContent(''); // Clear out input on submit
+    } catch (error) {
+      console.error(error);
+      alert('Error adding post');  
+    }
+  };
+
+  function handlePostSubmit() {
+    if (!postContent) return;
+    // Call the function to add the post to Firestore
+    addPostToFirestore(firebase.auth().currentUser, postContent); // Use the currentUser property. If a user isn’t signed in, currentUser == null
+    closeModal(); // Close the modal after posting
   }
 
   return (
@@ -35,8 +58,14 @@ const AddPost = () => {
         </div>
         <div className={styles.inputPostContainer}>
           <input type="text" className={styles.inputPost} onClick={openModal}
-            placeholder="Start Post" />
-          <Modal
+            placeholder="Start Post"
+            value={postContent} // Bind input value to state
+            onChange={(e) => setPostContent(e.target.value)} // Update postContent state 
+            />
+            <button 
+            disabled={!postContent} //If no content, cannot submit
+            onClick={handlePostSubmit}>Post</button> {/* Add a "Post" button */}
+          <Modal 
             isOpen={modalIsOpen}
             onRequestClose={closeModal}
             ariaHideApp={false}
