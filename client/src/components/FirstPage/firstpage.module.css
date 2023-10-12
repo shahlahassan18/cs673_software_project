@@ -55,6 +55,10 @@
 background:  lightgray 50% / cover no-repeat;
   }
 
+  .linkBtn, .linkBtn:hover{
+    background-color: white;
+  }
+
   @media screen and (max-width: 1000px) {
     .homeImgContainer{
       width: 100%;

@@ -130,6 +130,7 @@ align-items: center;
 gap: 4px;
 border-radius: 6px;
 background: var(--primary-main, #604DCF);
+color: white;
 }
 
 @media screen and (max-width: 1050px) {

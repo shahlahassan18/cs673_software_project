@@ -102,7 +102,7 @@ const AddPost = () => {
             src='./play-circle.svg' alt='search' />
           <p className={styles.btnText}>Video</p>
         </div>
-        <div className={styles.inputPostContainer}>
+        {/* <div className={styles.inputPostContainer}>
           <input type="text" className={styles.inputPost} value={postContent} onChange={(e) => setPostContent(e.target.value)} // setPostContent(...) is a React state update using the useState hook
           onClick={openModal}
             placeholder="Start Post" />
@@ -124,7 +124,7 @@ const AddPost = () => {
               <button>the modal</button>
             </form>
           </Modal>
-        </div>
+        </div> */}
         <div className={styles.addPostBtn}>
           <img className={styles.icon}
             src='./image.svg' alt='search' />
