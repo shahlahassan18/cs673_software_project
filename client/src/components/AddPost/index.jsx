@@ -34,7 +34,8 @@ const AddPost = () => {
     if (!postContent) return; // If content is empty, cannot submit
 
     try {
-      await addPostToFirestore(firebase.auth().currentUser, postContent);
+      // Call the function to add the post to Firestore
+      await addPostToFirestore(firebase.auth().currentUser, postContent); // Use the currentUser property. If a user isn’t signed in, currentUser == null
       closeModal(); // Close the modal after posting
       setPostContent(''); // Clear out input on submit
     } catch (error) {
@@ -42,13 +43,6 @@ const AddPost = () => {
       alert('Error adding post');  
     }
   };
-
-  function handlePostSubmit() {
-    if (!postContent) return;
-    // Call the function to add the post to Firestore
-    addPostToFirestore(firebase.auth().currentUser, postContent); // Use the currentUser property. If a user isn’t signed in, currentUser == null
-    closeModal(); // Close the modal after posting
-  }
 
   return (
     // <div className={styles.addPost}>
@@ -109,7 +103,8 @@ const AddPost = () => {
           <p className={styles.btnText}>Video</p>
         </div>
         <div className={styles.inputPostContainer}>
-          <input type="text" className={styles.inputPost} onClick={openModal}
+          <input type="text" className={styles.inputPost} value={postContent} onChange={(e) => setPostContent(e.target.value)} // setPostContent(...) is a React state update using the useState hook
+          onClick={openModal}
             placeholder="Start Post" />
           <Modal
             isOpen={modalIsOpen}
