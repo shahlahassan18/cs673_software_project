@@ -1,4 +1,4 @@
-.addPost{
+/* .addPost{
     display: flex;
     flex-direction: column;
     background-color: white;   
@@ -38,4 +38,103 @@
     justify-content: center;
     gap: 0.5rem;
 }
+ */
 
+
+ .addPostContainer{
+display: flex;
+/* width: 806px; */
+/* height: 102px; */
+padding: 20px;
+flex-direction: column;
+align-items: flex-end;
+gap: 12px;
+border-radius: 16px;
+background: var(--gray-0210, #FFF);
+ }
+
+.addPostInputContainer{
+    display: flex;
+align-items: center;
+gap: 16px;
+align-self: stretch;
+}
+
+.profilePicContainer{
+    width: 48px;
+height: 48px;
+}
+
+.profilePic{
+    width: 45.134px;
+height: 45.134px;
+flex-shrink: 0;
+}
+
+.addPostInput{
+    display: flex;
+padding: 12px;
+align-items: center;
+gap: 10px;
+flex: 1 0 0;
+border-radius: 12px;
+background: #F4F7FE;
+color: var(--gray-02100, #0A0A0A);
+
+/* Body Text/Inter/16/Medium */
+font-family: Inter;
+font-size: 16px;
+font-style: normal;
+font-weight: 500;
+line-height: 24px; /* 150% */
+}
+
+.addPostBtns{
+    display: flex;
+align-items: flex-start;
+gap: 19px;
+}
+
+.addPostBtn{
+    display: flex;
+padding: 8px;
+align-items: center;
+gap: 12px;
+border-radius: 50px;
+border: 1px solid var(--gray-0240, #E0E0E0);
+}
+
+.icon{
+    width: 20px;
+height: 20px;
+cursor: pointer;
+}
+
+.btnText{
+    color: var(--gray-02100, #0A0A0A);
+font-family: Inter;
+font-size: 15px;
+font-style: normal;
+font-weight: 500;
+line-height: 20px; /* 133.333% */
+text-wrap: nowrap;
+margin:0;
+cursor: pointer;
+}
+
+.postBtn,.postBtn:hover{
+    display: flex;
+padding: 8px 16px;
+justify-content: center;
+align-items: center;
+gap: 4px;
+border-radius: 6px;
+background: var(--primary-main, #604DCF);
+}
+
+@media screen and (max-width: 1050px) {
+    .btnText{
+        display: none
+    }
+    
+}
