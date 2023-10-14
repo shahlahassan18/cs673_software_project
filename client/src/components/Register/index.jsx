@@ -130,7 +130,7 @@ const Register = () => {
 
           <div className={styles.googleSignIn}>
             <img src="/public/flat-color-icons_google.svg" alt="google logo" />
-            <button onClick={handleGoogleSignIn} className={styles.GSignInBtn}>
+            <button type="button" onClick={handleGoogleSignIn} className={styles.GSignInBtn}>
               {" "}
               Sign in with Google
             </button>
