@@ -26,6 +26,9 @@ const FirstPage = () => {
             <div className={styles.nav}>
               <div className={styles.logoContainer}>
                 <img src="/public/logo.jpg" alt="Your Logo" className={styles.logo} />
+                <div className={styles.logoTitle}>
+                  <h1>TAKE OFF</h1>
+                </div>
               </div>
               <div className={styles.linksContainer}>
                 <button className={styles.linkBtn}><Link to="/register" className={styles.link}>JOIN NOW</Link></button>
