@@ -32,13 +32,32 @@ const Navbars = () => {
   // );
   return (
     <>
-     <div className={styles.navBar}>
-      <div className={styles.logoIcon}>
-      <img className={styles.navLogo}
-      src="https://s3-alpha-sig.figma.com/img/c286/c76e/9a08ebe78cd93da9cd3ab7a7d8ae9630?Expires=1698019200&Signature=oduQ3~F5ajF2eW9oXDAOmTUCETxrTSxAaff2na52wW4YJoQy8y7cBZysDL26RO3~qpFEvI-Hpffc3WuY6U59mn~Bk-r6~VMziXHkCkrx2LJO4to4dMCD0y~khdELSfKPHo~g4tCLwSQ9hM4cI7X8h1jVQhGO6avRFYg3aMGYRVWUVaNEOT54qBrkcxw9OkkqYAHmpymbAM5WSQsxA8pcGe6E3I-Sy69tIoZkUPSLQzq-hc8uPo~H8Ggni0wmAhiEqDlwtJ7SZvNqfj0WLpJ2X4EKs8qvoFm0mMnF3qvLIe9Ft1r6WLlUhZ6z6Hx-bR82DQ-GjiZZjUk13qkhFaA0~g__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4" alt="logo" />
-      <ImMenu size={40} className={styles.menuIcon} onClick={(()=>setIsActive(!isActive))} />
-      </div>
-      {/* <img className={styles.navLogo}
+      <div className={styles.navBar}>
+        <div className={styles.logoIcon}>
+          <img className={styles.navLogo}
+            src="https://s3-alpha-sig.figma.com/img/c286/c76e/9a08ebe78cd93da9cd3ab7a7d8ae9630?Expires=1698019200&Signature=oduQ3~F5ajF2eW9oXDAOmTUCETxrTSxAaff2na52wW4YJoQy8y7cBZysDL26RO3~qpFEvI-Hpffc3WuY6U59mn~Bk-r6~VMziXHkCkrx2LJO4to4dMCD0y~khdELSfKPHo~g4tCLwSQ9hM4cI7X8h1jVQhGO6avRFYg3aMGYRVWUVaNEOT54qBrkcxw9OkkqYAHmpymbAM5WSQsxA8pcGe6E3I-Sy69tIoZkUPSLQzq-hc8uPo~H8Ggni0wmAhiEqDlwtJ7SZvNqfj0WLpJ2X4EKs8qvoFm0mMnF3qvLIe9Ft1r6WLlUhZ6z6Hx-bR82DQ-GjiZZjUk13qkhFaA0~g__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4" alt="logo" />
+          
+          {!isActive &&
+          <div className={styles.menu}>
+          <div className={styles.menuItem}>
+            <img className={styles.icon} src='./home.svg' alt="home" style={{ fill: '#9F9BB9' }} />
+          </div>
+          <div className={styles.menuItem}>
+            <img className={styles.icon} src='./layers.svg' alt="network" />
+          </div>
+          <div className={styles.menuItem}>
+            <img className={styles.icon} src='./briefcase.svg' alt="jobs" />
+          </div>
+          <div className={styles.menuItem}>
+            <img className={styles.icon} src='./message-square.svg' alt="Messaging" />
+          </div>
+          <div className={styles.menuItem}>
+            <img className={styles.icon} src='./monitor.svg' alt="business" />
+          </div>
+        </div> }
+          <ImMenu size={40} className={styles.menuIcon} onClick={(() => setIsActive(!isActive))} />
+        </div>
+        {/* <img className={styles.navLogo}
       src="https://s3-alpha-sig.figma.com/img/c286/c76e/9a08ebe78cd93da9cd3ab7a7d8ae9630?Expires=1698019200&Signature=oduQ3~F5ajF2eW9oXDAOmTUCETxrTSxAaff2na52wW4YJoQy8y7cBZysDL26RO3~qpFEvI-Hpffc3WuY6U59mn~Bk-r6~VMziXHkCkrx2LJO4to4dMCD0y~khdELSfKPHo~g4tCLwSQ9hM4cI7X8h1jVQhGO6avRFYg3aMGYRVWUVaNEOT54qBrkcxw9OkkqYAHmpymbAM5WSQsxA8pcGe6E3I-Sy69tIoZkUPSLQzq-hc8uPo~H8Ggni0wmAhiEqDlwtJ7SZvNqfj0WLpJ2X4EKs8qvoFm0mMnF3qvLIe9Ft1r6WLlUhZ6z6Hx-bR82DQ-GjiZZjUk13qkhFaA0~g__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4" alt="logo" />
       <ImMenu size={40} className={styles.menuIcon} onClick={(()=>setIsActive(!isActive))} /> */}
       <div className={styles.navMenu1}>

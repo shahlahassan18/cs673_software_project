@@ -195,7 +195,9 @@ line-height: 24px; /* 150% */
 }
 
 .postImg{
-    height: 400.5px;
+    /* height: 400.5px; */
+    max-width: 100%;
+    height: auto;
 flex-shrink: 0;
 align-self: stretch;
 background: url(<path-to-image>), lightgray 50% / contain no-repeat;
@@ -269,3 +271,10 @@ margin: 0;
 }
 
 
+@media screen and (max-width: 750px) {
+
+    .actionText{
+        display: none;
+    }
+    
+}

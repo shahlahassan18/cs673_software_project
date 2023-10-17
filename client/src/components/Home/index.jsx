@@ -4,6 +4,7 @@ import LeftProfile from "./../LeftProfile"
 import Feed from "./../Feed"
 import RightNews from "./../Right"
 import styles from "./home.module.css"
+import FooterSearch from "./../FooterSearch"
 
 const Home = () => {
   return (
@@ -13,7 +14,9 @@ const Home = () => {
           <LeftProfile />
           <Feed/>
           <RightNews/>
+          {/* <FooterSearch /> */}
       </div>
+      <FooterSearch />
     </div>
   )
 }
