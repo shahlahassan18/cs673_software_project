@@ -1,7 +1,7 @@
-import {initializeApp} from 'firebase/app'
+import { initializeApp } from 'firebase/app'
 import {getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult} from 'firebase/auth'
 import {getStorage} from 'firebase/storage'
-import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import { getFirestore } from 'firebase/firestore';
 
 
 // const firebaseConfig = {
@@ -28,11 +28,11 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const storage = getStorage(app)
 const provider = new GoogleAuthProvider()
-const db = getFirestore(app);
+const db = getFirestore()
 
-  //Have to check DB
+  //Have to check firestore
 
-  export {auth, provider, storage}
+  export {app, auth, provider, storage, db}
 
   export function GoogleSignInAPIRedirect(){
     return (dispatch) =>{
@@ -42,26 +42,6 @@ const db = getFirestore(app);
             console.log(err)
         })
     }
-  }
-
-  export function addPostToFirestore(userId, postContent) {
-    const postsCollection = collection(db, 'posts'); // 'posts' is the name of your Firestore collection
-  
-    // Define the data for the new post
-    const postData = {
-      userId: userId, // The user who created the post
-      content: postContent, // The content for the post
-      timeStamp: new Date(), // Add a timestamp or date for the post
-    };
-  
-    // Add the post to Firestore
-    return addDoc(postsCollection, postData)
-      .then((docRef) => {
-        console.log('Post added with ID: ', docRef.id); // The unique identifier for the post
-      })
-      .catch((error) => {
-        console.error('Error adding post: ', error);
-      });
   }
   
 

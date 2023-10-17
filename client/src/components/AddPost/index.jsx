@@ -1,10 +1,11 @@
-import React, {useState} from 'react'
+ import React, {useState} from 'react'
 import styles from "./addpost.module.css"
 import {MdOutlinePermMedia} from "react-icons/md";
 import {FaSuitcase} from "react-icons/fa";
 import {RiArticleLine} from "react-icons/ri";
 import Modal from 'react-modal';
-import { addPostToFirestore } from '../../firebase';
+import { db, auth } from '../../firebase';
+import { collection, addDoc } from 'firebase/firestore';
 
 const customStyles = {
   content: {
@@ -29,19 +30,13 @@ const AddPost = () => {
     setIsOpen(false);
   }
 
-  // Use async with const allows us to wait for the Promise returned by addPostToFireStore (avoids callback hell)
-  const handlePostSubmit = async () => {
-    if (!postContent) return; // If content is empty, cannot submit
-
-    try {
-      // Call the function to add the post to Firestore
-      await addPostToFirestore(firebase.auth().currentUser, postContent); // Use the currentUser property. If a user isn’t signed in, currentUser == null
-      closeModal(); // Close the modal after posting
-      setPostContent(''); // Clear out input on submit
-    } catch (error) {
-      console.error(error);
-      alert('Error adding post');  
-    }
+  const handlePostSubmit = (e) => {
+    e.preventDefault();
+    const docRef = addDoc(collection(db, 'posts'),{
+      postCont: postContent
+    });
+    console.log("Posts added ID: ", docRef.id)
+    setPostContent("");
   };
 
   return (
@@ -86,7 +81,7 @@ const AddPost = () => {
             src='https://s3-alpha-sig.figma.com/img/d0a7/3619/a7eaeb87169fa6f7361c4c51e67f89ab?Expires=1698019200&Signature=XjynzDMFyeBTJcjBzaDIawi~ESyKcW6XlR~ej5qSZxc2syl8oY12nrlUfVn~xroKHCKw3ZnGVWpWo1zIIELBZrCCNlB4eDGUogleYQ~NIXqoueMBFkEgRK2eOkJY2-wi3x00W-Ts7cORP9pvCb0NrEXIUsikUBJViyk-LtlG-XBo4e54utX6tmlLqx5xU8eMxMbVWsDI75TjY1gVWtNJB-v-quBjsJ5Dm~mo1qSIw-x5xiNIkJZlePP1ML-90qFJBvnlwCDDaJTxUQC94HFhZUhkh6OiXOi8JUQ3~Vi693dOwOJNNmeZ39bsFoQc48tqpY~gRUUZgKVNG7dU2JKpEw__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4' alt='profile' />
         </div>
         {/* <div className={styles.addPostInput}> */}
-        <input type="text" className={styles.addPostInput} />
+        <input type="text" className={styles.addPostInput} value={postContent} onChange={(e) => setPostContent(e.target.value)}/>
         {/* </div> */}
 
 
@@ -131,7 +126,7 @@ const AddPost = () => {
           <p className={styles.btnText}>Photo</p>
         </div>
 
-        <button className={styles.postBtn} disabled={!postContent} //If no content, cannot submit
+        <button className={styles.postBtn} //If no content, cannot submit
             onClick={handlePostSubmit}>
           Post
         </button>
