@@ -2,7 +2,7 @@ import React from 'react'
 import Navbars from '../Navbar'
 import LeftProfile from "./../LeftProfile"
 import Feed from "./../Feed"
-import RightNews from "./../RightNews"
+import RightNews from "./../Right"
 import styles from "./home.module.css"
 
 const Home = () => {
