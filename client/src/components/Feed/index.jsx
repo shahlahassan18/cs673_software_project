@@ -4,18 +4,15 @@ import Banner from '../Banner'
 import Posts from '../Posts'
 import styles from "./feed.module.css"
 import {db} from './../../firebase'
-import { collection, getDoc, getDocs, doc } from "firebase/firestore"; 
+import { collection, getDoc, getDocs, doc, query } from "firebase/firestore"; 
 
 const Feed = () => {
 
-  const test = doc(db, 'posts/ZethHPqeT13c434HNMBV')
-
   async function readdocs() {
-    const snapshot = await getDoc(test);
-    if(snapshot.exists()){
-      const docdata = snapshot.data();
-      console.log(`My data is ${JSON.stringify(docdata)}`);
-    }
+    const queryallDocs = await getDocs(collection(db, 'posts'))
+    queryallDocs.forEach(element => {
+      console.log(element.id, " => ", element.data())
+    });
   }
   readdocs()
   const [posts, setPosts] = useState([]);

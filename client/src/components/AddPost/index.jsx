@@ -5,7 +5,7 @@ import {FaSuitcase} from "react-icons/fa";
 import {RiArticleLine} from "react-icons/ri";
 import Modal from 'react-modal';
 import { db, auth } from '../../firebase';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const customStyles = {
   content: {
@@ -33,9 +33,10 @@ const AddPost = () => {
   const handlePostSubmit = (e) => {
     e.preventDefault();
     const docRef = addDoc(collection(db, 'posts'),{
-      postCont: postContent
+      postCont: postContent,
+      TimeCreated: serverTimestamp()
     });
-    console.log("Posts added ID: ", docRef.id)
+    console.log("Posts added ID: ", docRef)
     setPostContent("");
   };
 
