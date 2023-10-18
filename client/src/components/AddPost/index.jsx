@@ -6,17 +6,7 @@ import {RiArticleLine} from "react-icons/ri";
 import Modal from 'react-modal';
 import { db, auth } from '../../firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-
-const customStyles = {
-  content: {
-    top: '50%',
-    left: '50%',
-    right: 'auto',
-    bottom: 'auto',
-    marginRight: '-50%',
-    transform: 'translate(-50%, -50%)',
-  },
-};
+import { getAuth } from 'firebase/auth'
 
 const AddPost = () => {
 
@@ -32,12 +22,22 @@ const AddPost = () => {
 
   const handlePostSubmit = (e) => {
     e.preventDefault();
-    const docRef = addDoc(collection(db, 'posts'),{
-      postCont: postContent,
-      TimeCreated: serverTimestamp()
-    });
-    console.log("Posts added ID: ", docRef)
-    setPostContent("");
+    const auth = getAuth(); // Get the authentication instance
+    const currentUser = auth.currentUser;
+    if(currentUser){
+      const userId = currentUser.uid
+      const docRef = addDoc(collection(db, 'posts'),{
+        userId: userId,
+        postCont: postContent,
+        TimeCreated: serverTimestamp()
+      });
+      console.log("Posts added ID: ", docRef)
+      setPostContent("");
+    }
+    else{
+      console.log("User is NOT Authenticated")
+    }
+    
   };
 
   return (
@@ -96,7 +96,7 @@ const AddPost = () => {
         <div className={styles.addPostBtn}>
           <img className={styles.icon}
             src='./play-circle.svg' alt='search' />
-          <p className={styles.btnText}>Video</p>
+          <p className={styles.btnText}>Media</p>
         </div>
         {/* <div className={styles.inputPostContainer}>
           <input type="text" className={styles.inputPost} value={postContent} onChange={(e) => setPostContent(e.target.value)} // setPostContent(...) is a React state update using the useState hook
@@ -121,12 +121,13 @@ const AddPost = () => {
             </form>
           </Modal>
         </div> */}
+        {/* 
         <div className={styles.addPostBtn}>
           <img className={styles.icon}
             src='./image.svg' alt='search' />
           <p className={styles.btnText}>Photo</p>
         </div>
-
+        */} 
         <button className={styles.postBtn} //If no content, cannot submit
             onClick={handlePostSubmit}>
           Post
