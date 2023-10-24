@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { set, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
-import { GoogleSignInAPIRedirect } from "./../../firebase";
+import { db } from "../../firebase";
+import { doc, setDoc, getFirestore } from "firebase/firestore";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import styles from "./register.module.css";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
@@ -24,15 +25,14 @@ const Register = () => {
 
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        // The user was registered successfully
         const user = userCredential.user;
         setUser(user);
+        addUserToFirestore(user, data);
         console.log("Registered successfully!", user);
         alert("Registered successfully! ");
         navigate("/login");
       })
       .catch((error) => {
-        // An error occurred during registration
         console.error("Error registering:", error.message);
         alert("Error registering: " + error.message);
       });
@@ -50,7 +50,12 @@ const Register = () => {
 
     signInWithPopup(auth, provider)
       .then((result) => {
+        const isNewUser = result.additionalUserInfo?.isNewUser;
+        const user = result.user;
         setUser(result.user);
+        if (isNewUser) {
+          addUserToFirestore(user);
+        }
         navigate("/feed");
       })
       .catch((error) => {
@@ -58,6 +63,63 @@ const Register = () => {
         alert("Error signing in with Google: " + error.message);
       });
   };
+
+  const addUserToFirestore = async (userData, formData) => {
+    try {
+      const userId = userData.uid;
+  
+      const userProfile = {
+        userID: userId,
+        firstName: formData.firstName || "",
+        lastName: formData.lastName || "",
+        profilePicture: formData.profilePicture || "",
+        title: formData.title || "",
+        education: formData.education || "",
+        skills: formData.skills || [],
+        interests: formData.interests || [],
+        bio: formData.bio || "",
+        followersCount: 0,
+        posts: [],
+        comments: [],
+        experience: formData.experience || [],
+        contacts: formData.contacts || [],
+        createdAt: new Date(),
+        lastLogin: new Date(),
+        // userID: Unique user identifier.
+        // firstName: The user's first name.
+        // lastName: Last name of the user.
+        // profilePicture: URL of the user's avatar.(maybe)
+        // title: The user's title or job position.
+        // education: The user's educational background, e.g. "Master's Student (Computer Science) - Boston University".
+        // skills: A list or array of all the skills listed by the user.
+        // interests: A list or array of companies or other interests that the user follows.
+        // bio: A profile or personal description of the user.
+
+        // followersCount: The number of followers the user has.
+        // posts: A list of IDs of posts related to the user.
+        // comments: A list of IDs of comments related to the user.
+
+        // experience: A list or array of items, each of which contains the following fields:
+        // position: The name of the position.
+        // company: The name of the company or organization.
+        // location: Location of the job.
+        // startDate: Start date.
+        // endDate: End date or current.
+        // description: Description or responsibility for the experience.
+
+        // contacts: A list or array of all the contact information provided by the user, such as email, phone number, etc.
+
+        // createdAt: The date and time the user created the account.
+        // lastLogin: The date and time the user last logged in.
+      };
+  
+      await setDoc(doc(db, "users", userId), userProfile);
+      console.log("User profile saved successfully");
+    } catch (error) {
+      console.error("Error saving user profile:", error);
+    }
+  };
+  
 
   return (
     <>
