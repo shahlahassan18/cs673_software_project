@@ -1,27 +1,20 @@
- import React, {useState} from 'react'
+import React, {useState} from 'react'
 import styles from "./addpost.module.css"
 import {MdOutlinePermMedia} from "react-icons/md";
 import {FaSuitcase} from "react-icons/fa";
 import {RiArticleLine} from "react-icons/ri";
 import Modal from 'react-modal';
-import { db, auth } from '../../firebase';
-import { collection, addDoc } from 'firebase/firestore';
-
-const customStyles = {
-  content: {
-    top: '50%',
-    left: '50%',
-    right: 'auto',
-    bottom: 'auto',
-    marginRight: '-50%',
-    transform: 'translate(-50%, -50%)',
-  },
-};
+import { db, storage } from '../../firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { getAuth } from 'firebase/auth'
 
 const AddPost = () => {
 
   const [modalIsOpen, setIsOpen] = useState(false);
   const [postContent, setPostContent] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
+  
   function openModal() {
     setIsOpen(true);
   }
@@ -30,13 +23,45 @@ const AddPost = () => {
     setIsOpen(false);
   }
 
-  const handlePostSubmit = (e) => {
+  const handlePostSubmit = async (e) => {
     e.preventDefault();
-    const docRef = addDoc(collection(db, 'posts'),{
-      postCont: postContent
-    });
-    console.log("Posts added ID: ", docRef.id)
-    setPostContent("");
+    const auth = getAuth(); // Get the authentication instance
+    const currentUser = auth.currentUser;
+    if(!currentUser){
+      console.log("User is NOT Authenticated")
+    }
+    else{
+      const userId = currentUser.uid
+      console.log("selectedFile ", selectedFile)
+      let mediaURL = null;
+      if(selectedFile == null){
+        const docRef = addDoc(collection(db, 'posts'),{
+          userId: userId,
+          postCont: postContent,
+          TimeCreated: serverTimestamp()
+        });
+        console.log("Posts added ID: ", docRef)
+      }
+      else{
+        //Create a reference to the media file in Storage
+        const storageRef = ref(storage, `media/${userId}/${selectedFile.name}`);
+        await uploadBytes(storageRef, selectedFile).then(() => {
+          alert('Uploaded media file!!!')
+        });
+        mediaURL = await getDownloadURL(storageRef);
+        const docRef = addDoc(collection(db, 'posts'),{
+          userId: userId,
+          postCont: postContent,
+          mediaURL: mediaURL,
+          TimeCreated: serverTimestamp()
+        });
+        console.log("Posts added ID: ", docRef)
+      }
+      setPostContent("");
+      setSelectedFile(null);
+      closeModal();
+    }
+     
   };
 
   return (
@@ -92,40 +117,49 @@ const AddPost = () => {
             src='./Article.svg' alt='search' />
           <p className={styles.btnText}>Write Article</p>
         </div>
-        <div className={styles.addPostBtn}>
+        <div className={styles.addPostBtn} onClick={openModal}>
           <img className={styles.icon}
             src='./play-circle.svg' alt='search' />
-          <p className={styles.btnText}>Video</p>
+          <p className={styles.btnText}>Media</p>
         </div>
-        {/* <div className={styles.inputPostContainer}>
-          <input type="text" className={styles.inputPost} value={postContent} onChange={(e) => setPostContent(e.target.value)} // setPostContent(...) is a React state update using the useState hook
-          onClick={openModal}
-            placeholder="Start Post" />
+        <div className={styles.inputPostContainer}>
           <Modal
             isOpen={modalIsOpen}
             onRequestClose={closeModal}
             ariaHideApp={false}
-            style={customStyles}
-            contentLabel="Example Modal"
+            contentLabel="Media Modal"
           >
-            <h2>Hello</h2>
-            <button onClick={closeModal}>X</button>
-            <div>I am a modal</div>
-            <form>
-              <input />
-              <button>tab navigation</button>
-              <button>stays</button>
-              <button>inside</button>
-              <button>the modal</button>
-            </form>
+            <div>
+              <h2>Attach Media Files</h2>
+              <input type="file" onChange={(e) => setSelectedFile(e.target.files[0])}/>
+            </div>
+            <div>
+              <h2>Preview</h2>
+              {selectedFile && (
+              <div>
+                {selectedFile.type.includes('image') ? (
+                <img src={URL.createObjectURL(selectedFile)} alt="Preview" />
+                ) : (
+                <video src={URL.createObjectURL(selectedFile)} controls />
+                )}
+              </div>
+              )}
+              </div>
+            <div>
+              <h2>Add Caption</h2>
+              <input type="text" className={styles.captionInput} placeholder="Enter caption" onChange={(e) => setPostContent(e.target.value)}/>
+            </div>
+            <button className={styles.closeButton} onClick={closeModal}>Close</button>
+            <button className={styles.submitButton} onClick={handlePostSubmit}>Submit</button>
           </Modal>
-        </div> */}
+        </div>
+        {/* 
         <div className={styles.addPostBtn}>
           <img className={styles.icon}
             src='./image.svg' alt='search' />
           <p className={styles.btnText}>Photo</p>
         </div>
-
+        */} 
         <button className={styles.postBtn} //If no content, cannot submit
             onClick={handlePostSubmit}>
           Post
