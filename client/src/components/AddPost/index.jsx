@@ -13,7 +13,7 @@ const AddPost = () => {
 
   const [modalIsOpen, setIsOpen] = useState(false);
   const [postContent, setPostContent] = useState('');
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFile, setSelectedFile] = useState([]);
   
   function openModal() {
     setIsOpen(true);
@@ -23,82 +23,100 @@ const AddPost = () => {
     setIsOpen(false);
   }
 
+  const getFileCategory = (file) => {
+    const fileCategories = {
+      image: ['.jpeg', '.jpg', '.png', '.gif', '.bmp', '.webp'],
+      video: ['.mp4', '.avi', '.mkv', '.mov', '.wmv', '.webm'],
+    };
+
+    const fileExt = file.name.slice(((file.name.lastIndexOf(".") - 1) >>> 0) + 2);
+
+    for (const category in fileCategories) {
+      if (fileCategories[category].includes(`.${fileExt}`)) {
+        return category;
+      }
+    }
+    // Other types not listed (Prob need to manually add it into fileCategories)
+    return 'other';
+
+  };
+
+  const handleMultiFiles = (e) => {
+    const files = Array.from(e.target.files);
+
+    // Combine newly selected files + existing selected files (else it will override & destroy)
+    setSelectedFile((prevSelectedFiles) => [...prevSelectedFiles, ...files]);
+  };
+
   const handlePostSubmit = async (e) => {
     e.preventDefault();
-    const auth = getAuth(); // Get the authentication instance
+    const auth = getAuth();
     const currentUser = auth.currentUser;
-    if(!currentUser){
-      console.log("User is NOT Authenticated")
+
+    if (!currentUser) {
+      console.log("User is NOT Authenticated");
+      return;
     }
-    else{
-      const userId = currentUser.uid
-      console.log("selectedFile ", selectedFile)
-      let mediaURL = null;
-      if(selectedFile == null){
-        const docRef = addDoc(collection(db, 'posts'),{
+
+    const userId = currentUser.uid;
+    // Initialize array to store upload-promise(s)
+    const postPromises = [];
+    const uploadCounter = selectedFile.length;
+
+    if (uploadCounter === 0) {
+      // NO media files, create post without media
+      postPromises.push(
+        addDoc(collection(db, 'posts'), {
           userId: userId,
           postCont: postContent,
           TimeCreated: serverTimestamp()
+        })
+      );
+    } 
+    else {
+      // Media files included
+      selectedFile.forEach((file) => {
+        // ID if its image or video file type
+        const fileGrp = getFileCategory(file);
+        // Set the directory path from the Ext
+        const dir = `media/${userId}/${fileGrp}`;
+        const storageRef = ref(storage, `${dir}/${file.name}`);
+        const uploadPromise = uploadBytes(storageRef, file).then(() => {
+          return getDownloadURL(storageRef);
         });
-        console.log("Posts added ID: ", docRef)
-      }
-      else{
-        //Create a reference to the media file in Storage
-        const storageRef = ref(storage, `media/${userId}/${selectedFile.name}`);
-        await uploadBytes(storageRef, selectedFile).then(() => {
-          alert('Uploaded media file!!!')
+        // Add each upload-promise to array
+        postPromises.push(uploadPromise);
+      });
+
+      // Wait for ALL media uploads to finish
+      Promise.all(postPromises)
+        .then((mediaURLs) => {
+          const mediaData = mediaURLs.map((url, index) => ({
+            url,
+            type: selectedFile[index].type
+          }));
+          return addDoc(collection(db, 'posts'), {
+            userId: userId,
+            postCont: postContent,
+            media: mediaData,
+            TimeCreated: serverTimestamp()
+          });
+        })
+        .then(() => {
+          console.log("Posts added with media");
+          setPostContent("");
+          setSelectedFile([]);
+          closeModal();
+          // End part is just to deal with grammar (1 = file but 2,3,4,5 = fileS)
+          alert(`Uploaded ${uploadCounter} media file${uploadCounter === 1 ? '' : 's'}!`);
+        })
+        .catch((error) => {
+          console.error("Error adding post with media:", error);
         });
-        mediaURL = await getDownloadURL(storageRef);
-        const docRef = addDoc(collection(db, 'posts'),{
-          userId: userId,
-          postCont: postContent,
-          mediaURL: mediaURL,
-          TimeCreated: serverTimestamp()
-        });
-        console.log("Posts added ID: ", docRef)
-      }
-      setPostContent("");
-      setSelectedFile(null);
-      closeModal();
     }
-     
   };
 
   return (
-    // <div className={styles.addPost}>
-    //   <div className={styles.startPost}>
-    //     <div className={styles.user}>
-    //       <img className={styles.avatar} src="https://cdn.imgbin.com/21/23/1/imgbin-computer-icons-female-user-profile-avatar-material-x1Zz1EDVQQssccaQu0dy0VFGy.jpg" />
-    //     </div>
-    //     <div className={styles.inputPostContainer}>
-    //       <input type="text" className={styles.inputPost} onClick={openModal}
-    //         placeholder="Start Post" />
-    //       <Modal
-    //         isOpen={modalIsOpen}
-    //         onRequestClose={closeModal}
-    //         ariaHideApp={false}
-    //         style={customStyles}
-    //         contentLabel="Example Modal"
-    //       >
-    //         <h2>Hello</h2>
-    //         <button onClick={closeModal}>X</button>
-    //         <div>I am a modal</div>
-    //         <form>
-    //           <input />
-    //           <button>tab navigation</button>
-    //           <button>stays</button>
-    //           <button>inside</button>
-    //           <button>the modal</button>
-    //         </form>
-    //       </Modal>
-    //     </div>
-    //   </div>
-    //   <div className={styles.btnOptions}>
-    //     <button className={styles.option}><MdOutlinePermMedia />Media</button>
-    //     <button className={styles.option}><FaSuitcase />Job</button>
-    //     <button className={styles.option}><RiArticleLine />Write Article</button>
-    //   </div>
-    // </div>
     <div className={styles.addPostContainer}>
       <div className={styles.addPostInputContainer}>
         <div className={styles.profilePicContainer}>
@@ -108,7 +126,6 @@ const AddPost = () => {
         {/* <div className={styles.addPostInput}> */}
         <input type="text" className={styles.addPostInput} value={postContent} onChange={(e) => setPostContent(e.target.value)}/>
         {/* </div> */}
-
 
       </div>
       <div className={styles.addPostBtns}>
@@ -127,24 +144,27 @@ const AddPost = () => {
             isOpen={modalIsOpen}
             onRequestClose={closeModal}
             ariaHideApp={false}
-            contentLabel="Media Modal"
-          >
+            contentLabel="Media Modal">
             <div>
               <h2>Attach Media Files</h2>
-              <input type="file" onChange={(e) => setSelectedFile(e.target.files[0])}/>
+              <input type="file" multiple onChange={handleMultiFiles}/>
             </div>
             <div>
-              <h2>Preview</h2>
-              {selectedFile && (
-              <div>
-                {selectedFile.type.includes('image') ? (
-                <img src={URL.createObjectURL(selectedFile)} alt="Preview" />
-                ) : (
-                <video src={URL.createObjectURL(selectedFile)} controls />
-                )}
-              </div>
+            <h2>Preview</h2>
+              {selectedFile.length > 0 && (
+                <div>
+                  {selectedFile.map((file, index) => (
+                    <div key={index}>
+                      {file.type.includes('image') ? (
+                        <img src={URL.createObjectURL(file)} alt={`Preview ${index}`} />
+                      ) : (
+                        <video src={URL.createObjectURL(file)} controls />
+                      )}
+                    </div>
+                  ))}
+                </div>
               )}
-              </div>
+            </div>
             <div>
               <h2>Add Caption</h2>
               <input type="text" className={styles.captionInput} placeholder="Enter caption" onChange={(e) => setPostContent(e.target.value)}/>
@@ -153,14 +173,8 @@ const AddPost = () => {
             <button className={styles.submitButton} onClick={handlePostSubmit}>Submit</button>
           </Modal>
         </div>
-        {/* 
-        <div className={styles.addPostBtn}>
-          <img className={styles.icon}
-            src='./image.svg' alt='search' />
-          <p className={styles.btnText}>Photo</p>
-        </div>
-        */} 
-        <button className={styles.postBtn} //If no content, cannot submit
+
+        <button className={styles.postBtn}
             onClick={handlePostSubmit}>
           Post
         </button>
