@@ -11,17 +11,27 @@ import { getAuth } from 'firebase/auth'
 
 const AddPost = () => {
 
-  const [modalIsOpen, setIsOpen] = useState(false);
+  const [mediaModal, setMediaModal] = useState(false);
+  const [articleModal, setArticleModal] = useState(false);
   const [postContent, setPostContent] = useState('');
   const [selectedFile, setSelectedFile] = useState([]);
   
-  function openModal() {
-    setIsOpen(true);
+  function openMediaModal() {
+    setMediaModal(true);
   }
 
-  function closeModal() {
-    setIsOpen(false);
+  function closeMediaModal() {
+    setMediaModal(false);
   }
+
+  function openArticleModal(){
+    setArticleModal(true);
+  }
+
+  function closeArticleModal(){
+    setArticleModal(false);
+  }
+  
 
   const getFileCategory = (file) => {
     const fileCategories = {
@@ -106,7 +116,7 @@ const AddPost = () => {
           console.log("Posts added with media");
           setPostContent("");
           setSelectedFile([]);
-          closeModal();
+          closeMediaModal();
           // End part is just to deal with grammar (1 = file but 2,3,4,5 = fileS)
           alert(`Uploaded ${uploadCounter} media file${uploadCounter === 1 ? '' : 's'}!`);
         })
@@ -129,20 +139,38 @@ const AddPost = () => {
 
       </div>
       <div className={styles.addPostBtns}>
-        <div className={styles.addPostBtn}>
+
+        <div className={styles.addPostBtn} onClick={openArticleModal}>
           <img className={styles.icon}
             src='./Article.svg' alt='search' />
           <p className={styles.btnText}>Write Article</p>
         </div>
-        <div className={styles.addPostBtn} onClick={openModal}>
+
+        <div className={styles.inputPostContainer}>
+          <Modal
+            isOpen={articleModal}
+            onRequestClose={closeArticleModal}
+            ariaHideApp={false}
+            contentLabel="Article Modal">
+            <div>
+              <h2>Write your Article</h2>
+              <textarea className={styles.articleInput} placeholder="Start writing your article..." onChange={(e) => setPostContent(e.target.value)}></textarea>
+              <button className={styles.closeButton} onClick={closeArticleModal}>Close</button>
+              <button className={styles.submitButton} onClick={handlePostSubmit}>Submit</button>
+            </div>
+          </Modal>
+        </div>
+
+        <div className={styles.addPostBtn} onClick={openMediaModal}>
           <img className={styles.icon}
             src='./play-circle.svg' alt='search' />
           <p className={styles.btnText}>Media</p>
         </div>
+
         <div className={styles.inputPostContainer}>
           <Modal
-            isOpen={modalIsOpen}
-            onRequestClose={closeModal}
+            isOpen={mediaModal}
+            onRequestClose={closeMediaModal}
             ariaHideApp={false}
             contentLabel="Media Modal">
             <div>
@@ -169,7 +197,7 @@ const AddPost = () => {
               <h2>Add Caption</h2>
               <input type="text" className={styles.captionInput} placeholder="Enter caption" onChange={(e) => setPostContent(e.target.value)}/>
             </div>
-            <button className={styles.closeButton} onClick={closeModal}>Close</button>
+            <button className={styles.closeButton} onClick={closeMediaModal}>Close</button>
             <button className={styles.submitButton} onClick={handlePostSubmit}>Submit</button>
           </Modal>
         </div>
@@ -178,6 +206,7 @@ const AddPost = () => {
             onClick={handlePostSubmit}>
           Post
         </button>
+
       </div>
 
     </div>
