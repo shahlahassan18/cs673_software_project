@@ -1,11 +1,35 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import styles from "./posts.module.css"
 import { AiOutlineLike } from "react-icons/ai";
 import {BiCommentDetail, BiRepost} from "react-icons/bi";
 import {BsFillSendFill} from "react-icons/bs";
+import {db} from './../../firebase'
+import {
+  collection,
+  onSnapshot, // Replace getDocs with onSnapshot
+  // doc,
+  // query,
+} from 'firebase/firestore';
+
 
 
 const Posts = () => {
+
+  // useEffect(() => { 
+  //   db.collection('posts').onSnapshot(snapshot => {
+  //     console.log("snap, :\n",snapshot)
+  //     // setTodos(snapshot.docs.map(doc => ({id:doc.id, todo:doc.data().todo})))
+  //   })
+  // }, []);
+
+  useEffect(() => {
+    const postsCollection = collection(db, 'posts'); // Reference the 'posts' collection
+    onSnapshot(postsCollection, (snapshot) => {
+      console.log('snap: \n', snapshot.docs);
+      // setTodos(snapshot.docs.map((doc) => ({ id: doc.id, todo: doc.data().todo })));
+    });
+  }, []);
+
   return (
     // <div className={styles.posts}>
     //   <div className={styles.user}>
