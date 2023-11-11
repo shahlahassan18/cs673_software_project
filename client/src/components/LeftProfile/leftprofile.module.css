@@ -61,7 +61,7 @@ margin: 0;
 }
 
 /* MENU */
-.menu{
+.menu, .job_tabs{
     display: flex;
     padding-left: 0px;
     flex-direction: column;
@@ -70,7 +70,7 @@ margin: 0;
     align-self: stretch;
 }
 
-.menuItem{
+.menuItemLink, .JobmenuItem{
     display: flex;
     padding: 0 1rem;
     align-items: center;
@@ -78,6 +78,20 @@ margin: 0;
     align-self: stretch;
     border-right: 2px solid var(--primary-main, #604DCF);
     cursor: pointer;
+}
+
+.menuItem, .jobItem{
+    display: flex;
+    padding: 0 1rem;
+    align-items: center;
+    gap: 8px;
+    align-self: stretch;
+    /* border-right: 2px solid var(--primary-main, #604DCF); */
+    cursor: pointer;
+}
+
+.jobItem{
+    margin-left: 1rem;
 }
 
 .icon{
@@ -93,6 +107,11 @@ margin: 0;
     font-weight: 500;
     line-height: 24px; 
     padding-top: 1rem;
+}
+
+.job_tabs{
+    display: flex;
+    flex-direction: column;
 }
 
 

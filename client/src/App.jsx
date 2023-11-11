@@ -10,6 +10,7 @@ import Home from "./components/Home";
 import Loading from "./components/LoadingContainer";
 import Profile from "./components/Profile"
 import Networks from "./components/Networks";
+import Jobs from "./components/Jobs";
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -36,6 +37,7 @@ const App = () => {
           <Route path="/feed" element={<ProtectedRoute><Home /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/network" element={<ProtectedRoute><Networks /></ProtectedRoute>} />
+          <Route path="/jobs" element={<ProtectedRoute><Jobs /></ProtectedRoute>} />
         </Routes>
       </Router>
     </UserContext.Provider>
