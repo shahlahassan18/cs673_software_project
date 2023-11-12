@@ -32,7 +32,6 @@ const AddPost = () => {
     setArticleModal(false);
   }
   
-
   const getFileCategory = (file) => {
     const fileCategories = {
       image: ['.jpeg', '.jpg', '.png', '.gif', '.bmp', '.webp'],
