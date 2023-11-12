@@ -1,0 +1,52 @@
+.networks_section{
+    display: grid;
+    grid-template-areas: "manage_network_section users";
+    grid-template-columns: minmax(0, 5fr) minmax(0, 18fr); 
+    column-gap: 3.5rem;
+    row-gap: 1.5rem;
+    padding: 1rem;
+
+}
+
+.manage_network_section{
+    display: flex;
+    flex-direction: column;
+}
+
+.connection, .contacts{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 1rem;
+    color: #666666;
+    cursor: pointer;
+    /* padding: 1rem; */
+
+}
+
+
+
+.connection.active, .contacts.active {
+    background-color: #604DCF;
+    color: white; 
+}
+
+
+
+.txt{
+    margin: 0;
+}
+
+h3{
+    padding-bottom:  1.5rem;
+}
+
+@media screen and (max-width : 750px) {
+    .networks_section{
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+       
+    }
+    
+}

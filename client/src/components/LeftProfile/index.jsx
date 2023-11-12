@@ -1,16 +1,54 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import styles from "./leftprofile.module.css"
+import { useNavigate } from 'react-router-dom';
+import { db } from '../../firebase';
+import { getAuth } from 'firebase/auth';
+import {doc, getDoc} from 'firebase/firestore';
 
 const LeftProfile = () => {
+  const [profilePicture, setprofilePicture] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [title, setTitle] = useState('');
+
+  const navigate = useNavigate();
+
+  const handleViewProfile = () => {
+    navigate("/profile");
+  }
+
+
+  useEffect(() => {
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
+
+    if (currentUser) {
+      const userDocRef = doc(db, 'users', currentUser.uid);
+      getDoc(userDocRef).then(docSnapshot => {
+        if (docSnapshot.exists()) {
+          const data = docSnapshot.data();
+          setprofilePicture(data.profilePicture);
+          setFirstName(data.firstName);
+          setLastName(data.lastName);
+          setTitle(data.title);
+          console.log(`Full Name: ${data.firstName} ${data.lastName}`);
+        } else {
+          console.error("User document doesn't exist!");
+        }
+      }).catch(err => {
+        console.error("Error fetching user data:", err);
+      });
+    }
+  }, []);
+
   return (
     <div className={styles.left}>
     <div className={styles.user}>
       <img className={styles.userImage}
-      src="https://s3-alpha-sig.figma.com/img/d0a7/3619/a7eaeb87169fa6f7361c4c51e67f89ab?Expires=1698019200&Signature=XjynzDMFyeBTJcjBzaDIawi~ESyKcW6XlR~ej5qSZxc2syl8oY12nrlUfVn~xroKHCKw3ZnGVWpWo1zIIELBZrCCNlB4eDGUogleYQ~NIXqoueMBFkEgRK2eOkJY2-wi3x00W-Ts7cORP9pvCb0NrEXIUsikUBJViyk-LtlG-XBo4e54utX6tmlLqx5xU8eMxMbVWsDI75TjY1gVWtNJB-v-quBjsJ5Dm~mo1qSIw-x5xiNIkJZlePP1ML-90qFJBvnlwCDDaJTxUQC94HFhZUhkh6OiXOi8JUQ3~Vi693dOwOJNNmeZ39bsFoQc48tqpY~gRUUZgKVNG7dU2JKpEw__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4" alt="user"  />
-      <p className={styles.name}>Sai Shirish Katady</p>
-      <p className={styles.jobTitle}>UI/UX Design</p>
-      <button className={styles.viewProfileBtn}>View Profile</button>
-    </div>
+      src={profilePicture} alt="user"  />
+      <p className={styles.name}>{firstName} {lastName}</p>
+      <p className={styles.jobTitle}>{title}</p>
+      <button className={styles.viewProfileBtn} onClick={handleViewProfile}>View Profile</button>    </div>
     <div className={styles.menu}>
       <div className={styles.menuItem}>
         <img className={styles.icon} src='./home.svg' alt="home"/>

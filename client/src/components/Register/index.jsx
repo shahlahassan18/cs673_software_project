@@ -70,9 +70,10 @@ const Register = () => {
   
       const userProfile = {
         userID: userId,
+        email: userData.email,
         firstName: formData.firstName || "",
         lastName: formData.lastName || "",
-        profilePicture: formData.profilePicture || "",
+        profilePicture: formData.profilePicture || "https://cdn.onlinewebfonts.com/svg/img_383214.png",
         title: formData.title || "",
         education: formData.education || "",
         skills: formData.skills || [],
