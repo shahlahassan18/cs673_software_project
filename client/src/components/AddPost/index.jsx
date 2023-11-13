@@ -118,8 +118,8 @@ const AddPost = () => {
         })
         .then(() => {
           console.log("Posts added with media");
-          setSelectedFile([]);
-          closeMediaModal();
+          
+          
           // End part is just to deal with grammar (1 = file but 2,3,4,5 = fileS)
           alert(`Uploaded ${uploadCounter} media file${uploadCounter === 1 ? '' : 's'}!`);
         })
@@ -127,6 +127,10 @@ const AddPost = () => {
           console.error("Error adding post with media:", error);
         });
     }
+    //setPosts((prevPosts) => [newPost, ...prevPosts]);
+    setSelectedFile([]);
+    closeMediaModal();
+    closeArticleModal();
     setPostContent("");
   };
 
