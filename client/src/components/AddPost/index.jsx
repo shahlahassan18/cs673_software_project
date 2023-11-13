@@ -5,7 +5,7 @@ import {FaSuitcase} from "react-icons/fa";
 import {RiArticleLine} from "react-icons/ri";
 import Modal from 'react-modal';
 import { db, storage } from '../../firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, arrayUnion } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { getAuth } from 'firebase/auth'
 
@@ -15,6 +15,7 @@ const AddPost = () => {
   const [articleModal, setArticleModal] = useState(false);
   const [postContent, setPostContent] = useState('');
   const [selectedFile, setSelectedFile] = useState([]);
+  const [comment, setComment] = useState('');
   
   function openMediaModal() {
     setMediaModal(true);
@@ -78,7 +79,9 @@ const AddPost = () => {
         addDoc(collection(db, 'posts'), {
           userId: userId,
           postCont: postContent,
-          TimeCreated: serverTimestamp()
+          TimeCreated: serverTimestamp(),
+          likes: [],
+          //comments: arrayUnion({ userId, text: comment })
         })
       );
     } 
@@ -108,12 +111,13 @@ const AddPost = () => {
             userId: userId,
             postCont: postContent,
             media: mediaData,
-            TimeCreated: serverTimestamp()
+            TimeCreated: serverTimestamp(),
+            likes: [],
+            //comments: arrayUnion({ userId, text: comment })
           });
         })
         .then(() => {
           console.log("Posts added with media");
-          setPostContent("");
           setSelectedFile([]);
           closeMediaModal();
           // End part is just to deal with grammar (1 = file but 2,3,4,5 = fileS)
@@ -123,6 +127,7 @@ const AddPost = () => {
           console.error("Error adding post with media:", error);
         });
     }
+    setPostContent("");
   };
 
   return (
@@ -201,7 +206,7 @@ const AddPost = () => {
           </Modal>
         </div>
 
-        <button className={styles.postBtn}
+        <button className={styles.postBtn} disabled={!postContent.trim()}
             onClick={handlePostSubmit}>
           Post
         </button>
