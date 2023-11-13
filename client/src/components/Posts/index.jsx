@@ -1,106 +1,99 @@
-import React, { useEffect, useState } from 'react';
-import styles from './posts.module.css';
-import { AiOutlineLike } from 'react-icons/ai';
-import { BiCommentDetail, BiRepost } from 'react-icons/bi';
-import { BsFillSendFill } from 'react-icons/bs';
-import { db } from './../../firebase';
-import {
-  collection,
-  onSnapshot,
-  getDoc,
-  doc,
-} from 'firebase/firestore';
+
+import React, {useEffect, useState} from 'react'
+import styles from "./posts.module.css"
+import { AiOutlineLike } from "react-icons/ai";
+import {BiCommentDetail, BiRepost} from "react-icons/bi";
+import {BsFillSendFill} from "react-icons/bs";
+import {db} from './../../firebase'
+import { collection, getDoc, updateDoc, onSnapshot, doc, query, orderBy} from 'firebase/firestore';
+import { getAuth } from 'firebase/auth'
+
 
 const Posts = () => {
-  const [posts, setPosts] = useState([]); // State to store the fetched posts
-
+  const [posts, setPosts] = useState([]);
   useEffect(() => {
     const postsCollection = collection(db, 'posts');
-
-    const unsubscribe = onSnapshot(postsCollection, async (snapshot) => {
-      const postsData = [];
-      for (const doc1 of snapshot.docs) {
-        const postData = doc1.data();
-        const userId = postData.userId;
-
-        // Check if userId is defined
-        if (userId) {
-          // Construct the user document reference
-          const userDocRef = doc(db, 'users', userId);
-
-          // Fetch user data from Firestore
-          const userDocSnapshot = await getDoc(userDocRef);
-          const userData = userDocSnapshot.data();
-
-          if (userData) {
-            postsData.push({
-              id: doc1.id,
-              post: postData,
-              user: userData,
-            });
-          }
-        }
-      }
+    const postsQuery = query(postsCollection, orderBy('TimeCreated', 'desc')); // Order by 'createdAt' in descending order
+  
+    const unsubscribe = onSnapshot(postsQuery, (snapshot) => {
+      console.log('Snapshot received:', snapshot); // Log the received snapshot
+  
+      const postsData = snapshot.docs.map((doc) => {
+        console.log('Doc data:', doc.data()); // Log each document's data
+        return { id: doc.id, ...doc.data() };
+      });
+  
+      console.log('Posts data:', postsData); // Log the mapped posts data
       setPosts(postsData);
     });
-
-    // Cleanup the subscription when the component unmounts
+  
+    // Clean up the subscription on unmount
     return () => unsubscribe();
   }, []);
 
+  const handleLike = async (postId) => {
+    const postRef = doc(db, 'posts', postId);
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) {
+      console.log("User is NOT Authenticated");
+      return;
+    }
+    // Get the current user's ID
+    const userId = currentUser.uid;
+  
+    // Get the current likes
+    const postSnapshot = await getDoc(postRef);
+    const currentLikes = postSnapshot.data().likes;
+  
+    // Add or remove the user's ID from the likes
+    const newLikes = currentLikes.includes(userId)
+      ? currentLikes.filter(id => id !== userId) // Remove the user's ID
+      : [...currentLikes, userId]; // Add the user's ID
+  
+    // Update the likes in Firestore
+    await updateDoc(postRef, { likes: newLikes });
+  };
+
   return (
+
+
     <div className={styles.postContainer}>
       {posts.map((post) => (
-        <div key={post.id} className={styles.post}>
-          {/* Render user information for the post */}
-          <div className={styles.user}>
-            <div className={styles.profilePicContainer}>
-              <img
-                className={styles.profilePic}
-                src={post.user.profilePicture} // Use the correct field for the profile picture
-                alt='profile'
-              />
-            </div>
-            <div className={styles.postUser}>
-              <p className={styles.postUserName}>
-                {post.user.firstName} {post.user.lastName}
-              </p>
-              <p className={styles.postUserJobTitle}>{post.user.title}</p>
-              <div className={styles.jobTimer}>
-                {/* Render the post's timestamp */}
-                <img
-                  className={styles.jobTimerImg}
-                  src='./history-outline.svg'
-                  alt='timer'
-                />
-                <p className={styles.jobTime}>
-                  {/* Format and display the post's timestamp here */}
-                </p>
-              </div>
+
+      <div className={styles.post} key = {post.id}>
+        <div className={styles.user}>
+          <div className={styles.profilePicContainer}>
+            <img className={styles.profilePic}
+              src='https://s3-alpha-sig.figma.com/img/d0a7/3619/a7eaeb87169fa6f7361c4c51e67f89ab?Expires=1698019200&Signature=XjynzDMFyeBTJcjBzaDIawi~ESyKcW6XlR~ej5qSZxc2syl8oY12nrlUfVn~xroKHCKw3ZnGVWpWo1zIIELBZrCCNlB4eDGUogleYQ~NIXqoueMBFkEgRK2eOkJY2-wi3x00W-Ts7cORP9pvCb0NrEXIUsikUBJViyk-LtlG-XBo4e54utX6tmlLqx5xU8eMxMbVWsDI75TjY1gVWtNJB-v-quBjsJ5Dm~mo1qSIw-x5xiNIkJZlePP1ML-90qFJBvnlwCDDaJTxUQC94HFhZUhkh6OiXOi8JUQ3~Vi693dOwOJNNmeZ39bsFoQc48tqpY~gRUUZgKVNG7dU2JKpEw__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4' alt='profile' />
+          </div>
+          <div className={styles.postUser}>
+            <p className={styles.postUserName}>Sai Shirish Katady</p>
+            <p className={styles.postUserJobTitle}>Product Designer</p>
+            <div className={styles.jobTimer}>
+              <img className={styles.jobTimerImg} src="./history-outline.svg" alt="timer" />
+              <p className={styles.jobTime}>{post.TimeCreated ? post.TimeCreated.toDate().toLocaleString() : 'Loading...'}</p>
             </div>
           </div>
-          {/* Render post data from Firestore here */}
-          <p className={styles.postContent}>{post.post.postCont}</p>
-          {/* Render images and buttons */}
-          {post?.post?.media?.map((mediaItem, index) => (
-            <img
-              key={index}
-              alt={`image${index}`}
-              className={styles.postImg}
-              src={mediaItem.url}
-            />
+          <div className={styles.addPostSettings}>
+          <img className={styles.settingsIcon}
+            src='./DotsThree.svg' alt='settings' />
+        </div>
+        </div>
+        <p className={styles.postContent}>{post.postCont}</p>
+        <div className={styles.postMedia}>
+          {post.media && post.media.map((url, index) => (
+            <img key={index} src={url} alt="Post media" />
           ))}
-          <div className={styles.btns}>
-            <div className={styles.reactionBtns}>
-              {/* Render the number of comments */}
-              <p className={styles.postComments}>29 comments</p>
-            </div>
-            <div className={styles.actionBtns}>
-              {/* Render Like, Comment, Repost, and Favourites buttons */}
-                           <div className={styles.actionBtn}>
+        </div>
+        <div className={styles.btns}>
+          <div className={styles.actionBtns}>
+            <div className={styles.actionBtn} onClick={() => handleLike(post.id)}>
+
               <img className={styles.actionIcon}
                 src='./ThumbsUp.svg' alt='search' />
-              <p className={styles.actionText}>Like</p>
+              <p className={styles.actionText}>Like {post.likes && post.likes.length}</p>
             </div>
             <div className={styles.actionBtn}>
               <img className={styles.actionIcon}
@@ -120,6 +113,11 @@ const Posts = () => {
             </div>
           </div>
         </div>
+
+
+
+      // </div>
+
       ))}
     </div>
   );

@@ -16,7 +16,7 @@ const Login = () => {
   const { register, handleSubmit, formState } = useForm();
   const { errors } = formState;
 
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -65,9 +65,10 @@ const Login = () => {
   
       const userProfile = {
         userID: userId,
+        email: userData.email,
         firstName: formData.firstName || "",
         lastName: formData.lastName || "",
-        profilePicture: formData.profilePicture || "",
+        profilePicture: formData.profilePicture || "https://cdn.onlinewebfonts.com/svg/img_383214.png",
         title: formData.title || "",
         education: formData.education || "",
         skills: formData.skills || [],
@@ -80,32 +81,6 @@ const Login = () => {
         contacts: formData.contacts || [],
         createdAt: new Date(),
         lastLogin: new Date(),
-        // userID: Unique user identifier.
-        // firstName: The user's first name.
-        // lastName: Last name of the user.
-        // profilePicture: URL of the user's avatar.(maybe)
-        // title: The user's title or job position.
-        // education: The user's educational background, e.g. "Master's Student (Computer Science) - Boston University".
-        // skills: A list or array of all the skills listed by the user.
-        // interests: A list or array of companies or other interests that the user follows.
-        // bio: A profile or personal description of the user.
-
-        // followersCount: The number of followers the user has.
-        // posts: A list of IDs of posts related to the user.
-        // comments: A list of IDs of comments related to the user.
-
-        // experience: A list or array of items, each of which contains the following fields:
-        // position: The name of the position.
-        // company: The name of the company or organization.
-        // location: Location of the job.
-        // startDate: Start date.
-        // endDate: End date or current.
-        // description: Description or responsibility for the experience.
-
-        // contacts: A list or array of all the contact information provided by the user, such as email, phone number, etc.
-
-        // createdAt: The date and time the user created the account.
-        // lastLogin: The date and time the user last logged in.
       };
   
       await setDoc(doc(db, "users", userId), userProfile);

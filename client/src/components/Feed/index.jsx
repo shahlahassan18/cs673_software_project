@@ -11,7 +11,11 @@ const Feed = () => {
   async function readdocs() {
     const queryallDocs = await getDocs(collection(db, 'posts'))
     queryallDocs.forEach(element => {
+
       // console.log(element.id, " => ", element.data())
+
+      //console.log(element.id, " => ", element.data())
+
     });
   }
   readdocs()
