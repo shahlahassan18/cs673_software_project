@@ -49,29 +49,32 @@ const Users = ({ type }) => {
       const handleConnectClick = async (contactId) => {
         const auth = getAuth();
         const currentUser = auth.currentUser;
-    
+      
         if (currentUser) {
-          const userDocRef = doc(db, 'users', currentUser.uid);
-          const userDocSnapshot = await getDoc(userDocRef);
-
-          if (userDocSnapshot.exists) {
-            const userData = userDocSnapshot.data();
-            const contactsData = userData.contacts || [];
-
-            for (let contactId of contactsData) {
-              const newConnection = {
-                userId: currentUser.uid,
-                contactId: contactId,
-                timestamp: new Date(),
-              };
-
-              try {
-                const docRef = await addDoc(collection(db, "connections"), newConnection);
-                console.log("Document written with ID: ", docRef.id);
-              } catch (e) {
-                console.error("Error adding document: ", e);
-              }
-            }
+          const connectionsQuery = query(
+            collection(db, "connections"),
+            where("userId", "==", currentUser.uid),
+            where("contactId", "==", contactId)
+          );
+          const querySnapshot = await getDocs(connectionsQuery);
+      
+          if (!querySnapshot.empty) {
+            console.log("Connection request already exists");
+            return;
+          }
+      
+          const newConnection = {
+            userId: currentUser.uid,
+            contactId: contactId,
+            timestamp: new Date(),
+            status: "requested"
+          };
+      
+          try {
+            const docRef = await addDoc(collection(db, "connections"), newConnection);
+            console.log("Document written with ID: ", docRef.id);
+          } catch (e) {
+            console.error("Error adding document: ", e);
           }
         }
       };
@@ -137,7 +140,7 @@ const Users = ({ type }) => {
                 <p className={styles.userName}>
                   {contact.firstName} {contact.lastName}
                 </p>
-                <button className={styles.connectBtn}>Connect</button>
+                <button className={styles.connectBtn}>Connected</button>
               </div>
             ))}
           </div>

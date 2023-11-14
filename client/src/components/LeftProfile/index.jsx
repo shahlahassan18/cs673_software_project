@@ -42,7 +42,6 @@ const LeftProfile = ({onFindJobsClick,onSavedJobsClick}) => {
           setFirstName(data.firstName);
           setLastName(data.lastName);
           setTitle(data.title);
-          console.log(`Full Name: ${data.firstName} ${data.lastName}`);
         } else {
           console.error("User document doesn't exist!");
         }
