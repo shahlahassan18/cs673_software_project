@@ -30,7 +30,8 @@ const Register = () => {
         addUserToFirestore(user, data);
         console.log("Registered successfully!", user);
         alert("Registered successfully! ");
-        navigate("/login");
+        navigate("/create-profile");
+        // navigate("/login");
       })
       .catch((error) => {
         console.error("Error registering:", error.message);
