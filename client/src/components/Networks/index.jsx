@@ -34,12 +34,12 @@ const Networks = () => {
                           {activeTab === "Connections" ?
                       <div className={styles.title}>
                            <h3>New Connections</h3>
-                           <Users />
+                           <Users type="new-connections"/>
                        </div>
                        :
                        <div className={styles.title}>
                            <h3>Contacts</h3>
-                           <Users />
+                           <Users type="contacts"/>
                        </div>}
           </div>
         </div>

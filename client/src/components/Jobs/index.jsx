@@ -1,165 +1,143 @@
-import React, {useState} from 'react'
-import styles from "./jobs.module.css"
-import Navbars from './../Navbar'
-import LeftProfile from '../LeftProfile'
-import {BsBookmark, BsBookmarkFill} from 'react-icons/bs'
+import React, { useState, useEffect } from "react";
+import {
+  getDocs,
+  collection,
+  updateDoc,
+  doc,
+  arrayUnion,
+  arrayRemove,
+} from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { db } from "../../firebase";
+import styles from "./jobs.module.css";
+import Navbars from "./../Navbar";
+import LeftProfile from "../LeftProfile";
+import { BsBookmark, BsBookmarkFill } from "react-icons/bs";
+
+const JobItem = ({ job, onBookmarkClick, isBookmarked }) => (
+  <div className={styles.job}>
+    <div className={styles.logo}>
+      <img
+        className={styles.job_logo}
+        src={job.imageUrl}
+        alt={`${job.company} logo`}
+      />
+    </div>
+    <div className={styles.details}>
+      <h4 className={styles.job_title}>{job.title}</h4>
+      <p className={styles.job_company_name}>{job.company}</p>
+      <p className={styles.job_location}>{job.location}</p>
+    </div>
+    <div
+      className={styles.save_icon}
+      onClick={(e) => {
+        e.stopPropagation(); // Prevent event bubbling
+        onBookmarkClick(job);
+      }}
+    >
+      {isBookmarked ? <BsBookmarkFill /> : <BsBookmark />}
+    </div>
+  </div>
+);
 
 const Jobs = () => {
-    const [showRecommendedJobs, setShowRecommendedJobs] = useState(true);
-  const [showSavedJobs, setShowSavedJobs] = useState(false);
+  const [currentView, setCurrentView] = useState("recommended");
+  const [jobs, setJobs] = useState([]);
+  const [savedJobs, setSavedJobs] = useState([]);
 
-  const handleFindJobsClick = () => {
-    setShowRecommendedJobs(!showRecommendedJobs);
-    setShowSavedJobs(!showSavedJobs);
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const jobsSnapshot = await getDocs(collection(db, "jobs"));
+        const jobsData = jobsSnapshot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
+        setJobs(jobsData);
+      } catch (error) {
+        console.error("Error fetching jobs:", error);
+      }
+    };
+
+    fetchJobs();
+  }, []);
+
+  const handleBookmarkClick = async (job) => {
+    try {
+      const auth = getAuth();
+      const currentUser = auth.currentUser;
+
+      if (currentUser) {
+        const userDocRef = doc(db, "users", currentUser.uid);
+        if (savedJobs.some((j) => j.id === job.id)) {
+          // Remove job from saved jobs
+          await updateDoc(userDocRef, {
+            interests: arrayRemove(job),
+          });
+          setSavedJobs((prev) => prev.filter((j) => j.id !== job.id));
+        } else {
+          // Add job to saved jobs
+          await updateDoc(userDocRef, {
+            interests: arrayUnion(job),
+          });
+          setSavedJobs((prev) => [...prev, job]);
+        }
+      }
+    } catch (error) {
+      console.error("Error saving job:", error);
+    }
   };
 
-  const handleSavedJobsClick = () => {
-    setShowRecommendedJobs(!showRecommendedJobs);
-    setShowSavedJobs(!showSavedJobs);
+  const toggleView = (view) => {
+    setCurrentView(view);
   };
+
   return (
     <>
-    <Navbars />
-    <div className={styles.jobs_section}>
-      
-        <LeftProfile className ={styles.left} onFindJobsClick={handleFindJobsClick} onSavedJobsClick={handleSavedJobsClick}/>
-
-
-        {showRecommendedJobs && (
-       <div className={styles.jobs_container}>
-       <input className={styles.search_jobs} placeholder='Search Jobs'></input>
-       <div className={styles.recommended}>
-           <h4 className={styles.title}>
-              Recommended Jobs 
-           </h4>
-           <div className={styles.jobs}>
-               <div className={styles.job}>
-                   <div className={styles.logo}>
-                       <img className={styles.job_logo}
-                       src="https://s3-alpha-sig.figma.com/img/d0a7/3619/a7eaeb87169fa6f7361c4c51e67f89ab?Expires=1700438400&Signature=BAJvqavXjvmoPHPxSWvkrzPDvt-OXHNcyGC1pIyT32aL7LB~Ul9yKKtbS6487o0fyVdA1tU5KPqchc6Vtgkr1quLYKlyAaXy~IFYNqOuzPsh9mmlbJa3mMQUvv9VSQMJbkuCVpxTrF7f1wy7s428qg901fkqJpdkVssJ8Tjc~5JqspxbIBmtg5CrVA1G3R1OJUknJejW~9oZjRfPDkN498pWn7s-j3e8yoy3o2srKSl858BuRG2I0xDlkhWoSqEXQpoxujSC8rkksINRIHAMYUzT6jdetLjDcJMUMQZC9zVzB-FdyxyKwQ~Zwj0GD8qPakLC-WWF5Trf51EbQQkZNA__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4" />
-                   </div>
-                   <div className={styles.details}>
-                       <h3 className={styles.job_title}>Software Engineer Internship</h3>
-                       <p className={styles.job_company_name}>ABC Company</p>
-                       <p className={styles.job_location}>New York, USA</p>
-                   </div>
-                   <div className={styles.save_icon}>
-                         <BsBookmark />
-                   </div>     
-               </div>
-
-               <div className={styles.job}>
-                   <div className={styles.logo}>
-                       <img className={styles.job_logo}
-                       src="https://s3-alpha-sig.figma.com/img/d0a7/3619/a7eaeb87169fa6f7361c4c51e67f89ab?Expires=1700438400&Signature=BAJvqavXjvmoPHPxSWvkrzPDvt-OXHNcyGC1pIyT32aL7LB~Ul9yKKtbS6487o0fyVdA1tU5KPqchc6Vtgkr1quLYKlyAaXy~IFYNqOuzPsh9mmlbJa3mMQUvv9VSQMJbkuCVpxTrF7f1wy7s428qg901fkqJpdkVssJ8Tjc~5JqspxbIBmtg5CrVA1G3R1OJUknJejW~9oZjRfPDkN498pWn7s-j3e8yoy3o2srKSl858BuRG2I0xDlkhWoSqEXQpoxujSC8rkksINRIHAMYUzT6jdetLjDcJMUMQZC9zVzB-FdyxyKwQ~Zwj0GD8qPakLC-WWF5Trf51EbQQkZNA__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4" />
-                   </div>
-                   <div className={styles.details}>
-                       <h3 className={styles.job_title}>Software Engineer Internship</h3>
-                       <p className={styles.job_company_name}>ABC Company</p>
-                       <p className={styles.job_location}>New York, USA</p>
-                   </div>
-                   <div className={styles.save_icon}>
-                         <BsBookmark />
-                   </div>     
-               </div>
-           </div>
-       </div>
-   </div>    
-
-        ) }
-
-
-        {showSavedJobs && (
-       <div className={styles.jobs_container}>
-       <input className={styles.search_jobs} placeholder='Search Jobs'></input>
-       <div className={styles.recommended}>
-           <h4 className={styles.title}>
-              Saved Jobs 
-           </h4>
-           <div className={styles.jobs}>
-               <div className={styles.job}>
-                   <div className={styles.logo}>
-                       <img className={styles.job_logo}
-                       src="https://s3-alpha-sig.figma.com/img/d0a7/3619/a7eaeb87169fa6f7361c4c51e67f89ab?Expires=1700438400&Signature=BAJvqavXjvmoPHPxSWvkrzPDvt-OXHNcyGC1pIyT32aL7LB~Ul9yKKtbS6487o0fyVdA1tU5KPqchc6Vtgkr1quLYKlyAaXy~IFYNqOuzPsh9mmlbJa3mMQUvv9VSQMJbkuCVpxTrF7f1wy7s428qg901fkqJpdkVssJ8Tjc~5JqspxbIBmtg5CrVA1G3R1OJUknJejW~9oZjRfPDkN498pWn7s-j3e8yoy3o2srKSl858BuRG2I0xDlkhWoSqEXQpoxujSC8rkksINRIHAMYUzT6jdetLjDcJMUMQZC9zVzB-FdyxyKwQ~Zwj0GD8qPakLC-WWF5Trf51EbQQkZNA__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4" />
-                   </div>
-                   <div className={styles.details}>
-                       <h3 className={styles.job_title}>Software Engineer Internship</h3>
-                       <p className={styles.job_company_name}>ABC Company</p>
-                       <p className={styles.job_location}>New York, USA</p>
-                   </div>
-                   <div className={styles.save_icon}>
-                         <BsBookmark />
-                   </div>     
-               </div>
-
-               <div className={styles.job}>
-                   <div className={styles.logo}>
-                       <img className={styles.job_logo}
-                       src="https://s3-alpha-sig.figma.com/img/d0a7/3619/a7eaeb87169fa6f7361c4c51e67f89ab?Expires=1700438400&Signature=BAJvqavXjvmoPHPxSWvkrzPDvt-OXHNcyGC1pIyT32aL7LB~Ul9yKKtbS6487o0fyVdA1tU5KPqchc6Vtgkr1quLYKlyAaXy~IFYNqOuzPsh9mmlbJa3mMQUvv9VSQMJbkuCVpxTrF7f1wy7s428qg901fkqJpdkVssJ8Tjc~5JqspxbIBmtg5CrVA1G3R1OJUknJejW~9oZjRfPDkN498pWn7s-j3e8yoy3o2srKSl858BuRG2I0xDlkhWoSqEXQpoxujSC8rkksINRIHAMYUzT6jdetLjDcJMUMQZC9zVzB-FdyxyKwQ~Zwj0GD8qPakLC-WWF5Trf51EbQQkZNA__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4" />
-                   </div>
-                   <div className={styles.details}>
-                       <h3 className={styles.job_title}>Software Engineer Internship</h3>
-                       <p className={styles.job_company_name}>ABC Company</p>
-                       <p className={styles.job_location}>New York, USA</p>
-                   </div>
-                   <div className={styles.save_icon}>
-                         <BsBookmark />
-                   </div>     
-               </div>
-           </div>
-       </div>
-   </div>    
-
-        )}
-
-         {/* {/* --Recommended JOB SECTION */}
- 
-
-
-        {/* --SAVED JOB SECTION */}
-        {/* <div className={styles.jobs_container}>
-            <input className={styles.search_jobs} placeholder='Search Jobs'></input>
+      <Navbars />
+      <div className={styles.jobs_section}>
+        <LeftProfile
+          className={styles.left}
+          onFindJobsClick={() => toggleView("recommended")}
+          onSavedJobsClick={() => toggleView("saved")}
+        />
+        <div className={styles.jobs_container}>
+          <input
+            className={styles.search_jobs}
+            placeholder="Search Jobs"
+          ></input>
+          {currentView === "recommended" && (
             <div className={styles.recommended}>
-                <h4 className={styles.title}>
-                   Saved Jobs 
-                </h4>
-                <div className={styles.jobs}>
-                    <div className={styles.job}>
-                        <div className={styles.logo}>
-                            <img className={styles.job_logo}
-                            src="https://s3-alpha-sig.figma.com/img/d0a7/3619/a7eaeb87169fa6f7361c4c51e67f89ab?Expires=1700438400&Signature=BAJvqavXjvmoPHPxSWvkrzPDvt-OXHNcyGC1pIyT32aL7LB~Ul9yKKtbS6487o0fyVdA1tU5KPqchc6Vtgkr1quLYKlyAaXy~IFYNqOuzPsh9mmlbJa3mMQUvv9VSQMJbkuCVpxTrF7f1wy7s428qg901fkqJpdkVssJ8Tjc~5JqspxbIBmtg5CrVA1G3R1OJUknJejW~9oZjRfPDkN498pWn7s-j3e8yoy3o2srKSl858BuRG2I0xDlkhWoSqEXQpoxujSC8rkksINRIHAMYUzT6jdetLjDcJMUMQZC9zVzB-FdyxyKwQ~Zwj0GD8qPakLC-WWF5Trf51EbQQkZNA__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4" />
-                        </div>
-                        <div className={styles.details}>
-                            <h3 className={styles.job_title}>Software Engineer Internship</h3>
-                            <p className={styles.job_company_name}>ABC Company</p>
-                            <p className={styles.job_location}>New York, USA</p>
-                        </div>
-                        <div className={styles.save_icon}>
-                              <BsBookmark />
-                        </div>     
-                    </div>
-
-                    <div className={styles.job}>
-                        <div className={styles.logo}>
-                            <img className={styles.job_logo}
-                            src="https://s3-alpha-sig.figma.com/img/d0a7/3619/a7eaeb87169fa6f7361c4c51e67f89ab?Expires=1700438400&Signature=BAJvqavXjvmoPHPxSWvkrzPDvt-OXHNcyGC1pIyT32aL7LB~Ul9yKKtbS6487o0fyVdA1tU5KPqchc6Vtgkr1quLYKlyAaXy~IFYNqOuzPsh9mmlbJa3mMQUvv9VSQMJbkuCVpxTrF7f1wy7s428qg901fkqJpdkVssJ8Tjc~5JqspxbIBmtg5CrVA1G3R1OJUknJejW~9oZjRfPDkN498pWn7s-j3e8yoy3o2srKSl858BuRG2I0xDlkhWoSqEXQpoxujSC8rkksINRIHAMYUzT6jdetLjDcJMUMQZC9zVzB-FdyxyKwQ~Zwj0GD8qPakLC-WWF5Trf51EbQQkZNA__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4" />
-                        </div>
-                        <div className={styles.details}>
-                            <h3 className={styles.job_title}>Software Engineer Internship</h3>
-                            <p className={styles.job_company_name}>ABC Company</p>
-                            <p className={styles.job_location}>New York, USA</p>
-                        </div>
-                        <div className={styles.save_icon}>
-                              <BsBookmark />
-                        </div>     
-                    </div>
-                </div>
+              <div className={styles.jobs}>
+                {jobs.slice(0, 3).map((job) => (
+                  <JobItem
+                    key={job.id}
+                    job={job}
+                    onBookmarkClick={handleBookmarkClick}
+                    isBookmarked={savedJobs.some((j) => j.id === job.id)}
+                  />
+                ))}
+              </div>
             </div>
-        </div>   */}
-    </div>
+          )}
+          {currentView === "saved" && (
+            <div className={styles.recommended}>
+              <div className={styles.jobs}>
+                {savedJobs.map((job) => (
+                  <JobItem
+                    key={job.id}
+                    job={job}
+                    onBookmarkClick={handleBookmarkClick}
+                    isBookmarked={true}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </>
-    
-  )
-}
+  );
+};
 
-export default Jobs
+export default Jobs;

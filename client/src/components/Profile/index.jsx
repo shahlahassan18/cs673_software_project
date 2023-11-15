@@ -12,8 +12,8 @@ const Profile = () => {
     const [title, setTitle] = useState('');
     const [bio, setBio] = useState('');
     const [followersCount, setfollowersCount] = useState('');
-    const [experience, setexperience] = useState('');
-    const [skills, setskills] = useState('');
+    const [experience, setexperience] = useState([]);
+    const [skills, setskills] = useState([]);
     const [interests, setinterests] = useState('');
 
   useEffect(() => {
@@ -112,28 +112,29 @@ const Profile = () => {
                     {/* 4th SECTION */}
                       <div className={styles.experienceSection}>
                           <h6 >Experience</h6>
-
-                          <div className={styles.experienceContainer}>
-                            {/* TODO */}
-                            {/* experience.map((item) => ( */}
+                          {experience.map((exp, index) => (
+                          <div key={index} className={styles.experienceContainer}>
                               <img  className={styles.companylogo}
-                                  src="https://s3-alpha-sig.figma.com/img/3e08/a066/1cd0b7f7060b9c08df97d21d6a1c7904?Expires=1699228800&Signature=mEVmpZKnvT2ic7lS1d~0TiKj~Pb5nDNaDlrxhOwjj7YboWzzkC5SFPc-nk17Urxxul7CFYe-Jm7w3lXBEZ3jnGqutHxzeDt0K2J-HhDjsW0mqteRV0JuH4WtnqooJFaunAaTmKiijybjYWXrpBi1IFvEp8HUfx4r~QIfYMrlQWHD0SE2D2DGJF0unbuGuZCVSLFR0L7t2PhYogqAHK4vmfDEX~xavyPEpHkUaBcBvTKm4YZEGUq0aN~s4ab1E8gtPvVKG6D0LliHh6sTFY~WSCX81jOJmrl4Mb~rZzPveLD8WyTJRDLyK3nSZEezjqT0m2im98zEqoNxMVULpHnz4w__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4" />
+                                  src={exp.companylogo} />
                               <div className={styles.experience}>
-                                <p className={styles.job}>Freelance UX/UI designer</p>
-                                <p className={styles.jobCompany}>GkC Construction    -India </p>
-                                <p className={styles.jobDate}>Jun 2021 — 2022</p>
-                                <p className={styles.jobDesc}>
-                                As a dedicated UI Designer at GKC, I am responsible for creating visually appealing and intuitive user interfaces that enhance user experience and drive engagement. My role involves collaborating with cross-functional teams, including UX designers, developers, and product managers, to translate complex ideas into elegant, user-friendly designs. I am passionate about crafting seamless digital experiences and thrive in a fast-paced, innovative environment </p>
+                                <p className={styles.job}>{exp.title}</p>
+                                <p className={styles.jobCompany}>{exp.company}</p>
+                                <p className={styles.jobDate}>{exp.startDate} - {exp.endDate}</p>
+                                <p className={styles.jobDesc}>{exp.description}</p>
                               </div>
-
+                        
                           </div>
-
+                            ))}
                       </div>
 
                       {/* 5th SECTION */}
-                    <div className={styles.skillSection}>
+                      <div className={styles.skillSection}>
                         {/* TODO */}
-                        {/* skills.map((item) => ( */}
+                        {skills.map((skills, index) => (
+                            <div key={index} className={styles.showPostsContainer}>
+                                <p>{skills}</p>
+                            </div>
+                        ))}
                           <div className={styles.showPostsContainer}>
                                 <p className={styles.showPosts}> Show all skills 
                                 </p>
@@ -147,16 +148,6 @@ const Profile = () => {
                             <p>Companies</p>
                             {/* TODO */}
                             {/* interests.map((item) => ( */}
-
-                            <div className={styles.interestContainer}>
-                                <img className={styles.companylogo}
-                                    src="https://s3-alpha-sig.figma.com/img/3e08/a066/1cd0b7f7060b9c08df97d21d6a1c7904?Expires=1699228800&Signature=mEVmpZKnvT2ic7lS1d~0TiKj~Pb5nDNaDlrxhOwjj7YboWzzkC5SFPc-nk17Urxxul7CFYe-Jm7w3lXBEZ3jnGqutHxzeDt0K2J-HhDjsW0mqteRV0JuH4WtnqooJFaunAaTmKiijybjYWXrpBi1IFvEp8HUfx4r~QIfYMrlQWHD0SE2D2DGJF0unbuGuZCVSLFR0L7t2PhYogqAHK4vmfDEX~xavyPEpHkUaBcBvTKm4YZEGUq0aN~s4ab1E8gtPvVKG6D0LliHh6sTFY~WSCX81jOJmrl4Mb~rZzPveLD8WyTJRDLyK3nSZEezjqT0m2im98zEqoNxMVULpHnz4w__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4" />
-                                <div className={styles.experience}>
-                                    <p className={styles.job}>Google </p>
-                                    <p className={styles.jobCompany}>10.258M followers </p>
-                                    <button className={styles.followBtn} >Follow</button>
-                                </div>
-                            </div>
 
                             <div className={styles.interestContainer}>
                                 <img className={styles.companylogo}
