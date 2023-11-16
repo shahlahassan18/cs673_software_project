@@ -87,6 +87,7 @@ const Register = () => {
         contacts: formData.contacts || [],
         createdAt: new Date(),
         lastLogin: new Date(),
+        birthday: formData.birthday || "",
         // userID: Unique user identifier.
         // firstName: The user's first name.
         // lastName: Last name of the user.
