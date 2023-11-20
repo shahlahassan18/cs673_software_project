@@ -15,13 +15,15 @@ const Posts = () => {
     const postsCollection = collection(db, 'posts');
     const postsQuery = query(postsCollection, orderBy('TimeCreated', 'desc')); // Order by 'createdAt' in descending order
   
-    const unsubscribe = onSnapshot(postsQuery, (snapshot) => {
+    const unsubscribe = onSnapshot(postsQuery, async (snapshot) => {
       console.log('Snapshot received:', snapshot); // Log the received snapshot
-  
-      const postsData = snapshot.docs.map((doc) => {
+      const postsData = await Promise.all(snapshot.docs.map(async (doc) => {
+        const postData = doc.data();
+        const { userId } = postData;
+        const userData = await getUserData(userId);
         console.log('Doc data:', doc.data()); // Log each document's data
-        return { id: doc.id, ...doc.data() };
-      });
+        return { id: doc.id, ...postData, ... userData };
+      }));
   
       console.log('Posts data:', postsData); // Log the mapped posts data
       setPosts(postsData);
@@ -56,6 +58,23 @@ const Posts = () => {
     await updateDoc(postRef, { likes: newLikes });
   };
 
+  const getUserData = async (userId) => {
+    if (!userId) {
+      console.log('No userId provided!');
+      return null;
+    }
+    const userRef = doc(db, 'users', userId);
+    const userSnapshot = await getDoc(userRef);
+    if (userSnapshot.exists()) {
+      const userData = userSnapshot.data();
+      const { firstName, lastName } = userData; // Replace 'firstName' and 'lastName' with your actual field names
+      return { firstName, lastName };
+    } else {
+      console.log('No such user!');
+      return null;
+    }
+  } 
+
   return (
 
 
@@ -69,7 +88,7 @@ const Posts = () => {
               src='https://s3-alpha-sig.figma.com/img/d0a7/3619/a7eaeb87169fa6f7361c4c51e67f89ab?Expires=1698019200&Signature=XjynzDMFyeBTJcjBzaDIawi~ESyKcW6XlR~ej5qSZxc2syl8oY12nrlUfVn~xroKHCKw3ZnGVWpWo1zIIELBZrCCNlB4eDGUogleYQ~NIXqoueMBFkEgRK2eOkJY2-wi3x00W-Ts7cORP9pvCb0NrEXIUsikUBJViyk-LtlG-XBo4e54utX6tmlLqx5xU8eMxMbVWsDI75TjY1gVWtNJB-v-quBjsJ5Dm~mo1qSIw-x5xiNIkJZlePP1ML-90qFJBvnlwCDDaJTxUQC94HFhZUhkh6OiXOi8JUQ3~Vi693dOwOJNNmeZ39bsFoQc48tqpY~gRUUZgKVNG7dU2JKpEw__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4' alt='profile' />
           </div>
           <div className={styles.postUser}>
-            <p className={styles.postUserName}>Sai Shirish Katady</p>
+            <p className={styles.postUserName}>{post.firstName} {post.lastName}</p>
             <p className={styles.postUserJobTitle}>Product Designer</p>
             <div className={styles.jobTimer}>
               <img className={styles.jobTimerImg} src="./history-outline.svg" alt="timer" />
@@ -77,9 +96,9 @@ const Posts = () => {
             </div>
           </div>
           <div className={styles.addPostSettings}>
-          <img className={styles.settingsIcon}
-            src='./DotsThree.svg' alt='settings' />
-        </div>
+            <img className={styles.settingsIcon}
+              src='./DotsThree.svg' alt='settings' />
+          </div>
         </div>
         <p className={styles.postContent}>{post.postCont}</p>
         <div className={styles.postMedia}>
