@@ -180,8 +180,11 @@ const AddPost = () => {
             <div>
               <h2>Write your Article</h2>
               <textarea className={styles.articleInput} placeholder="Start writing your article..." onChange={(e) => setPostContent(e.target.value)}></textarea>
-              <button className={styles.closeButton} onClick={closeArticleModal}>Close</button>
-              <button className={styles.submitButton} onClick={handlePostSubmit}>Submit</button>
+              <div className={styles.btns}>
+                <button className={styles.btn} onClick={closeArticleModal}>Close</button>
+                <button className={styles.btn} onClick={handlePostSubmit}>Submit</button>
+              </div>
+              
             </div>
           </Modal>
         </div>
@@ -198,11 +201,11 @@ const AddPost = () => {
             onRequestClose={closeMediaModal}
             ariaHideApp={false}
             contentLabel="Media Modal">
-            <div>
+            <div className={styles.mediasContainer}>
               <h2>Attach Media Files</h2>
               <input type="file" multiple onChange={handleMultiFiles}/>
             </div>
-            <div>
+            <div className={styles.mediasContainer}>
             <h2>Preview</h2>
               {selectedFile.length > 0 && (
                 <div>
@@ -219,11 +222,14 @@ const AddPost = () => {
               )}
             </div>
             <div>
-              <h2>Add Caption</h2>
-              <input type="text" className={styles.captionInput} placeholder="Enter caption" onChange={(e) => setPostContent(e.target.value)}/>
+              {/* <h2>Add Caption</h2> */}
+              <textarea type="text" className={styles.captionInput} placeholder="Enter caption" onChange={(e) => setPostContent(e.target.value)}/>
             </div>
-            <button className={styles.closeButton} onClick={closeMediaModal}>Close</button>
-            <button className={styles.submitButton} onClick={handlePostSubmit}>Submit</button>
+            <div className={styles.btns}>
+            <button className={styles.btn} onClick={closeMediaModal}>Close</button>
+            <button className={styles.btn} onClick={handlePostSubmit}>Submit</button>
+            </div>
+            
           </Modal>
         </div>
 

@@ -17,6 +17,7 @@
     flex-direction: column;
     overflow: auto;
     grid-area: jobs_container;
+    flex: 3;
 }
 
 .search_post{
@@ -141,4 +142,15 @@ margin: 0;
     grid-area: right;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
+}
+
+.job_details_column {
+    flex: 2;
+    margin-left: 2rem;
+    padding: 1rem;
+    border: 1px solid rgba(0, 0, 0, 0.20);
+    border-radius: 10px;
+    overflow: auto;
+    background: #FFF;
 }
