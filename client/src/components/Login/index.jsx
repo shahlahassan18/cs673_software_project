@@ -9,6 +9,8 @@ import { useUser } from "../../features/contexts/UserContext";
 import LogoContainer from "./../LogoContainer";
 import Divider from "../Divider";
 import Button from "react-bootstrap/Button";
+import { db } from "../../firebase";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 
 const Login = () => {
   const { user, setUser } = useUser();
@@ -45,24 +47,22 @@ const Login = () => {
 
     signInWithPopup(auth, provider)
       .then((result) => {
-        const isNewUser = result.additionalUserInfo?.isNewUser;
         const user = result.user;
         setUser(result.user);
-        if (isNewUser) {
-          addUserToFirestore(user);
-        }
+        checkUserInFirestore(user);
         navigate("/feed");
       })
       .catch((error) => {
         console.error("Error signing in with Google: ", error.message);
         alert("Error signing in with Google: " + error.message);
       });
+
+
   };
 
   const addUserToFirestore = async (userData, formData) => {
     try {
       const userId = userData.uid;
-  
       const userProfile = {
         userID: userId,
         email: userData.email,
@@ -79,14 +79,47 @@ const Login = () => {
         comments: [],
         experience: formData.experience || [],
         contacts: formData.contacts || [],
-        createdAt: new Date(),
-        lastLogin: new Date(),
+        createdAt: formData.createdAt || new Date(),
+        lastLogin: formData.lastLogin || new Date(),
       };
   
       await setDoc(doc(db, "users", userId), userProfile);
       console.log("User profile saved successfully");
     } catch (error) {
       console.error("Error saving user profile:", error);
+    }
+  };
+
+  const checkUserInFirestore = async (user) => {
+    const userRef = doc(db, "users", user.uid);
+    const docSnap = await getDoc(userRef);
+
+    console.log("docSnap.exists(): ", docSnap.exists());
+  
+    if (!docSnap.exists()) {
+
+      const DefaultuserProfile = {
+        firstName: "",
+        lastName: "",
+        profilePicture: "https://cdn.onlinewebfonts.com/svg/img_383214.png",
+        title: "",
+        education: "",
+        skills: [],
+        interests: [],
+        bio: "",
+        followersCount: 0,
+        posts: [],
+        comments: [],
+        experience: [],
+        contacts: [],
+        createdAt: new Date(),
+        lastLogin: new Date(),
+      };
+
+      await addUserToFirestore(user, DefaultuserProfile);
+    }
+    else {
+      console.log("User already exists in Firestore");
     }
   };
 
