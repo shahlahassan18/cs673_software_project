@@ -4,7 +4,7 @@ import styles from "./posts.module.css"
 import { AiOutlineLike } from "react-icons/ai";
 import {BiCommentDetail, BiRepost} from "react-icons/bi";
 import {BsFillSendFill} from "react-icons/bs";
-import {db} from './../../firebase'
+import {db} from '../../firebase'
 import { collection, getDoc, updateDoc, onSnapshot, doc, query, orderBy} from 'firebase/firestore';
 import { getAuth } from 'firebase/auth'
 
@@ -67,8 +67,8 @@ const Posts = () => {
     const userSnapshot = await getDoc(userRef);
     if (userSnapshot.exists()) {
       const userData = userSnapshot.data();
-      const { firstName, lastName } = userData; // Replace 'firstName' and 'lastName' with your actual field names
-      return { firstName, lastName };
+      const { firstName, lastName, profilePicture } = userData; // Replace 'firstName' and 'lastName' with your actual field names
+      return { firstName, lastName, profilePicture };
     } else {
       console.log('No such user!');
       return null;
@@ -85,7 +85,7 @@ const Posts = () => {
         <div className={styles.user}>
           <div className={styles.profilePicContainer}>
             <img className={styles.profilePic}
-              src='https://s3-alpha-sig.figma.com/img/d0a7/3619/a7eaeb87169fa6f7361c4c51e67f89ab?Expires=1698019200&Signature=XjynzDMFyeBTJcjBzaDIawi~ESyKcW6XlR~ej5qSZxc2syl8oY12nrlUfVn~xroKHCKw3ZnGVWpWo1zIIELBZrCCNlB4eDGUogleYQ~NIXqoueMBFkEgRK2eOkJY2-wi3x00W-Ts7cORP9pvCb0NrEXIUsikUBJViyk-LtlG-XBo4e54utX6tmlLqx5xU8eMxMbVWsDI75TjY1gVWtNJB-v-quBjsJ5Dm~mo1qSIw-x5xiNIkJZlePP1ML-90qFJBvnlwCDDaJTxUQC94HFhZUhkh6OiXOi8JUQ3~Vi693dOwOJNNmeZ39bsFoQc48tqpY~gRUUZgKVNG7dU2JKpEw__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4' alt='profile' />
+              src={post.profilePicture} alt='profile' />
           </div>
           <div className={styles.postUser}>
             <p className={styles.postUserName}>{post.firstName} {post.lastName}</p>
@@ -102,9 +102,9 @@ const Posts = () => {
         </div>
         <p className={styles.postContent}>{post.postCont}</p>
         <div className={styles.postMedia}>
-          {post.media && post.media.map((url, index) => (
-            <img key={index} src={url} alt="Post media" />
-          ))}
+          {post.media && post.media.map((urlObject, index) =>
+            <img key={index} src={urlObject.url} alt={urlObject.url} />
+          )}
         </div>
         <div className={styles.btns}>
           <div className={styles.actionBtns}>

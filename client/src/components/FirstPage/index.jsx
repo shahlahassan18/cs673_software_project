@@ -40,7 +40,7 @@ const FirstPage = () => {
      
            <div className={styles.homeImgContainer}>
              <img alt='home' className={styles.homeImg}
-              src="https://s3-alpha-sig.figma.com/img/344e/3717/e001ba5428e0c3813dba5fbf4ea9a6ac?Expires=1698019200&Signature=P9TkhoLoT1ZHmTQvmUoOLOOfyCkm7JJ1F81BStNlvsU2HKXXr8rWhT~1n1sLudWeiKV8xpLIl~dJjEQAMVe-zPkumEDLYFDWGcCBz8t~5J0RpsCTpQcGJW-u0icRioktOEHc3AG9MARSsPsAQlJaaf3NOr6QGfFIek~czFk0QL647xZbffn~HQyLBYi9-ffmkBS1N8f0F7jjWpTLhieUzGGMvs~FZr7pJd0PZ-FUka-Gv9ibWIUi8ItFmn1z1sx9w4OD27Hed5806Iih4EP7JoeDH2q0tRz5SAgI2cwgUi9x8q-9b9~rez-whD4ItPFwpJkiR3QBZ7kosfH~Lbi6fQ__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4"
+              src="/public/homepage.svg"
             />
            </div>
            

@@ -1,11 +1,11 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import styles from "./addpost.module.css"
 import {MdOutlinePermMedia} from "react-icons/md";
 import {FaSuitcase} from "react-icons/fa";
 import {RiArticleLine} from "react-icons/ri";
 import Modal from 'react-modal';
 import { db, storage } from '../../firebase';
-import { collection, addDoc, serverTimestamp, arrayUnion } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, arrayUnion, doc, getDoc } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { getAuth } from 'firebase/auth'
 
@@ -16,6 +16,25 @@ const AddPost = () => {
   const [postContent, setPostContent] = useState('');
   const [selectedFile, setSelectedFile] = useState([]);
   const [comment, setComment] = useState('');
+  const [profilePicture, setprofilePicture] = useState('');
+  const auth = getAuth();
+  const currentUser = auth.currentUser;
+
+  useEffect(() => {
+    if (currentUser) {
+      const userDocRef = doc(db, 'users', currentUser.uid);
+      getDoc(userDocRef).then(docSnapshot => {
+        if (docSnapshot.exists()) {
+          const data = docSnapshot.data();
+          setprofilePicture(data.profilePicture);
+        } else {
+          console.error("User document doesn't exist!");
+        }
+      }).catch(err => {
+        console.error("Error fetching user data:", err);
+      });
+    }
+  }, []);
   
   function openMediaModal() {
     setMediaModal(true);
@@ -60,8 +79,6 @@ const AddPost = () => {
 
   const handlePostSubmit = async (e) => {
     e.preventDefault();
-    const auth = getAuth();
-    const currentUser = auth.currentUser;
 
     if (!currentUser) {
       console.log("User is NOT Authenticated");
@@ -139,7 +156,7 @@ const AddPost = () => {
       <div className={styles.addPostInputContainer}>
         <div className={styles.profilePicContainer}>
           <img className={styles.profilePic}
-            src='https://s3-alpha-sig.figma.com/img/d0a7/3619/a7eaeb87169fa6f7361c4c51e67f89ab?Expires=1698019200&Signature=XjynzDMFyeBTJcjBzaDIawi~ESyKcW6XlR~ej5qSZxc2syl8oY12nrlUfVn~xroKHCKw3ZnGVWpWo1zIIELBZrCCNlB4eDGUogleYQ~NIXqoueMBFkEgRK2eOkJY2-wi3x00W-Ts7cORP9pvCb0NrEXIUsikUBJViyk-LtlG-XBo4e54utX6tmlLqx5xU8eMxMbVWsDI75TjY1gVWtNJB-v-quBjsJ5Dm~mo1qSIw-x5xiNIkJZlePP1ML-90qFJBvnlwCDDaJTxUQC94HFhZUhkh6OiXOi8JUQ3~Vi693dOwOJNNmeZ39bsFoQc48tqpY~gRUUZgKVNG7dU2JKpEw__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4' alt='profile' />
+            src={profilePicture} alt='profile' />
         </div>
         {/* <div className={styles.addPostInput}> */}
         <input type="text" className={styles.addPostInput} value={postContent} onChange={(e) => setPostContent(e.target.value)}/>

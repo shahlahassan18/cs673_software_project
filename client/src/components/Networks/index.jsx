@@ -114,7 +114,7 @@ const Networks = () => {
       };
   
       fetchFirstName();
-    }, [request.requesterId]); // 依赖于 requesterId
+    }, [request.requesterId]);
 
     return (
       <div>
