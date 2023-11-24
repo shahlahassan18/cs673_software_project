@@ -143,7 +143,7 @@ input[type="password"] {
   font-weight: bold;
 }
 
-button {
+/* button {
   display: block;
   width: 100%;
   padding: 10px;
@@ -153,11 +153,11 @@ button {
   border-radius: 3px;
   font-size: 16px;
   cursor: pointer;
-}
+} */
 
-button:hover {
+/* button:hover {
   background-color: #0056b3;
-}
+} */
 
 .passwordContainer {
   position: relative;

@@ -4,6 +4,10 @@ import styles from "./profile.module.css";
 import { db } from "../../firebase";
 import { getAuth } from "firebase/auth";
 import { doc, getDoc, getDocs, collection } from "firebase/firestore";
+import { FiPlus } from "react-icons/fi";
+import Modal from 'react-modal';
+import { IoCloseSharp } from "react-icons/io5";
+import { MdOutlineModeEdit } from "react-icons/md";
 
 
 const Profile = () => {
@@ -18,6 +22,60 @@ const Profile = () => {
   const [skills, setskills] = useState([]);
   const [interests, setinterests] = useState([]);
   const [newConnections, setNewConnections] = useState([]);
+  const [experienceModal, setExperienceModal] = useState(false);
+  const [skillModal, setSkillModal] = useState(false)
+  const [addProfilePicModal, setAddProfilePicModal] = useState(false)
+  const [addBannerModal, setAddBannerModal] = useState(false)
+  const [infoModal, setInfoModal] = useState(false)
+  const [generalInfoInput , setGeneralInfoInput] = useState("")
+  const [generalInfo , setGeneralInfo] = useState("")
+
+  //OPEN AND CLOSE MODAL FUNCTIONS
+  function openExperienceModal() {
+    setExperienceModal(true);
+  }
+
+  function closeExperienceModal() {
+    setExperienceModal(false);
+  }
+  function openSkillModal() {
+    setSkillModal(true);
+  }
+
+  function closeSkillModal() {
+    setSkillModal(false);
+  }
+
+  function openAddProfilePicModal() {
+    setAddProfilePicModal(true);
+  }
+
+  function closeAddProfilePicModal() {
+    setAddProfilePicModal(false);
+  }
+  function openAddBannerModal() {
+    setAddBannerModal(true);
+  }
+
+  function closeAddBannerModal() {
+    setAddBannerModal(false);
+  }
+
+  function openInfoModal() {
+    setInfoModal(true);
+  }
+
+  function closeInfoModal() {
+    setInfoModal(false);
+  }
+
+  //General information form submission
+  function handleGeneralInfoSubmit(e){
+    e.preventDefault()
+    console.log(generalInfoInput)
+    setGeneralInfo(generalInfoInput)
+    closeInfoModal()
+  }
 
   useEffect(() => {
     const auth = getAuth();
@@ -102,12 +160,13 @@ const Profile = () => {
           <div className={styles.profile}>
             {/* 1st section */}
             <div className={styles.user}>
-              <div className={styles.bannerContainer}>
+              <div className={styles.bannerContainer} onClick={openAddBannerModal}>
                 <img className={styles.banner} src={backPicture} />
               </div>
               {/* <div className={styles.picContainer}> */}
               <div className={styles.userTitles}>
-                <img className={styles.pic} src={profilePicture} />
+                <img className={styles.pic} onClick={openAddProfilePicModal}
+                 src={profilePicture} />
                 {/* </div> */}
                 <div className={styles.titleContainer}>
                   <h6 className={styles.username}>
@@ -115,6 +174,45 @@ const Profile = () => {
                   </h6>
                   <p className={styles.jobtitle}>{title} </p>
                 </div>
+
+                {/* ADD PROFILE PICTURE MODAL */}
+            <Modal
+            isOpen={addProfilePicModal}
+            onRequestClose={closeSkillModal}
+            ariaHideApp={false}
+            contentLabel=" Add Profile Picture Modal">
+              <div className={styles.title}>
+                <h2 className={styles.addExperienceTitle}>Add Profile Picture</h2>
+                <button onClick={closeAddProfilePicModal} className={styles.modalBtn}><IoCloseSharp/></button>
+              </div>
+              <form className={styles.experienceForm}>
+                <input type='file' placeholder="Upload Profile Picture" className={styles.formInput} />
+                <div className={styles.btns}>
+                  <button className={styles.btn} >Submit</button>
+                </div>
+              </form>
+          </Modal>
+
+             {/* ADD BANNER  MODAL */}
+             <Modal
+            isOpen={addBannerModal}
+            onRequestClose={closeAddBannerModal}
+            ariaHideApp={false}
+            contentLabel=" Add Banner Modal">
+              <div className={styles.title}>
+                <h2 className={styles.addExperienceTitle}>Add Banner</h2>
+                <button onClick={closeAddBannerModal} className={styles.modalBtn}><IoCloseSharp/></button>
+              </div>
+              <form className={styles.experienceForm}>
+                <input type='file' placeholder="Upload Banner" className={styles.formInput} />
+                <div className={styles.btns}>
+                  <button className={styles.btn} >Submit</button>
+                </div>
+              </form>
+          </Modal>
+
+
+
 
                 <div className={styles.btns}>
                   <button className={styles.connectBtn}>
@@ -131,9 +229,37 @@ const Profile = () => {
             </div>
             {/* 2nd SECTION */}
             <div className={styles.info}>
+              <div className={styles.infoContainer}>
               <h6>General Information</h6>
-              <p className={styles.generalText}>{bio}</p>
+              {generalInfo ? 
+              <MdOutlineModeEdit onClick={openInfoModal}/> 
+              : 
+              <FiPlus onClick={openInfoModal}/>}
+              </div>    
+              {/* <p className={styles.generalText}>{bio}</p> */}
+              {generalInfo &&
+              <p>{generalInfo}</p>
+              }
             </div>
+
+             {/* ADD /EDIT  GENERAL INFORMATION MODAL */}
+             <Modal
+            isOpen={infoModal}
+            onRequestClose={closeInfoModal}
+            ariaHideApp={false}
+            contentLabel=" Add/Edit General Information Modal">
+              <div className={styles.title}>
+                <h2 className={styles.addExperienceTitle}>General Information</h2>
+                <button onClick={closeInfoModal} className={styles.modalBtn}><IoCloseSharp/></button>
+              </div>
+              <form className={styles.experienceForm} onSubmit={handleGeneralInfoSubmit}>
+                <textarea type='text' value={generalInfoInput} onChange={e=>setGeneralInfoInput(e.target.value)}
+                 placeholder="Enter General Information" className={styles.formInput} />
+                <div className={styles.btns}>
+                  <button className={styles.btn} >Submit</button>
+                </div>
+              </form>
+          </Modal>
 
             {/* 3rd SECTION */}
             <div className={styles.activity}>
@@ -152,7 +278,10 @@ const Profile = () => {
 
             {/* 4th SECTION */}
             <div className={styles.experienceSection}>
-              <h6>Experience</h6>
+              <div className={styles.experienceTitle}>
+                <h6>Experience</h6>
+                <FiPlus onClick={openExperienceModal} />
+              </div>
               {experience.map((exp, index) => (
                 <div key={index} className={styles.experienceContainer}>
                   <img className={styles.companylogo} src={exp.companylogo} />
@@ -164,12 +293,38 @@ const Profile = () => {
                     </p>
                     <p className={styles.jobDesc}>{exp.description}</p>
                   </div>
+                  <MdOutlineModeEdit />
                 </div>
               ))}
             </div>
+             {/* ADD EXPERIENCE MODAL */}
+            <Modal
+            isOpen={experienceModal}
+            onRequestClose={closeExperienceModal}
+            ariaHideApp={false}
+            contentLabel=" Add Experience Modal">
+              <div className={styles.title}>
+                <h2 className={styles.addExperienceTitle}>Add Experience</h2>
+                <button onClick={closeExperienceModal} className={styles.modalBtn}><IoCloseSharp/></button>
+              </div>
+              <form className={styles.experienceForm}>
+                <input type='text' placeholder="Enter Job Title" className={styles.formInput} />
+                <input type='text' placeholder="Enter Company Name" className={styles.formInput} />
+                <input type='text' placeholder="Enter Date range" className={styles.formInput} />
+                <textarea type='text' placeholder="Enter Description" className={styles.formInput} />
+                <div className={styles.btns}>
+                  <button className={styles.btn} >Submit</button>
+                </div>
+              </form>
+          </Modal>
 
             {/* 5th SECTION */}
+     
             <div className={styles.skillSection}>
+            <div className={styles.experienceTitle}>
+                <h6>Skills</h6>
+                <FiPlus onClick={openSkillModal} />
+              </div>
               {skills.map((skills, index) => (
                 <div key={index} className={styles.showPostsContainer}>
                   <p>{skills}</p>
@@ -180,6 +335,24 @@ const Profile = () => {
                 <img src="./Arrow.svg" className={styles.icon} />
               </div>
             </div>
+
+           {/* ADD SKILL MODAL */}
+            <Modal
+            isOpen={skillModal}
+            onRequestClose={closeSkillModal}
+            ariaHideApp={false}
+            contentLabel=" Add Skills Modal">
+              <div className={styles.title}>
+                <h2 className={styles.addExperienceTitle}>Add Skills</h2>
+                <button onClick={closeSkillModal} className={styles.modalBtn}><IoCloseSharp/></button>
+              </div>
+              <form className={styles.experienceForm}>
+                <input type='text' placeholder="Enter Skill" className={styles.formInput} />
+                <div className={styles.btns}>
+                  <button className={styles.btn} >Submit</button>
+                </div>
+              </form>
+          </Modal>
 
             {/* 6th SECTION */}
             <div className={styles.interestSection}>

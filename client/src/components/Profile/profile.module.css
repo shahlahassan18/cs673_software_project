@@ -162,6 +162,7 @@ width: auto;
 
 .info{
     /* width: 782.922px; */
+    width: 745.922px;
     /* width: auto;
     height: 123.615px; */
     max-width: 100%;
@@ -183,6 +184,15 @@ padding: 1rem;
     /* width: 720.251px; */
     /* width: auto; */
 }
+
+.infoContainer{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+
+
 
 .activity{
     width: 783.626px;
@@ -403,6 +413,45 @@ border: 1px solid #666;
 /* border: 1px solid #E0DFDC; */
 background: #FFF;
 padding-right: 1rem;
+}
+
+
+.experienceTitle, .title{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.addExperienceTitle{
+    margin-left: 1rem;
+}
+.modalBtn{
+    all:unset
+}
+
+.formInput{
+    border-radius: 10px;
+    background: linear-gradient(0deg, #F4EDFE 0%, #F4EDFE 100%), #F4EDFE;
+    width: 290%;
+    height: 68px;
+    margin: 1rem;
+    padding: 1rem;
+    border: none;
+}
+
+.btns{
+    display: flex;
+    flex-direction: row;
+    gap:1rem;
+    justify-content: start;
+    margin: 1rem;
+}
+
+.btn, .btn:hover{
+    background:  #604DCF;
+    color: white;
+    width: 125px;
+    height: 51px;
 }
 
 
