@@ -38,6 +38,99 @@ const Profile = () => {
     companyLogo : '',
   });
   const [skillFormData, setSkillFormData ]= useState("")
+  const [editExperienceIndex, setEditExperienceIndex] = useState(null);
+  const [editExperienceModal, setEditExperienceModal] = useState(false);
+  const [editSkillIndex, setEditSkillIndex] = useState(null);
+const [editSkillModal, setEditSkillModal] = useState(false);
+
+const handleEditSkill = (index) => {
+  setEditSkillIndex(index);
+  setSkillFormData(skills[index]);
+  setEditSkillModal(true);
+};
+
+const closeEditSkillModal = () => {
+  setEditSkillIndex(null);
+  setEditSkillModal(false);
+  setSkillModal(false)
+  setSkillFormData('');
+};
+
+const handleDeleteSkill = (index) => {
+  setskills((prev) => {
+    const updatedSkills = [...prev];
+    updatedSkills.splice(index, 1);
+    return updatedSkills;
+  });
+};
+
+const handleSkillFormSubmit = (event) => {
+  event.preventDefault();
+
+  if (editSkillIndex !== null) {
+    setskills((prev) => {
+      const updatedSkills = [...prev];
+      updatedSkills[editSkillIndex] = skillFormData;
+      return updatedSkills;
+    });
+  } else {
+    setskills((prev) => (prev ? [...prev, skillFormData] : [skillFormData]));
+  }
+
+  setSkillFormData('');
+  closeEditSkillModal();
+};
+
+  
+  const handleEditExperience = (index) => {
+    setEditExperienceIndex(index);
+    setExperienceFormData(experience[index]);
+    setEditExperienceModal(true);
+  };
+  
+  const closeEditExperienceModal = () => {
+    setEditExperienceIndex(null);
+    setEditExperienceModal(false);
+    setExperienceFormData({
+      jobTitle: '',
+      companyName: '',
+      dateRange: '',
+      description: '',
+      companyLogo: '',
+    });
+    setExperienceModal(false)
+  };
+  
+  const handleExperienceFormSubmit = (event) => {
+    event.preventDefault();
+  
+    if (editExperienceIndex !== null) {
+      setexperience((prev) => {
+        const updatedExperience = [...prev];
+        updatedExperience[editExperienceIndex] = experienceFormData;
+        return updatedExperience;
+      });
+    } else {
+      setexperience((prev) => (prev ? [...prev, experienceFormData] : [experienceFormData]));
+    }
+    setExperienceFormData({
+      jobTitle: '',
+      companyName: '',
+      dateRange: '',
+      description: '',
+      companyLogo: '',
+    });
+    closeEditExperienceModal();
+  };
+  
+  const handleDeleteExperience = (index) => {
+    setexperience((prev) => {
+      const updatedExperience = [...prev];
+      updatedExperience.splice(index, 1);
+      return updatedExperience;
+    });
+  };
+    
 
 
   const handleInputChangeExperienceForm = (event) => {
@@ -50,41 +143,41 @@ const Profile = () => {
     setSkillFormData(value);
   };
 
-  const handleExperienceFormSubmit = (event) => {
-    event.preventDefault();
-    console.log('Experience Form data submitted:', experienceFormData);
-    setexperience(prev =>{
-      if(prev){
-        return [...prev, experienceFormData]
-      }else{
-        return [experienceFormData]
-      }
-    }
-     )
-    setExperienceFormData({
-      jobTitle: '',
-      companyName: '',
-      dateRange: '',
-      description: '',
-      companyLogo : '',
-    });
-    closeExperienceModal()
-  };
+  // const handleExperienceFormSubmit = (event) => {
+  //   event.preventDefault();
+  //   console.log('Experience Form data submitted:', experienceFormData);
+  //   setexperience(prev =>{
+  //     if(prev){
+  //       return [...prev, experienceFormData]
+  //     }else{
+  //       return [experienceFormData]
+  //     }
+  //   }
+  //    )
+  //   setExperienceFormData({
+  //     jobTitle: '',
+  //     companyName: '',
+  //     dateRange: '',
+  //     description: '',
+  //     companyLogo : '',
+  //   });
+  //   closeExperienceModal()
+  // };
 
-  const handleSkillFormSubmit = (event) => {
-    event.preventDefault();
-    console.log('skill Form data submitted:', skillFormData);
-    setskills(prev =>{
-      if(prev){
-        return [...prev, skillFormData]
-      }else{
-        return [skillFormData]
-      }
-    }
-     )
-    setSkillFormData("");
-    closeSkillModal()
-  };
+  // const handleSkillFormSubmit = (event) => {
+  //   event.preventDefault();
+  //   console.log('skill Form data submitted:', skillFormData);
+  //   setskills(prev =>{
+  //     if(prev){
+  //       return [...prev, skillFormData]
+  //     }else{
+  //       return [skillFormData]
+  //     }
+  //   }
+  //    )
+  //   setSkillFormData("");
+  //   closeSkillModal()
+  // };
 
   //OPEN AND CLOSE MODAL FUNCTIONS
   function openExperienceModal() {
@@ -350,8 +443,8 @@ const Profile = () => {
                     </p>
                     <p className={styles.jobDesc}>{exp.description}</p>
                   </div>
-                  <MdOutlineModeEdit />
-                  <MdOutlineDelete />
+                  <MdOutlineModeEdit onClick={()=>handleEditExperience(index)} />
+                  <MdOutlineDelete  onClick={()=>handleDeleteExperience(index)} />
                 </div>
               ))}
             </div>
@@ -375,8 +468,36 @@ const Profile = () => {
                 onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.dateRange} />
                 <textarea type='text' placeholder="Enter Description" name="description"  className={styles.formInput} 
                 onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.description} />
-                <input type='file' placeholder="Upload Company Logo" name="companyLogo"  className={styles.formInput} 
-                onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.companyLogo} />
+                {/* <input type='file' placeholder="Upload Company Logo" name="companyLogo"  className={styles.formInput} 
+                onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.companyLogo} /> */}
+                <div className={styles.btns}>
+                  <button className={styles.btn} >Submit</button>
+                </div>
+              </form>
+          </Modal>
+
+          {/* EDIT EXPERIENCE MODAL */}
+          <Modal
+            isOpen={editExperienceModal}
+            onRequestClose={closeExperienceModal}
+            ariaHideApp={false}
+            contentLabel=" Edit Experience Modal">
+              <div className={styles.title}>
+                <h2 className={styles.addExperienceTitle}>Add Experience</h2>
+                <button onClick={closeExperienceModal} className={styles.modalBtn}><IoCloseSharp/></button>
+              </div>
+              <form className={styles.experienceForm} onSubmit={handleExperienceFormSubmit}>
+                <input type='text' placeholder="Enter Job Title" name="jobTitle" className={styles.formInput}
+                 onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.jobTitle} 
+                 />
+                <input type='text' placeholder="Enter Company Name" name="companyName"  className={styles.formInput} 
+                onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.companyName} />
+                <input type='text' placeholder="Enter Date range" name="dateRange"  className={styles.formInput} 
+                onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.dateRange} />
+                <textarea type='text' placeholder="Enter Description" name="description"  className={styles.formInput} 
+                onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.description} />
+                {/* <input type='file' placeholder="Upload Company Logo" name="companyLogo"  className={styles.formInput} 
+                onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.companyLogo} /> */}
                 <div className={styles.btns}>
                   <button className={styles.btn} >Submit</button>
                 </div>
@@ -393,8 +514,10 @@ const Profile = () => {
               {skills.map((skill, index) => (
                 <div key={index} className={styles.showPostsContainer}>
                   <p>{skill}</p>
-                  <MdOutlineModeEdit />
-                  < MdOutlineDelete />
+                  <div className={styles.btns}>
+                  <MdOutlineModeEdit onClick={()=>handleEditSkill(index)} />
+                  <MdOutlineDelete  onClick={()=>handleDeleteSkill(index)} />
+                  </div>
                 </div>
               ))}
               <div className={styles.showPostsContainer}>
@@ -409,6 +532,25 @@ const Profile = () => {
             onRequestClose={closeSkillModal}
             ariaHideApp={false}
             contentLabel=" Add Skills Modal">
+              <div className={styles.title}>
+                <h2 className={styles.addExperienceTitle}>Add Skills</h2>
+                <button onClick={closeSkillModal} className={styles.modalBtn}><IoCloseSharp/></button>
+              </div>
+              <form className={styles.experienceForm} onSubmit={handleSkillFormSubmit}>
+                <input type='text' placeholder="Enter Skill" className={styles.formInput} name="skill"  
+                onChange={e=>handleInputChangeSkillForm(e)} value ={skillFormData}  />
+                <div className={styles.btns}>
+                  <button className={styles.btn} >Submit</button>
+                </div>
+              </form>
+          </Modal>
+
+          {/* EDIT SKILL MODAL */}
+          <Modal
+            isOpen={editSkillModal}
+            onRequestClose={closeSkillModal}
+            ariaHideApp={false}
+            contentLabel=" Edit Skills Modal">
               <div className={styles.title}>
                 <h2 className={styles.addExperienceTitle}>Add Skills</h2>
                 <button onClick={closeSkillModal} className={styles.modalBtn}><IoCloseSharp/></button>

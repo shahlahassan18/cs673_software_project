@@ -238,7 +238,7 @@ padding: 1rem;
 .showPostsContainer{
     border-top: 4px solid #EBEBEB;;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
 }
 
