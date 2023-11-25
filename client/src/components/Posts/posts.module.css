@@ -270,6 +270,21 @@ line-height: 20px; /* 133.333% */
 margin: 0;
 }
 
+.comments,.commentForm{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.commentInput{
+    width: 80%;
+    padding: 0.3rem;
+}
+
+.commentSubmit{
+    all:unset;
+}
 
 @media screen and (max-width: 750px) {
 

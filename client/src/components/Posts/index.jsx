@@ -7,10 +7,31 @@ import {BsFillSendFill} from "react-icons/bs";
 import {db} from '../../firebase'
 import { collection, getDoc, updateDoc, onSnapshot, doc, query, orderBy} from 'firebase/firestore';
 import { getAuth } from 'firebase/auth'
+import { MdOutlineDelete } from "react-icons/md";
 
 
 const Posts = () => {
   const [posts, setPosts] = useState([]);
+  const [comment, setComment] = useState("")
+  const [comments, setComments] = useState([])
+  const [activePost,setActivePost] = useState(null)
+
+
+   //Comment Form Submission
+   const handleCommentSubmit = (e,postId) =>{
+    e.preventDefault()
+    setComments((prev) => (prev ? [...prev, {postId,comment}] : [{postId,comment}]));
+    setComment('');
+   } 
+
+   const handleDeleteComment = (index) => {
+    setComments((prev) => {
+      const updatedComments = [...prev];
+      updatedComments.splice(index, 1);
+      return updatedComments;
+    });
+  };
+
   useEffect(() => {
     const postsCollection = collection(db, 'posts');
     const postsQuery = query(postsCollection, orderBy('TimeCreated', 'desc')); // Order by 'createdAt' in descending order
@@ -114,9 +135,9 @@ const Posts = () => {
                 src='./ThumbsUp.svg' alt='search' />
               <p className={styles.actionText}>Like {post.likes && post.likes.length}</p>
             </div>
-            <div className={styles.actionBtn}>
+            <div className={styles.actionBtn} onClick={()=>setActivePost(post.id)}>
               <img className={styles.actionIcon}
-                src='./ChatText.svg' alt='search' />
+                src='./ChatText.svg' alt='comment' />
               <p className={styles.actionText}>Comment</p>
             </div>
             <div className={styles.actionBtn}>
@@ -131,6 +152,30 @@ const Posts = () => {
             </div>
             </div>
           </div>
+          {activePost === post.id && 
+          (
+            <>
+            {/* <div className={styles.commentInputContainer}> */}
+            <form onSubmit={(e)=>handleCommentSubmit(e,post.id)} className={styles.commentForm}>
+              <input type='text' placeholder='Enter Comment' onChange ={(e)=>setComment(e.target.value)} value={comment}
+              className={styles.commentInput}></input>
+              <button type='submit' className={styles.commentSubmit}>Submit</button>
+            </form>
+          {/* </div> */}
+          
+           {comments && comments.filter((comm)=>comm.postId === post.id)
+            .map((ele, ind) => (
+              <div key={ind} className={styles.comments}>
+                <p>{ele.comment}</p>
+                <MdOutlineDelete onClick={handleDeleteComment} />
+              </div>
+            ))
+           }
+            </>
+          )
+          }
+        
+          
         </div>
 
 
