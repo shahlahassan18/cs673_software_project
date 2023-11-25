@@ -8,6 +8,7 @@ import { FiPlus } from "react-icons/fi";
 import Modal from 'react-modal';
 import { IoCloseSharp } from "react-icons/io5";
 import { MdOutlineModeEdit } from "react-icons/md";
+import { MdOutlineDelete } from "react-icons/md";
 
 
 const Profile = () => {
@@ -29,6 +30,61 @@ const Profile = () => {
   const [infoModal, setInfoModal] = useState(false)
   const [generalInfoInput , setGeneralInfoInput] = useState("")
   const [generalInfo , setGeneralInfo] = useState("")
+  const [experienceFormData, setExperienceFormData] = useState({
+    jobTitle: '',
+    companyName: '',
+    dateRange: '',
+    description: '',
+    companyLogo : '',
+  });
+  const [skillFormData, setSkillFormData ]= useState("")
+
+
+  const handleInputChangeExperienceForm = (event) => {
+    const { name, value } = event.target;
+    setExperienceFormData({ ...experienceFormData, [name]: value });
+  };
+
+  const handleInputChangeSkillForm = (event) => {
+    const {value } = event.target;
+    setSkillFormData(value);
+  };
+
+  const handleExperienceFormSubmit = (event) => {
+    event.preventDefault();
+    console.log('Experience Form data submitted:', experienceFormData);
+    setexperience(prev =>{
+      if(prev){
+        return [...prev, experienceFormData]
+      }else{
+        return [experienceFormData]
+      }
+    }
+     )
+    setExperienceFormData({
+      jobTitle: '',
+      companyName: '',
+      dateRange: '',
+      description: '',
+      companyLogo : '',
+    });
+    closeExperienceModal()
+  };
+
+  const handleSkillFormSubmit = (event) => {
+    event.preventDefault();
+    console.log('skill Form data submitted:', skillFormData);
+    setskills(prev =>{
+      if(prev){
+        return [...prev, skillFormData]
+      }else{
+        return [skillFormData]
+      }
+    }
+     )
+    setSkillFormData("");
+    closeSkillModal()
+  };
 
   //OPEN AND CLOSE MODAL FUNCTIONS
   function openExperienceModal() {
@@ -280,20 +336,22 @@ const Profile = () => {
             <div className={styles.experienceSection}>
               <div className={styles.experienceTitle}>
                 <h6>Experience</h6>
-                <FiPlus onClick={openExperienceModal} />
+                <FiPlus onClick={openExperienceModal}/>
               </div>
-              {experience.map((exp, index) => (
+              {experience && experience.map((exp, index) => (
                 <div key={index} className={styles.experienceContainer}>
                   <img className={styles.companylogo} src={exp.companylogo} />
                   <div className={styles.experience}>
-                    <p className={styles.job}>{exp.title}</p>
-                    <p className={styles.jobCompany}>{exp.company}</p>
+                    <p className={styles.job}>{exp.jobTitle}</p>
+                    <p className={styles.jobCompany}>{exp.companyName}</p>
                     <p className={styles.jobDate}>
-                      {exp.startDate} - {exp.endDate}
+                      {/* {exp.startDate} - {exp.endDate} */}
+                      {exp.dateRange}
                     </p>
                     <p className={styles.jobDesc}>{exp.description}</p>
                   </div>
                   <MdOutlineModeEdit />
+                  <MdOutlineDelete />
                 </div>
               ))}
             </div>
@@ -307,11 +365,18 @@ const Profile = () => {
                 <h2 className={styles.addExperienceTitle}>Add Experience</h2>
                 <button onClick={closeExperienceModal} className={styles.modalBtn}><IoCloseSharp/></button>
               </div>
-              <form className={styles.experienceForm}>
-                <input type='text' placeholder="Enter Job Title" className={styles.formInput} />
-                <input type='text' placeholder="Enter Company Name" className={styles.formInput} />
-                <input type='text' placeholder="Enter Date range" className={styles.formInput} />
-                <textarea type='text' placeholder="Enter Description" className={styles.formInput} />
+              <form className={styles.experienceForm} onSubmit={handleExperienceFormSubmit}>
+                <input type='text' placeholder="Enter Job Title" name="jobTitle" className={styles.formInput}
+                 onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.jobTitle} 
+                 />
+                <input type='text' placeholder="Enter Company Name" name="companyName"  className={styles.formInput} 
+                onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.companyName} />
+                <input type='text' placeholder="Enter Date range" name="dateRange"  className={styles.formInput} 
+                onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.dateRange} />
+                <textarea type='text' placeholder="Enter Description" name="description"  className={styles.formInput} 
+                onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.description} />
+                <input type='file' placeholder="Upload Company Logo" name="companyLogo"  className={styles.formInput} 
+                onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.companyLogo} />
                 <div className={styles.btns}>
                   <button className={styles.btn} >Submit</button>
                 </div>
@@ -325,9 +390,11 @@ const Profile = () => {
                 <h6>Skills</h6>
                 <FiPlus onClick={openSkillModal} />
               </div>
-              {skills.map((skills, index) => (
+              {skills.map((skill, index) => (
                 <div key={index} className={styles.showPostsContainer}>
-                  <p>{skills}</p>
+                  <p>{skill}</p>
+                  <MdOutlineModeEdit />
+                  < MdOutlineDelete />
                 </div>
               ))}
               <div className={styles.showPostsContainer}>
@@ -346,8 +413,9 @@ const Profile = () => {
                 <h2 className={styles.addExperienceTitle}>Add Skills</h2>
                 <button onClick={closeSkillModal} className={styles.modalBtn}><IoCloseSharp/></button>
               </div>
-              <form className={styles.experienceForm}>
-                <input type='text' placeholder="Enter Skill" className={styles.formInput} />
+              <form className={styles.experienceForm} onSubmit={handleSkillFormSubmit}>
+                <input type='text' placeholder="Enter Skill" className={styles.formInput} name="skill"  
+                onChange={e=>handleInputChangeSkillForm(e)} value ={skillFormData}  />
                 <div className={styles.btns}>
                   <button className={styles.btn} >Submit</button>
                 </div>
