@@ -11,6 +11,7 @@ import PlacesAutocomplete, {
   geocodeByAddress,
   getLatLng,
 } from 'react-places-autocomplete';
+import { IoCloseSharp } from "react-icons/io5";
 
 const JobItem = ({ job, onBookmarkClick, isBookmarked, onJobClick }) => (
   <div className={styles.job} onClick={() => onJobClick(job)}>
@@ -58,7 +59,6 @@ const Jobs = () => {
   const [savedJobs, setSavedJobs] = useState([]);
   const [createJobOpen, setcreateJobOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
   // Store input data to create job listing
   const [jobTitle, setJobTitle] = useState("");
   const [companyName, setCompanyName] = useState("");
@@ -92,15 +92,26 @@ const Jobs = () => {
       }));
       setJobs(jobsData);
 
+      if (searchTerm) {
+        // Filter jobs based on the search term
+        console.log("search", searchTerm)
+        const filteredJobs = jobsData.filter((job) =>
+          job.title.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+
+        setJobs(filteredJobs);
+
+      }
+
       // Check for duplicate job IDs
       const jobIds = jobsData.map(job => job.id);
       const hasDuplicateJobIds = jobIds.length !== new Set(jobIds).size;
       console.log('Has duplicate job IDs:', hasDuplicateJobIds);
-    });
+    }, [searchTerm]);
   
     // Clean up the listener when the component is unmounted
     return () => unsubscribe();
-  }, []);
+  }, [searchTerm]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -192,7 +203,21 @@ const Jobs = () => {
             })
           );
           setSavedJobs(userSavedJobs);
+        }else{
+          setSavedJobs([]);
         }
+        
+        if (searchTerm) {
+          // Filter jobs based on the search term
+          console.log("search", searchTerm)
+          const filteredJobs = savedJobs.filter((job) =>
+            job.title.toLowerCase().includes(searchTerm.toLowerCase())
+          );
+  
+          setSavedJobs(filteredJobs);
+  
+        }
+
       }
     };
   
@@ -217,6 +242,8 @@ const Jobs = () => {
             <input
               className={styles.search_jobs}
               placeholder="Search Jobs"
+              value={searchTerm}
+              onChange={e=> setSearchTerm(e.target.value)}
             ></input>
             <button className={styles.create_job} onClick={OpenCreateJobModal}>Post a Job</button>
             <Modal
@@ -225,22 +252,29 @@ const Jobs = () => {
               ariaHideApp={false}
               contentLabel="Job Posting Modal"
             >
-              <h2>Post a Job</h2>
+              {/* <h2>Post a Job</h2> */}
+              <div className={styles.title}>
+                <h2 className={styles.addExperienceTitle}>Post A Job</h2>
+                <button onClick={CloseCreateJobModal} className={styles.modalBtn}><IoCloseSharp/></button>
+              </div>
               <input
                 type="text"
                 placeholder="Job Title"
+                className={styles.formInput}
                 value={jobTitle}
                 onChange={(event) => setJobTitle(event.target.value)}
               />
               <input
                 type="text"
                 placeholder="Company Name"
+                className={styles.formInput}
                 value={companyName}
                 onChange={(event) => setCompanyName(event.target.value)}
               />
               <select
                 name="jobType"
                 id="jobType"
+                className={styles.formInput}
                 value={jobType}
                 onChange={(e) => setJobType(e.target.value)}
               >
@@ -255,27 +289,33 @@ const Jobs = () => {
               <input
                 type="text"
                 placeholder="Salary"
+                className={styles.formInput}
                 value={salary}
                 onChange={(e) => setSalary(e.target.value)}
               />
               <input
                 type="text"
                 placeholder="Job Location"
+                className={styles.formInput}
                 value={jobLocation}
                 onChange={(e) => setJobLocation(e.target.value)}
               />
               <textarea
                 placeholder="Job Description"
                 value={jobDescription}
+                className={styles.formInput}
                 onChange={(e) => setJobDescription(e.target.value)}
               />
               <textarea
                 placeholder="Requirements"
                 value={requirements}
+                className={styles.formInput}
                 onChange={(e) => setRequirements(e.target.value)}
               />
-              <button onClick={CloseCreateJobModal}>Close</button>
-              <button onClick={handleSubmit}>Submit</button>
+              <div className={styles.btns}>
+                <button className={styles.btn} onClick={CloseCreateJobModal}>Close</button>
+                <button className={styles.btn} onClick={handleSubmit}>Submit</button>
+              </div>
             </Modal>
           </div>
           <div style={{display: 'flex'}}>
@@ -300,7 +340,7 @@ const Jobs = () => {
               {currentView === "saved" && (
                 <div className={styles.recommended}>
                   <div className={styles.jobs}>
-                  {savedJobs.map((job) => {
+                  {savedJobs.length>0 ? savedJobs.map((job) => {
                     console.log('Job:', job);
                     return (
                       <JobItem
@@ -311,7 +351,8 @@ const Jobs = () => {
                         onJobClick={handleJobClick(job)}
                       />
                     );
-                  })}
+                  }) : <h3>No Saved Jobs</h3>
+                }
                   </div>
                 </div>
               )}
