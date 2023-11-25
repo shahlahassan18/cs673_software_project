@@ -70,7 +70,7 @@ margin: 0;
     align-self: stretch;
 }
 
-.menuItemLink, .JobmenuItem{
+.menuItemLink, .JobmenuItem,.homeMenuItemLink{
     display: flex;
     padding: 0 1rem;
     align-items: center;
@@ -78,7 +78,13 @@ margin: 0;
     align-self: stretch;
     border-right: 2px solid var(--primary-main, #604DCF);
     cursor: pointer;
+    text-decoration: none;
 }
+
+.homeMenuItemLink{
+    padding: 0;
+}
+
 
 .menuItem, .jobItem{
     display: flex;

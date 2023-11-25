@@ -7,12 +7,18 @@ import { getAuth } from 'firebase/auth';
 import {doc, getDoc} from 'firebase/firestore';
 // import axios from 'axios';
 
-const LeftProfile = ({onFindJobsClick,onSavedJobsClick}) => {
+const LeftProfile = ({onFindJobsClick,onSavedJobsClick, handleTabClick}) => {
 
   const [showJobsMenu, setShowJobsMenu] = useState(false);
+  const [showNetWorksMenu, setShowNetWorksMenu] = useState(false);
+
 
   const toggleJobsMenu = () => {
     setShowJobsMenu(!showJobsMenu);
+  };
+
+  const toggleNetorkMenu = () => {
+    setShowNetWorksMenu(!showNetWorksMenu);
   };
 
 
@@ -61,7 +67,7 @@ const LeftProfile = ({onFindJobsClick,onSavedJobsClick}) => {
       <p className={styles.jobTitle}>{title}</p>
       <button className={styles.viewProfileBtn} onClick={handleViewProfile}>View Profile</button>    </div>
     <div className={styles.menu}>
-    <Link to="/feed" className={styles.menuItemLink}>
+    <Link to="/feed" className={styles.homeMenuItemLink}>
       <div className={styles.menuItem}>  
         <img className={styles.icon} src='./home.svg' alt="home"/>
         <p className={styles.menuText}> Home</p>
@@ -69,12 +75,35 @@ const LeftProfile = ({onFindJobsClick,onSavedJobsClick}) => {
       </div>
       </Link>  
 
-      <Link to="/network" className={styles.menuItemLink}>
+      {/* <Link to="/network" className={styles.menuItemLink}>
       <div className={styles.menuItem}>
         <img className={styles.icon} src='./layers.svg' alt="network"/>
         <p className={styles.menuText}> My Network</p>
       </div>
-      </Link>
+      </Link> */}
+   
+     <div className={styles.JobmenuItem} onClick={() => toggleNetorkMenu()}>
+          <img className={styles.icon} src='./layers.svg' alt="Network" />
+          <p className={styles.menuText}> My Network</p>
+        </div>
+        {showNetWorksMenu &&
+
+          <div className={styles.job_tabs}>
+            <Link to="/network" className={styles.menuItemLink}  onClick={() => handleTabClick("Connections")}>
+              <div className={styles.jobItem} onClick={onFindJobsClick}>
+                <img className={styles.icon} src='./briefcase.svg' alt="Network" />
+                <p className={styles.menuText}> New Connections</p>
+              </div>
+            </Link>
+            <Link to="/network" className={styles.menuItemLink} onClick={() => handleTabClick("Contacts")}>
+              <div className={styles.jobItem} onClick={onSavedJobsClick}>
+                <img className={styles.icon} src='./briefcase.svg' alt="Network" />
+                <p className={styles.menuText}> Contacts</p>
+              </div>
+            </Link>
+          </div>
+        }
+     
      
         {/* <Link to="/jobs" className={styles.menuItemLink}> */}
 
@@ -97,9 +126,12 @@ const LeftProfile = ({onFindJobsClick,onSavedJobsClick}) => {
                 <p className={styles.menuText}> Saved Jobs</p>
               </div>
               </Link>
-            </div>}
+            </div>
+            }
 
        
+
+        
 
      
 

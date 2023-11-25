@@ -5,6 +5,7 @@ import Users from '../Users';
 import { getAuth } from 'firebase/auth';
 import { doc,getDoc, updateDoc, arrayUnion, collection, query, where, getDocs } from "firebase/firestore";
 import { db } from '../../firebase';
+import LeftProfile from '../LeftProfile';
 
 const Networks = () => {
   const [activeTab, setActiveTab] = useState("Connections");
@@ -167,7 +168,7 @@ const Networks = () => {
       </div>
     )}
       <div className={styles.networks_section}>
-        <div className={styles.manage_network_section}>
+        {/* <div className={styles.manage_network_section}>
           <h6>Manage your networks</h6>
           <div
             className={`${styles.connection} ${activeTab === "Connections" ? styles.active : ""}`}
@@ -180,9 +181,9 @@ const Networks = () => {
             onClick={() => handleTabClick("Contacts")}
           >
             <p className={styles.txt}>Contacts</p>
-            {/* <p className={styles.txt}>1277</p> */}
           </div>
-        </div>
+        </div> */}
+        <LeftProfile handleTabClick={handleTabClick}/>
         <div className={styles.users}>
                           {activeTab === "Connections" ?
                       <div className={styles.title}>
