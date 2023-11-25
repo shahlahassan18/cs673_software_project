@@ -48,7 +48,9 @@ const JobDetails = ({ job }) => (
     <h2>{job.title}</h2>
     <h3>{job.company}</h3>
     <p>{job.location}</p>
+    <button className={styles.btn} >Apply</button>
     <p>{job.description}</p>
+    <p>{job.requirements}</p>
     {/* Add more fields as needed */}
   </div>
 );
