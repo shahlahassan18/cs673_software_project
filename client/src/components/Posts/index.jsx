@@ -5,7 +5,7 @@ import { AiOutlineLike } from "react-icons/ai";
 import {BiCommentDetail, BiRepost} from "react-icons/bi";
 import {BsFillSendFill} from "react-icons/bs";
 import {db} from '../../firebase'
-import { collection, getDoc, updateDoc, onSnapshot, doc, query, orderBy} from 'firebase/firestore';
+import { collection, addDoc, getDoc, getDocs, updateDoc, deleteDoc, onSnapshot, doc, query, orderBy, serverTimestamp} from 'firebase/firestore';
 import { getAuth } from 'firebase/auth'
 import { MdOutlineDelete } from "react-icons/md";
 
@@ -18,16 +18,38 @@ const Posts = () => {
 
 
    //Comment Form Submission
-   const handleCommentSubmit = (e,postId) =>{
+   const handleCommentSubmit = async(e,postId) =>{
     e.preventDefault()
-    setComments((prev) => (prev ? [...prev, {postId,comment}] : [{postId,comment}]));
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
+  
+    if (!currentUser) {
+      console.log("User is NOT Authenticated");
+      return;
+    }
+
+    const userId = currentUser.uid;
+    const postRef = doc(db, 'posts', postId);
+    const commentsCollection = collection(postRef, 'comments');
+    const newComment = { userId, text: comment, timestamp: serverTimestamp() };
+  
+    const commentRef = await addDoc(commentsCollection, newComment);
+
+    setComments((prev) => (prev ? [...prev, {id: commentRef.id, postId, comment}] : [{id: commentRef.id, postId, comment}]));
     setComment('');
    } 
 
-   const handleDeleteComment = (index) => {
+   const handleDeleteComment = async (postId, commentId) => {
+    const postRef = doc(db, 'posts', postId);
+    const commentRef = doc(postRef, 'comments', commentId);
+    await deleteDoc(commentRef);
+  
     setComments((prev) => {
       const updatedComments = [...prev];
-      updatedComments.splice(index, 1);
+      const index = updatedComments.findIndex((comment) => comment.id === commentId);
+      if (index !== -1) {
+        updatedComments.splice(index, 1);
+      }
       return updatedComments;
     });
   };
@@ -38,12 +60,17 @@ const Posts = () => {
   
     const unsubscribe = onSnapshot(postsQuery, async (snapshot) => {
       console.log('Snapshot received:', snapshot); // Log the received snapshot
-      const postsData = await Promise.all(snapshot.docs.map(async (doc) => {
-        const postData = doc.data();
+      const postsData = await Promise.all(snapshot.docs.map(async (docPost) => {
+        const postData = docPost.data();
         const { userId } = postData;
         const userData = await getUserData(userId);
-        console.log('Doc data:', doc.data()); // Log each document's data
-        return { id: doc.id, ...postData, ... userData };
+        console.log('Doc data:', docPost.data()); // Log each document's data
+        // Fetch comments for the post
+        const postRef = doc(db, 'posts', docPost.id);
+        const commentsCollection = collection(postRef, 'comments');
+        const commentsSnapshot = await getDocs(commentsCollection);
+        const commentsData = commentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        return { id: docPost.id, ...postData, ... userData, comments: commentsData };
       }));
   
       console.log('Posts data:', postsData); // Log the mapped posts data
@@ -138,9 +165,8 @@ const Posts = () => {
               <p className={styles.actionText}>Like {post.likes && post.likes.length}</p>
             </div>
             <div className={styles.actionBtn} onClick={()=>setActivePost(post.id)}>
-              <img className={styles.actionIcon}
-                src='./ChatText.svg' alt='comment' />
-              <p className={styles.actionText}>Comment</p>
+              <img className={styles.actionIcon} src='./ChatText.svg' alt='comment' />
+              <p className={styles.actionText}>Comment {post.comments ? post.comments.length : 0}</p>
             </div>
             <div className={styles.actionBtn}>
               <img className={styles.actionIcon}
@@ -165,14 +191,16 @@ const Posts = () => {
             </form>
           {/* </div> */}
           
-           {comments && comments.filter((comm)=>comm.postId === post.id)
-            .map((ele, ind) => (
-              <div key={ind} className={styles.comments}>
-                <p>{ele.comment}</p>
-                <MdOutlineDelete onClick={handleDeleteComment} />
-              </div>
-            ))
-           }
+          {post.comments && post.comments
+  .sort((a, b) => b.timestamp - a.timestamp) // Sort comments by timestamp in descending order
+  .slice(0, 3) // Take the first 3 comments
+  .map((comment, index) => (
+    <div key={index} className={styles.comments}>
+      <p>{comment.text}</p>
+      <MdOutlineDelete onClick={() => handleDeleteComment(post.id, comment.id)} />
+    </div>
+  ))
+}
             </>
           )
           }
@@ -190,105 +218,3 @@ const Posts = () => {
 };
 
 export default Posts;
-
-
-
-
-//------
-// import React, {useEffect} from 'react'
-// import styles from "./posts.module.css"
-// import { AiOutlineLike } from "react-icons/ai";
-// import {BiCommentDetail, BiRepost} from "react-icons/bi";
-// import {BsFillSendFill} from "react-icons/bs";
-// import {db} from './../../firebase'
-// import {
-//   collection,
-//   onSnapshot, // Replace getDocs with onSnapshot
-//   // doc,
-//   // query,
-// } from 'firebase/firestore';
-// import { useState } from 'react';
-
-
-
-// const Posts = () => {
-
-// const [posts, setPosts] = useState(null)
-
-//   useEffect(() => {
-//     const postsCollection = collection(db, 'posts'); // Reference the 'posts' collection
-//     onSnapshot(postsCollection, (snapshot) => {
-//       // console.log('snap: \n', snapshot.docs);
-//       // console.log('snap: \n', )
-//       setPosts(snapshot.docs.map((doc) => ({ id: doc.id, posts: doc.data() })));
-//     });
-//   }, []);
-
-//   console.log('snap: \n', posts)
-
-//   return (
-    
-
-//     <div className={styles.postContainer}>
-//       <div className={styles.post}>
-//         <div className={styles.user}>
-//           <div className={styles.profilePicContainer}>
-//             <img className={styles.profilePic}
-//               src='https://s3-alpha-sig.figma.com/img/d0a7/3619/a7eaeb87169fa6f7361c4c51e67f89ab?Expires=1698019200&Signature=XjynzDMFyeBTJcjBzaDIawi~ESyKcW6XlR~ej5qSZxc2syl8oY12nrlUfVn~xroKHCKw3ZnGVWpWo1zIIELBZrCCNlB4eDGUogleYQ~NIXqoueMBFkEgRK2eOkJY2-wi3x00W-Ts7cORP9pvCb0NrEXIUsikUBJViyk-LtlG-XBo4e54utX6tmlLqx5xU8eMxMbVWsDI75TjY1gVWtNJB-v-quBjsJ5Dm~mo1qSIw-x5xiNIkJZlePP1ML-90qFJBvnlwCDDaJTxUQC94HFhZUhkh6OiXOi8JUQ3~Vi693dOwOJNNmeZ39bsFoQc48tqpY~gRUUZgKVNG7dU2JKpEw__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4' alt='profile' />
-//           </div>
-//           <div className={styles.postUser}>
-//             <p className={styles.postUserName}>Sai Shirish Katady</p>
-//             <p className={styles.postUserJobTitle}>Product Designer</p>
-//             <div className={styles.jobTimer}>
-//               <img className={styles.jobTimerImg} src="./history-outline.svg" alt="timer" />
-//               <p className={styles.jobTime}> 1min</p>
-//             </div>
-//           </div>
-//           <div className={styles.addPostSettings}>
-//           <img className={styles.settingsIcon}
-//             src='./DotsThree.svg' alt='settings' />
-//         </div>
-//         </div>
-//         <p className={styles.postContent}>New Takeoff webpage for sign in and Join now</p>
-//         <img alt="image" className={styles.postImg}
-//         src="https://s3-alpha-sig.figma.com/img/3796/d458/84a37f35de9559168747d7ada8178c4d?Expires=1698019200&Signature=iTDyyjhepoTkhGx8NpgwCyAo-18b6ZPLqapo1RIMU1hq7yWWyp-4rBAvENSBHtiI2HFJsjRxVOYPsZnIaiCHXl2W9jRnM0RDcqinbKkw4xLZ9bTxzh4DP2Y~S0Kz9NpPbeP-H4ysvVv6~aGlcQpPIfwydRv1Pyjg6rvndvFCbpzH43ZvelIiFbxxi0ktp8GFTzu8So91JH1KwhLP17feov8z7l0Ku0YmF5iX6ww5Dx-HDSwBEF0si3DN2-PwMoLP-ZgqoW8Duay9UXrwI4wCbN7e3dd0pd0JY9pJT2vR~Dt5ECAR1e-tcvODQNXecBvtnOKWCYuk91nnIhw3ZFUVBg__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4" />
-//         <div className={styles.btns}>
-//           <div className={styles.reactionBtns}>
-
-//             <p className={styles.postComments}>29 comments</p>
-//           </div>
-//           <div className={styles.actionBtns}>
-//             <div className={styles.actionBtn}>
-//               <img className={styles.actionIcon}
-//                 src='./ThumbsUp.svg' alt='search' />
-//               <p className={styles.actionText}>Like</p>
-//             </div>
-//             <div className={styles.actionBtn}>
-//               <img className={styles.actionIcon}
-//                 src='./ChatText.svg' alt='search' />
-//               <p className={styles.actionText}>Comment</p>
-//             </div>
-//             <div className={styles.actionBtn}>
-//               <img className={styles.actionIcon}
-//                 src='./ShareNetwork.svg' alt='search' />
-//               <p className={styles.actionText}>Repost</p>
-//             </div>
-//             <div className={styles.actionBtn}>
-//               <img className={styles.actionIcon}
-//                 src='./Star.svg' alt='search' />
-//               <p className={styles.actionText}>Favourites</p>
-//             </div>
-
-
-//           </div>
-
-//         </div>
-
-//       </div>
-//     </div>
-
-
-//   )
-// }
-
-// export default Posts
