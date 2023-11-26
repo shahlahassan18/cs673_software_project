@@ -121,7 +121,9 @@ const Posts = () => {
               src='./DotsThree.svg' alt='settings' />
           </div>
         </div>
-        <p className={styles.postContent}>{post.postCont}</p>
+        {post.postCont.split('\n').map((line, index) => (
+          <p key={index} className={styles.postContent} style={{margin: 0}}>{line}</p>
+        ))}
         <div className={styles.postMedia}>
           {post.media && post.media.map((urlObject, index) =>
             <img key={index} src={urlObject.url} alt={urlObject.url} />

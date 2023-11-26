@@ -92,6 +92,7 @@ const AddPost = () => {
 
     if (uploadCounter === 0) {
       // NO media files, create post without media
+      console.log('Post content:', JSON.stringify(postContent));
       postPromises.push(
         addDoc(collection(db, 'posts'), {
           userId: userId,
