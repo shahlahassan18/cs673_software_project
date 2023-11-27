@@ -89,12 +89,28 @@ font-style: normal;
 font-weight: 400;
 line-height: 20px; /* 142.857% */
 letter-spacing: -0.28px;
+position: relative;
 }
 
 .searchInput:hover, .searchInput:focus{
     border: none;
     outline: none;
 }
+
+.searchResults{
+    display: flex;
+    flex-direction: column;
+    border: 2px solid #7B5AA6;
+    z-index: 1000;
+    background-color: white;
+    padding: 1rem;
+    position: absolute;
+    top: 4rem;
+    right: 9rem;
+    width: 230px;
+}
+
+
 
 
 .icons{
@@ -123,6 +139,8 @@ background: url(<path-to-image>), lightgray 50% / cover no-repeat;
 .menu{
     display: none;
 }
+
+
 
 @media screen and (max-width: 1080px) {
     .menuIcon{
