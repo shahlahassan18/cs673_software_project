@@ -3,7 +3,7 @@ import Navbars from "../Navbar";
 import styles from "./profile.module.css";
 import { db } from "../../firebase";
 import { getAuth } from "firebase/auth";
-import { doc, getDoc, getDocs, collection } from "firebase/firestore";
+import { doc, getDoc, getDocs, collection, updateDoc } from "firebase/firestore";
 import { FiPlus } from "react-icons/fi";
 import Modal from 'react-modal';
 import { IoCloseSharp } from "react-icons/io5";
@@ -31,9 +31,10 @@ const Profile = () => {
   const [generalInfoInput , setGeneralInfoInput] = useState("")
   const [generalInfo , setGeneralInfo] = useState("")
   const [experienceFormData, setExperienceFormData] = useState({
-    jobTitle: '',
-    companyName: '',
-    dateRange: '',
+    title: '',
+    company: '',
+    startDate: '',
+    endDate: '',
     description: '',
     companyLogo : '',
   });
@@ -92,35 +93,45 @@ const handleSkillFormSubmit = (event) => {
     setEditExperienceIndex(null);
     setEditExperienceModal(false);
     setExperienceFormData({
-      jobTitle: '',
-      companyName: '',
-      dateRange: '',
+      title: '',
+      company: '',
+      startDate: '',
+      endDate: '',
       description: '',
       companyLogo: '',
     });
     setExperienceModal(false)
   };
   
-  const handleExperienceFormSubmit = (event) => {
+  const handleExperienceFormSubmit = async (event) => {
     event.preventDefault();
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
   
-    if (editExperienceIndex !== null) {
-      setexperience((prev) => {
-        const updatedExperience = [...prev];
-        updatedExperience[editExperienceIndex] = experienceFormData;
-        return updatedExperience;
-      });
-    } else {
-      setexperience((prev) => (prev ? [...prev, experienceFormData] : [experienceFormData]));
+    if (currentUser) {
+      const userDocRef = doc(db, "users", currentUser.uid);
+      try {
+        // update experience state
+        let updatedExperience;
+        if (editExperienceIndex !== null) {
+          updatedExperience = [...experience];
+          updatedExperience[editExperienceIndex] = experienceFormData;
+        } else {
+          updatedExperience = [...experience, experienceFormData];
+        }
+  
+        // update experience in firestore
+        await updateDoc(userDocRef, {
+          experience: updatedExperience
+        });
+  
+        // update experience state
+        setexperience(updatedExperience);
+        closeEditExperienceModal();
+      } catch (error) {
+        console.error("Error updating experience: ", error);
+      }
     }
-    setExperienceFormData({
-      jobTitle: '',
-      companyName: '',
-      dateRange: '',
-      description: '',
-      companyLogo: '',
-    });
-    closeEditExperienceModal();
   };
   
   const handleDeleteExperience = (index) => {
@@ -435,11 +446,10 @@ const handleSkillFormSubmit = (event) => {
                 <div key={index} className={styles.experienceContainer}>
                   <img className={styles.companylogo} src={exp.companylogo} />
                   <div className={styles.experience}>
-                    <p className={styles.job}>{exp.jobTitle}</p>
-                    <p className={styles.jobCompany}>{exp.companyName}</p>
+                    <p className={styles.job}>{exp.title}</p>
+                    <p className={styles.jobCompany}>{exp.company}</p>
                     <p className={styles.jobDate}>
-                      {/* {exp.startDate} - {exp.endDate} */}
-                      {exp.dateRange}
+                      {exp.startDate} - {exp.endDate}
                     </p>
                     <p className={styles.jobDesc}>{exp.description}</p>
                   </div>
@@ -459,13 +469,29 @@ const handleSkillFormSubmit = (event) => {
                 <button onClick={closeExperienceModal} className={styles.modalBtn}><IoCloseSharp/></button>
               </div>
               <form className={styles.experienceForm} onSubmit={handleExperienceFormSubmit}>
-                <input type='text' placeholder="Enter Job Title" name="jobTitle" className={styles.formInput}
-                 onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.jobTitle} 
+                <input type='text' placeholder="Enter Job Title" name="title" className={styles.formInput}
+                 onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.title} 
                  />
-                <input type='text' placeholder="Enter Company Name" name="companyName"  className={styles.formInput} 
-                onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.companyName} />
-                <input type='text' placeholder="Enter Date range" name="dateRange"  className={styles.formInput} 
-                onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.dateRange} />
+                <input type='text' placeholder="Enter Company Name" name="company"  className={styles.formInput} 
+                onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.company} />
+                {/* <input type='text' placeholder="Enter Date range" name="dateRange"  className={styles.formInput} 
+                onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.dateRange} /> */}
+                <p>Start Date</p>
+                <input
+                  type="date"
+                  name="startDate"
+                  value={experienceFormData.startDate}
+                  className={styles.formInput} 
+                  onChange={handleInputChangeExperienceForm}
+                />
+                <p>End Date</p>
+                <input
+                  type="date"
+                  name="endDate"
+                  value={experienceFormData.endDate}
+                  className={styles.formInput} 
+                  onChange={handleInputChangeExperienceForm}
+                />
                 <textarea type='text' placeholder="Enter Description" name="description"  className={styles.formInput} 
                 onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.description} />
                 {/* <input type='file' placeholder="Upload Company Logo" name="companyLogo"  className={styles.formInput} 
@@ -479,21 +505,35 @@ const handleSkillFormSubmit = (event) => {
           {/* EDIT EXPERIENCE MODAL */}
           <Modal
             isOpen={editExperienceModal}
-            onRequestClose={closeExperienceModal}
+            onRequestClose={closeEditExperienceModal}
             ariaHideApp={false}
             contentLabel=" Edit Experience Modal">
               <div className={styles.title}>
-                <h2 className={styles.addExperienceTitle}>Add Experience</h2>
-                <button onClick={closeExperienceModal} className={styles.modalBtn}><IoCloseSharp/></button>
+                <h2 className={styles.addExperienceTitle}>Edit Experience</h2>
+                <button onClick={closeEditExperienceModal} className={styles.modalBtn}><IoCloseSharp/></button>
               </div>
               <form className={styles.experienceForm} onSubmit={handleExperienceFormSubmit}>
-                <input type='text' placeholder="Enter Job Title" name="jobTitle" className={styles.formInput}
-                 onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.jobTitle} 
+                <input type='text' placeholder="Enter Job Title" name="title" className={styles.formInput}
+                 onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.title} 
                  />
-                <input type='text' placeholder="Enter Company Name" name="companyName"  className={styles.formInput} 
-                onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.companyName} />
-                <input type='text' placeholder="Enter Date range" name="dateRange"  className={styles.formInput} 
-                onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.dateRange} />
+                <input type='text' placeholder="Enter Company Name" name="company"  className={styles.formInput} 
+                onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.company} />
+                {/* <input type='text' placeholder="Enter Date range" name="dateRange"  className={styles.formInput} 
+                onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.dateRange} /> */}
+                <input
+                  type="date"
+                  name="startDate"
+                  value={experienceFormData.startDate}
+                  className={styles.formInput} 
+                  onChange={handleInputChangeExperienceForm}
+                />
+                <input
+                  type="date"
+                  name="endDate"
+                  value={experienceFormData.endDate}
+                  className={styles.formInput} 
+                  onChange={handleInputChangeExperienceForm}
+                />
                 <textarea type='text' placeholder="Enter Description" name="description"  className={styles.formInput} 
                 onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.description} />
                 {/* <input type='file' placeholder="Upload Company Logo" name="companyLogo"  className={styles.formInput} 
