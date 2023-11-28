@@ -1,10 +1,14 @@
 import React from 'react'
 import styles from "./rightnews.module.css"
+import {useNavigate} from 'react-router-dom'
 
 const RightNews = () => {
+
+  const navigate = useNavigate()
+
   return (
     <div className={styles.right}>
-      <a href="#" className={styles.viewRecommendation}>View all recommendations</a>
+      <a href="/jobs" className={styles.viewRecommendation}>View all recommendations</a>
 
       {/* JOB RECOMMENDATIONS */}
       <div className={styles.jobRecommendations}>
@@ -13,7 +17,7 @@ const RightNews = () => {
             <p className={styles.jobTitleName}>Jobs</p>
             <p className={styles.jobNumber}>356 Jobs recommended for you</p>
           </div>
-          <button className={styles.viewAllBtn}>View all</button>
+          <button className={styles.viewAllBtn} onClick={()=>navigate("/jobs")}>View all</button>
 
         </div>
         <div className={styles.joblists}>

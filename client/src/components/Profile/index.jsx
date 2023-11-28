@@ -10,7 +10,7 @@ import Modal from 'react-modal';
 import { IoCloseSharp } from "react-icons/io5";
 import { MdOutlineModeEdit } from "react-icons/md";
 import { MdOutlineDelete } from "react-icons/md";
-import { set } from "react-hook-form";
+import LeftProfile from "../LeftProfile";
 
 
 const Profile = () => {
@@ -189,41 +189,7 @@ const updateUserSkills = async (updatedSkills) => {
     setSkillFormData(value);
   };
 
-  // const handleExperienceFormSubmit = (event) => {
-  //   event.preventDefault();
-  //   console.log('Experience Form data submitted:', experienceFormData);
-  //   setexperience(prev =>{
-  //     if(prev){
-  //       return [...prev, experienceFormData]
-  //     }else{
-  //       return [experienceFormData]
-  //     }
-  //   }
-  //    )
-  //   setExperienceFormData({
-  //     jobTitle: '',
-  //     companyName: '',
-  //     dateRange: '',
-  //     description: '',
-  //     companyLogo : '',
-  //   });
-  //   closeExperienceModal()
-  // };
-
-  // const handleSkillFormSubmit = (event) => {
-  //   event.preventDefault();
-  //   console.log('skill Form data submitted:', skillFormData);
-  //   setskills(prev =>{
-  //     if(prev){
-  //       return [...prev, skillFormData]
-  //     }else{
-  //       return [skillFormData]
-  //     }
-  //   }
-  //    )
-  //   setSkillFormData("");
-  //   closeSkillModal()
-  // };
+  
 
   const handleLogoUpload = async (file) => {
     if (!file) return;
@@ -412,7 +378,9 @@ const updateUserSkills = async (updatedSkills) => {
     <div>
       <Navbars />
       <div className={styles.container}>
-        <div className={styles.left}></div>
+        <div className={styles.left}>
+          <LeftProfile />
+        </div>
         <div className={styles.profileContainer}>
           <div className={styles.profile}>
             {/* 1st section */}

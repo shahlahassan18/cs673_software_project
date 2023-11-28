@@ -196,7 +196,8 @@ const Posts = () => {
   .slice(0, 3) // Take the first 3 comments
   .map((comment, index) => (
     <div key={index} className={styles.comments}>
-      <p>{comment.text}</p>
+      <p className={styles.commentText}><b>user</b></p>
+      <p className={styles.commentText}>{comment.text}</p>
       <MdOutlineDelete onClick={() => handleDeleteComment(post.id, comment.id)} />
     </div>
   ))

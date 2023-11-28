@@ -12,6 +12,7 @@ import Profile from "./components/Profile"
 import Networks from "./components/Networks";
 import Jobs from "./components/Jobs";
 import ProfileCreation from "./components/ProfileCreation";
+import UserProfile from "./components/UserProfile";
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -40,6 +41,7 @@ const App = () => {
           <Route path="/network" element={<ProtectedRoute><Networks /></ProtectedRoute>} />
           <Route path="/jobs" element={<ProtectedRoute><Jobs /></ProtectedRoute>} />
           <Route path="/create-profile" element={<ProtectedRoute><ProfileCreation /></ProtectedRoute>} />
+          <Route path="/:userID" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
         </Routes>
       </Router>
     </UserContext.Provider>

@@ -1,15 +1,27 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { getAuth, signOut } from "firebase/auth";
 import UserContext from '../../features/contexts/UserContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import styles from "./navbar.module.css"
 import {ImMenu} from "react-icons/im";
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where , getDocs} from 'firebase/firestore';
 import { db, storage } from '../../firebase';
 import { getDownloadURL, ref } from '@firebase/storage';
 
 
-const Navbars = () => {
+const Navbars = ({onFindJobsClick,onSavedJobsClick, handleTabClick}) => {
+  const [showJobsMenu, setShowJobsMenu] = useState(false);
+  const [showNetWorksMenu, setShowNetWorksMenu] = useState(false);
+
+
+  const toggleJobsMenu = () => {
+    setShowJobsMenu(!showJobsMenu);
+  };
+
+  const toggleNetorkMenu = () => {
+    setShowNetWorksMenu(!showNetWorksMenu);
+  };
+
   const { user } = useContext(UserContext);
   const navigate = useNavigate();
 
@@ -18,6 +30,10 @@ const Navbars = () => {
   const [imageUrl, setImageUrl] = useState(null);
   const auth = getAuth();
   const currentUser = auth.currentUser;
+
+  const [searchName, setSearchName] = useState(null)
+  const [searchResults, setSearchResults] = useState([])
+
 
   useEffect(() => {
     if (currentUser) {
@@ -62,13 +78,69 @@ const Navbars = () => {
     }
   };
 
+  
+//SEARCH USERS FUNCTIONALITY
+  const handleChangeSearch = (e) => {
+    setSearchName(e.target.value);
+  };
+
+  useEffect(() => {
+    const handleSearch = async () => {
+      //Clearing out the search results
+      if(searchName===""){
+        setSearchName(null)
+      }
+      try {
+            const usersCollection = collection(db, "users");
+        
+            const firstNameQuery = query(
+              usersCollection,
+              where("firstName", ">=", searchName),
+              where("firstName", "<=", searchName + "\uf8ff")
+            );
+        
+            const lastNameQuery = query(
+              usersCollection,
+              where("lastName", ">=", searchName),
+              where("lastName", "<=", searchName + "\uf8ff")
+            );
+        
+            const [firstNameSnapshot, lastNameSnapshot] = await Promise.all([
+              getDocs(firstNameQuery),
+              getDocs(lastNameQuery),
+            ]);
+        
+            const firstNameResults = firstNameSnapshot.docs.map((doc) => ({
+              id: doc.id,
+              firstName: doc.data().firstName,
+              lastName: doc.data().lastName,
+            }));
+        
+            const lastNameResults = lastNameSnapshot.docs.map((doc) => ({
+              id: doc.id,
+              firstName: doc.data().firstName,
+              lastName: doc.data().lastName,
+            }));
+        
+            const results = [...firstNameResults, ...lastNameResults];
+            
+            setSearchResults(results);
+            // console.log("res +", results);
+          } catch (error) {
+            console.error("Error searching users:", error);
+          }
+    };
+
+    handleSearch();
+  }, [searchName]);
+  
+  
+
+  // console.log("res +", searchResults);
 
 
-  // return (
-  //   <div>
-  //     {user && <button onClick={handleLogout}>Logout</button>}
-  //   </div>
-  // );
+
+  
   return (
     <>
       <div className={styles.navBar}>
@@ -101,25 +173,38 @@ const Navbars = () => {
       <ImMenu size={40} className={styles.menuIcon} onClick={(()=>setIsActive(!isActive))} /> */}
       <div className={styles.navMenu1}>
         <ul className={styles.navMenu1List}>
-          <li className={styles.navMenu1ListItem}>Settings & Privacy</li>
+          {/* <li className={styles.navMenu1ListItem}>Settings & Privacy</li>
           <li className={styles.navMenu1ListItem}>Help</li>
           <li className={styles.navMenu1ListItem}>Posts & Activity</li>
-          <li className={styles.navMenu1ListItem}>Job Posting Account</li>
-          <li className={styles.navMenu1ListItem} onClick={handleLogout}>Logout</li>
+          <li className={styles.navMenu1ListItem}>Job Posting Account</li> */}
+          {/* <li className={styles.navMenu1ListItem} onClick={handleLogout}>Logout</li> */}
         </ul>
       </div>
       <div className={styles.navMenu2}>
         <div className={styles.searchBarContainer}>
           <img className={styles.searchIcon}
           src='./search.svg' alt='search' />
-          <input type='text' className={styles.searchInput} placeholder="Search" />
+          <input type='text' className={styles.searchInput} onChange={e=>handleChangeSearch(e)}
+          placeholder="Search" value={searchName} />
         </div>
-        <img className={styles.icons}
+        
+        {searchResults.length >0 && 
+        <div  className={styles.searchResults}>
+        { searchResults.map((ele,i)=>(
+            <p key={i} onClick={()=>navigate(`/:${ele.id}`)}
+            className={styles.searchResult}>{ele.firstName} {" "} {ele.lastName}</p>
+         
+        ))}
+        </div>
+        }
+       
+        {/* <img className={styles.icons}
           src='./layers.svg' alt='layers' />
       <img className={styles.icons}
           src='./notifications_none.svg' alt='notifications' />
       <img className={styles.icons}
-          src='./mail.svg' alt='mail' />
+          src='./mail.svg' alt='mail' /> */}
+      <div className={styles.navMenu1ListItem} onClick={handleLogout}>Logout</div>
       <div className={styles.profilePicContainer}>
       <img className={styles.profilePic}
           src={profilePicture} alt='mail' />
@@ -130,14 +215,37 @@ const Navbars = () => {
       {isActive && 
       <div className={styles.mobNavBar}>
         <ul className={styles.navMenu1List}>
-          <li className={styles.navMenu1ListItem}>Home</li>
-          <li className={styles.navMenu1ListItem}>My Network</li>
-          <li className={styles.navMenu1ListItem}>Jobs</li>
-          <li className={styles.navMenu1ListItem}>Messaging</li>
+          <li className={styles.navMenu1ListItem} onClick={()=>navigate("/feed")}>Home</li>
+          <li className={styles.navMenu1ListItem} onClick={()=>toggleNetorkMenu()}>My Network</li>
+          {showNetWorksMenu &&   
+          <div className={styles.job_tabs}>
+            <Link to="/network" className={styles.menuItemLink}>
+              {/* <li className={styles.navMenu1ListItem} onClick={() => handleTabClick("Connections")}> New Connections</li>  */}
+              <li className={styles.navMenu1ListItem} onClick={() => navigate("/network")}> New Connections</li> 
+            </Link>
+            <Link to="/network" className={styles.menuItemLink}>
+              {/* <li className={styles.navMenu1ListItem} onClick={() => handleTabClick("Contacts")}> Contacts</li> */}
+              <li className={styles.navMenu1ListItem} onClick={() => navigate("/network")}> Contacts</li>
+            </Link>
+          </div>
+          }
+          <li className={styles.navMenu1ListItem} onClick={() => toggleJobsMenu()}>Jobs</li>
+          {showJobsMenu &&   
+          <div className={styles.job_tabs}>
+            <Link to="/jobs" className={styles.menuItemLink}>
+              <li className={styles.navMenu1ListItem} onClick={onFindJobsClick}> Find Jobs</li> 
+            </Link>
+            <Link to="/jobs" className={styles.menuItemLink}>
+              <li className={styles.navMenu1ListItem} onClick={onSavedJobsClick}> Saved Jobs</li>
+            </Link>
+          </div>
+          }
+          {/* <li className={styles.navMenu1ListItem}>Messaging</li>
           <li className={styles.navMenu1ListItem}>For Business</li>
           <li className={styles.navMenu1ListItem}>Settings & Privacy</li>
           <li className={styles.navMenu1ListItem}>Help</li>
-          <li className={styles.navMenu1ListItem}>Job Posting Account</li>
+          <li className={styles.navMenu1ListItem}>Job Posting Account</li> */}
+          <li className={styles.navMenu1ListItem} onClick={()=>navigate("/profile")}>Profile</li>
           <li className={styles.navMenu1ListItem} onClick={handleLogout}>Logout</li>
         </ul>
         
