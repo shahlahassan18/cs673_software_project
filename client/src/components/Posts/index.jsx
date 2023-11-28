@@ -17,41 +17,46 @@ const Posts = () => {
   const [activePost,setActivePost] = useState(null)
 
 
-   //Comment Form Submission
-   const handleCommentSubmit = async(e,postId) =>{
+  //Comment Form Submission
+  const handleCommentSubmit = async(e,postId) =>{
     e.preventDefault()
     const auth = getAuth();
     const currentUser = auth.currentUser;
-  
+
     if (!currentUser) {
       console.log("User is NOT Authenticated");
       return;
     }
 
     const userId = currentUser.uid;
+    const userRef = doc(db, 'users', userId);
+    const userSnapshot = await getDoc(userRef);
+    const { firstName, lastName } = userSnapshot.data(); // Fetch the firstName and lastName from the user's data
+    const fullName = `${firstName} ${lastName}`; // Concatenate firstName and lastName to create a full name
     const postRef = doc(db, 'posts', postId);
     const commentsCollection = collection(postRef, 'comments');
-    const newComment = { userId, text: comment, timestamp: serverTimestamp() };
-  
+    const newComment = { userId, username: fullName, text: comment, timestamp: serverTimestamp() }; // Include the full name in the newComment object
+
     const commentRef = await addDoc(commentsCollection, newComment);
 
-    setComments((prev) => (prev ? [...prev, {id: commentRef.id, postId, comment}] : [{id: commentRef.id, postId, comment}]));
+     // Update the local state
+    setPosts(posts.map(post => post.id === postId 
+      ? {...post, comments: [...post.comments, {...newComment, id: commentRef.id}]} 
+      : post
+    ));
     setComment('');
-   } 
+} 
 
-   const handleDeleteComment = async (postId, commentId) => {
+  const handleDeleteComment = async (postId, commentId) => {
     const postRef = doc(db, 'posts', postId);
     const commentRef = doc(postRef, 'comments', commentId);
     await deleteDoc(commentRef);
   
-    setComments((prev) => {
-      const updatedComments = [...prev];
-      const index = updatedComments.findIndex((comment) => comment.id === commentId);
-      if (index !== -1) {
-        updatedComments.splice(index, 1);
-      }
-      return updatedComments;
-    });
+    // Update the local state
+    setPosts(posts.map(post => post.id === postId 
+      ? {...post, comments: post.comments.filter(comment => comment.id !== commentId)} 
+      : post
+    ));
   };
 
   useEffect(() => {
@@ -192,16 +197,16 @@ const Posts = () => {
           {/* </div> */}
           
           {post.comments && post.comments
-  .sort((a, b) => b.timestamp - a.timestamp) // Sort comments by timestamp in descending order
-  .slice(0, 3) // Take the first 3 comments
-  .map((comment, index) => (
-    <div key={index} className={styles.comments}>
-      <p className={styles.commentText}><b>user</b></p>
-      <p className={styles.commentText}>{comment.text}</p>
-      <MdOutlineDelete onClick={() => handleDeleteComment(post.id, comment.id)} />
-    </div>
-  ))
-}
+            .sort((a, b) => b.timestamp - a.timestamp) // Sort comments by timestamp in descending order
+            .slice(0, 3) // Take the first 3 comments
+            .map((comment, index) => (
+              <div key={index} className={styles.comments}>
+                <p className={styles.commentText}><b>{comment.username}</b></p>
+                <p className={styles.commentText}>{comment.text}</p>
+                <MdOutlineDelete onClick={() => handleDeleteComment(post.id, comment.id)} />
+              </div>
+            ))
+          }
             </>
           )
           }
