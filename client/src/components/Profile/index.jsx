@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import Navbars from "../Navbar";
 import styles from "./profile.module.css";
-import { db } from "../../firebase";
+import { db, storage } from "../../firebase";
 import { getAuth } from "firebase/auth";
 import { doc, getDoc, getDocs, collection, updateDoc } from "firebase/firestore";
+import {ref, uploadBytes, getDownloadURL} from 'firebase/storage'
 import { FiPlus } from "react-icons/fi";
 import Modal from 'react-modal';
 import { IoCloseSharp } from "react-icons/io5";
@@ -13,6 +14,8 @@ import { set } from "react-hook-form";
 
 
 const Profile = () => {
+  const auth = getAuth();
+  const currentUser = auth.currentUser;
   const [profilePicture, setprofilePicture] = useState("");
   const [backPicture, setbackPicture] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -96,8 +99,6 @@ const handleSkillFormSubmit = (event) => {
 };
 
 const updateUserSkills = async (updatedSkills) => {
-  const auth = getAuth();
-  const currentUser = auth.currentUser;
 
   if (currentUser) {
     const userDocRef = doc(db, "users", currentUser.uid);
@@ -133,8 +134,6 @@ const updateUserSkills = async (updatedSkills) => {
   
   const handleExperienceFormSubmit = async (event) => {
     event.preventDefault();
-    const auth = getAuth();
-    const currentUser = auth.currentUser;
   
     if (currentUser) {
       const userDocRef = doc(db, "users", currentUser.uid);
@@ -165,9 +164,6 @@ const updateUserSkills = async (updatedSkills) => {
   const handleDeleteExperience = async (index) => {
     let updatedExperience = experience.filter((_, i) => i !== index);;
     setexperience(updatedExperience);
-
-    const auth = getAuth();
-    const currentUser = auth.currentUser;
 
     if (currentUser) {
       const userDocRef = doc(db, "users", currentUser.uid);
@@ -229,9 +225,67 @@ const updateUserSkills = async (updatedSkills) => {
   //   closeSkillModal()
   // };
 
-  const handleAddSkill = (newSkill) => {
-    setskills(prevSkills => [...prevSkills, newSkill]);
+  const handleLogoUpload = async (file) => {
+    if (!file) return;
+  
+    const fileRef = ref(storage, `logos/${file.name}`);
+  
+    try {
+      const snapshot = await uploadBytes(fileRef, file);
+      const url = await getDownloadURL(snapshot.ref);
+      return url;
+    } catch (error) {
+      console.error("Error uploading logo: ", error);
+    }
   };
+
+  const handleAvatarUpload = async (file) => {
+    if (!file) return;
+  
+    const fileRef = ref(storage, `avatars/${file.name}`);
+  
+    try {
+      const snapshot = await uploadBytes(fileRef, file);
+      const url = await getDownloadURL(snapshot.ref);
+      return url;
+    } catch (error) {
+      console.error("Error uploading avatar: ", error);    }
+  };
+  
+
+  const handleLogoChange = async (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const logoUrl = await handleLogoUpload(file);
+      setExperienceFormData(prevFormData => ({
+        ...prevFormData,
+        companyLogo: logoUrl
+      }));
+    }
+  };
+
+  const handleAvatarChange = async (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const avatarUrl = await handleAvatarUpload(file);
+      if (avatarUrl) {
+        setprofilePicture(avatarUrl); // 更新本地状态
+  
+        // 如果需要，更新用户文档
+        const userDocRef = doc(db, "users", currentUser.uid);
+        try {
+          await updateDoc(userDocRef, {
+            profilePicture: avatarUrl
+          });
+        } catch (error) {
+          console.error("Error updating user's profile picture:", error);
+        }
+      }
+    }
+  };
+  
+  
+  
   
   //OPEN AND CLOSE MODAL FUNCTIONS
   function openExperienceModal() {
@@ -389,7 +443,10 @@ const updateUserSkills = async (updatedSkills) => {
                 <button onClick={closeAddProfilePicModal} className={styles.modalBtn}><IoCloseSharp/></button>
               </div>
               <form className={styles.experienceForm}>
-                <input type='file' placeholder="Upload Profile Picture" className={styles.formInput} />
+                <input type='file' placeholder="Upload Profile Picture" className={styles.formInput} onChange={handleAvatarChange} />
+                {profilePicture && (
+                  <img src={profilePicture} alt="Profile Avatar" style={{ width: "100px", height: "100px" }} />
+                )}
                 <div className={styles.btns}>
                   <button className={styles.btn} >Submit</button>
                 </div>
@@ -487,7 +544,7 @@ const updateUserSkills = async (updatedSkills) => {
               </div>
               {experience && experience.map((exp, index) => (
                 <div key={index} className={styles.experienceContainer}>
-                  <img className={styles.companylogo} src={exp.companylogo} />
+                  <img className={styles.companylogo} src={exp.companyLogo} />
                   <div className={styles.experience}>
                     <p className={styles.job}>{exp.title}</p>
                     <p className={styles.jobCompany}>{exp.company}</p>
@@ -537,8 +594,11 @@ const updateUserSkills = async (updatedSkills) => {
                 />
                 <textarea type='text' placeholder="Enter Description" name="description"  className={styles.formInput} 
                 onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.description} />
-                {/* <input type='file' placeholder="Upload Company Logo" name="companyLogo"  className={styles.formInput} 
-                onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.companyLogo} /> */}
+                <input type='file' placeholder="Upload Company Logo" name="companyLogo"  className={styles.formInput} 
+                onChange={handleLogoChange} />
+                {experienceFormData.companyLogo && (
+                  <img src={experienceFormData.companyLogo} alt="Company Logo" style={{ width: "100px", height: "100px" }} />
+                )}
                 <div className={styles.btns}>
                   <button className={styles.btn} >Submit</button>
                 </div>
@@ -579,8 +639,11 @@ const updateUserSkills = async (updatedSkills) => {
                 />
                 <textarea type='text' placeholder="Enter Description" name="description"  className={styles.formInput} 
                 onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.description} />
-                {/* <input type='file' placeholder="Upload Company Logo" name="companyLogo"  className={styles.formInput} 
-                onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.companyLogo} /> */}
+                <input type='file' placeholder="Upload Company Logo" name="companyLogo"  className={styles.formInput} 
+                onChange={handleLogoChange} />
+                {experienceFormData.companyLogo && (
+                  <img src={experienceFormData.companyLogo} alt="Company Logo" style={{ width: "100px", height: "100px" }} />
+                )}
                 <div className={styles.btns}>
                   <button className={styles.btn} >Submit</button>
                 </div>
