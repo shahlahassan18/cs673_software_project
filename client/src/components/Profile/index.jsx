@@ -9,6 +9,7 @@ import Modal from 'react-modal';
 import { IoCloseSharp } from "react-icons/io5";
 import { MdOutlineModeEdit } from "react-icons/md";
 import { MdOutlineDelete } from "react-icons/md";
+import { set } from "react-hook-form";
 
 
 const Profile = () => {
@@ -61,6 +62,9 @@ const handleDeleteSkill = (index) => {
   setskills((prev) => {
     const updatedSkills = [...prev];
     updatedSkills.splice(index, 1);
+
+    updateUserSkills(updatedSkills);
+
     return updatedSkills;
   });
 };
@@ -72,16 +76,40 @@ const handleSkillFormSubmit = (event) => {
     setskills((prev) => {
       const updatedSkills = [...prev];
       updatedSkills[editSkillIndex] = skillFormData;
+
+      updateUserSkills(updatedSkills);
+
       return updatedSkills;
     });
   } else {
-    setskills((prev) => (prev ? [...prev, skillFormData] : [skillFormData]));
+    setskills((prev) => {
+      const newSkillsList = prev ? [...prev, skillFormData] : [skillFormData];
+
+      updateUserSkills(newSkillsList);
+
+      return newSkillsList;
+    });
   }
 
   setSkillFormData('');
   closeEditSkillModal();
 };
 
+const updateUserSkills = async (updatedSkills) => {
+  const auth = getAuth();
+  const currentUser = auth.currentUser;
+
+  if (currentUser) {
+    const userDocRef = doc(db, "users", currentUser.uid);
+    try {
+      await updateDoc(userDocRef, {
+        skills: updatedSkills
+      });
+    } catch (error) {
+      console.error("Error updating skills:", error);
+    }
+  }
+};
   
   const handleEditExperience = (index) => {
     setEditExperienceIndex(index);
@@ -134,12 +162,23 @@ const handleSkillFormSubmit = (event) => {
     }
   };
   
-  const handleDeleteExperience = (index) => {
-    setexperience((prev) => {
-      const updatedExperience = [...prev];
-      updatedExperience.splice(index, 1);
-      return updatedExperience;
-    });
+  const handleDeleteExperience = async (index) => {
+    let updatedExperience = experience.filter((_, i) => i !== index);;
+    setexperience(updatedExperience);
+
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
+
+    if (currentUser) {
+      const userDocRef = doc(db, "users", currentUser.uid);
+      try {
+        await updateDoc(userDocRef, {
+          experience: updatedExperience
+        });
+      } catch (error) {
+        console.error("Error updating experience:", error);
+      }
+    }
   };
     
 
@@ -190,6 +229,10 @@ const handleSkillFormSubmit = (event) => {
   //   closeSkillModal()
   // };
 
+  const handleAddSkill = (newSkill) => {
+    setskills(prevSkills => [...prevSkills, newSkill]);
+  };
+  
   //OPEN AND CLOSE MODAL FUNCTIONS
   function openExperienceModal() {
     setExperienceModal(true);
