@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { getAuth, signOut } from "firebase/auth";
 import UserContext from '../../features/contexts/UserContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import styles from "./navbar.module.css"
 import {ImMenu} from "react-icons/im";
 import { doc, getDoc, collection, query, where , getDocs} from 'firebase/firestore';
@@ -9,7 +9,19 @@ import { db, storage } from '../../firebase';
 import { getDownloadURL, ref } from '@firebase/storage';
 
 
-const Navbars = () => {
+const Navbars = ({onFindJobsClick,onSavedJobsClick, handleTabClick}) => {
+  const [showJobsMenu, setShowJobsMenu] = useState(false);
+  const [showNetWorksMenu, setShowNetWorksMenu] = useState(false);
+
+
+  const toggleJobsMenu = () => {
+    setShowJobsMenu(!showJobsMenu);
+  };
+
+  const toggleNetorkMenu = () => {
+    setShowNetWorksMenu(!showNetWorksMenu);
+  };
+
   const { user } = useContext(UserContext);
   const navigate = useNavigate();
 
@@ -67,7 +79,7 @@ const Navbars = () => {
   };
 
   
-
+//SEARCH USERS FUNCTIONALITY
   const handleChangeSearch = (e) => {
     setSearchName(e.target.value);
   };
@@ -113,7 +125,7 @@ const Navbars = () => {
             const results = [...firstNameResults, ...lastNameResults];
             
             setSearchResults(results);
-            console.log("res +", results);
+            // console.log("res +", results);
           } catch (error) {
             console.error("Error searching users:", error);
           }
@@ -124,7 +136,7 @@ const Navbars = () => {
   
   
 
-  console.log("res +", searchResults);
+  // console.log("res +", searchResults);
 
 
 
@@ -179,7 +191,8 @@ const Navbars = () => {
         {searchResults.length >0 && 
         <div  className={styles.searchResults}>
         { searchResults.map((ele,i)=>(
-            <p key={i} className={styles.searchResult}>{ele.firstName} {" "} {ele.lastName}</p>
+            <p key={i} onClick={()=>navigate(`/:${ele.id}`)}
+            className={styles.searchResult}>{ele.firstName} {" "} {ele.lastName}</p>
          
         ))}
         </div>
@@ -202,14 +215,37 @@ const Navbars = () => {
       {isActive && 
       <div className={styles.mobNavBar}>
         <ul className={styles.navMenu1List}>
-          <li className={styles.navMenu1ListItem}>Home</li>
-          <li className={styles.navMenu1ListItem} onClick={()=>navigate("/network")}>My Network</li>
-          <li className={styles.navMenu1ListItem} onClick={()=>navigate("/jobs")}>Jobs</li>
+          <li className={styles.navMenu1ListItem} onClick={()=>navigate("/feed")}>Home</li>
+          <li className={styles.navMenu1ListItem} onClick={()=>toggleNetorkMenu()}>My Network</li>
+          {showNetWorksMenu &&   
+          <div className={styles.job_tabs}>
+            <Link to="/network" className={styles.menuItemLink}>
+              {/* <li className={styles.navMenu1ListItem} onClick={() => handleTabClick("Connections")}> New Connections</li>  */}
+              <li className={styles.navMenu1ListItem} onClick={() => navigate("/network")}> New Connections</li> 
+            </Link>
+            <Link to="/network" className={styles.menuItemLink}>
+              {/* <li className={styles.navMenu1ListItem} onClick={() => handleTabClick("Contacts")}> Contacts</li> */}
+              <li className={styles.navMenu1ListItem} onClick={() => navigate("/network")}> Contacts</li>
+            </Link>
+          </div>
+          }
+          <li className={styles.navMenu1ListItem} onClick={() => toggleJobsMenu()}>Jobs</li>
+          {showJobsMenu &&   
+          <div className={styles.job_tabs}>
+            <Link to="/jobs" className={styles.menuItemLink}>
+              <li className={styles.navMenu1ListItem} onClick={onFindJobsClick}> Find Jobs</li> 
+            </Link>
+            <Link to="/jobs" className={styles.menuItemLink}>
+              <li className={styles.navMenu1ListItem} onClick={onSavedJobsClick}> Saved Jobs</li>
+            </Link>
+          </div>
+          }
           {/* <li className={styles.navMenu1ListItem}>Messaging</li>
           <li className={styles.navMenu1ListItem}>For Business</li>
           <li className={styles.navMenu1ListItem}>Settings & Privacy</li>
           <li className={styles.navMenu1ListItem}>Help</li>
           <li className={styles.navMenu1ListItem}>Job Posting Account</li> */}
+          <li className={styles.navMenu1ListItem} onClick={()=>navigate("/profile")}>Profile</li>
           <li className={styles.navMenu1ListItem} onClick={handleLogout}>Logout</li>
         </ul>
         

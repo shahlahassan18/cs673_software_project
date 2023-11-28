@@ -9,8 +9,9 @@
 }
 
 .manage_network_section {
-    display: flex;
-    flex-direction: column;
+    display: none;
+    /* flex-direction: column; */
+
 }
 
 .connection,
@@ -132,4 +133,12 @@ h3 {
 
     }
 
+    .leftP{
+        display: none;
+    }
+  
+    .manage_network_section{
+        display: flex;
+        flex-direction: column;
+    }
 }

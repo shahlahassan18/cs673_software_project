@@ -141,6 +141,9 @@ background: url(<path-to-image>), lightgray 50% / cover no-repeat;
 }
 
 
+.menuItemLink{
+    text-decoration: none;
+}
 
 @media screen and (max-width: 1080px) {
     .menuIcon{

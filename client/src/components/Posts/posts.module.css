@@ -275,11 +275,20 @@ margin: 0;
     flex-direction: row;
     justify-content: space-between;
     width: 100%;
+    padding: 0.5rem;
+    border-radius: 23rem;
+    background: rgba(96,77,207,0.1);
+}
+
+.commentText{
+    margin: 0;
 }
 
 .commentInput{
     width: 80%;
     padding: 0.3rem;
+    border: none;
+    border-radius: 1rem;
 }
 
 .commentSubmit{

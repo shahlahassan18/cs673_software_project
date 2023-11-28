@@ -168,7 +168,7 @@ const Networks = () => {
       </div>
     )}
       <div className={styles.networks_section}>
-        {/* <div className={styles.manage_network_section}>
+        <div className={styles.manage_network_section}>
           <h6>Manage your networks</h6>
           <div
             className={`${styles.connection} ${activeTab === "Connections" ? styles.active : ""}`}
@@ -182,8 +182,10 @@ const Networks = () => {
           >
             <p className={styles.txt}>Contacts</p>
           </div>
-        </div> */}
+        </div>
+        <div className={styles.leftP}>
         <LeftProfile handleTabClick={handleTabClick}/>
+        </div>
         <div className={styles.users}>
                           {activeTab === "Connections" ?
                       <div className={styles.title}>
