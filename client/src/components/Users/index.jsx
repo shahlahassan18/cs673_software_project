@@ -44,9 +44,7 @@ const Users = ({ type }) => {
 
       const unsubscribe = onSnapshot(userDocRef, (doc) => {
         if (doc.exists()) {
-          const userData = doc.data();
-          const contacts = userData.contacts;
-          setContacts(contacts);
+          fetchData();
         } else {
           console.log("No such document!");
         }
@@ -89,6 +87,7 @@ const Users = ({ type }) => {
           try {
             const docRef = await addDoc(collection(db, "connections"), newConnection);
             console.log("Document written with ID: ", docRef.id);
+            alert("Connection request sent!");
           } catch (e) {
             console.error("Error adding document: ", e);
           }

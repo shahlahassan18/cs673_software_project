@@ -3,7 +3,7 @@ import Navbars from "../Navbar";
 import styles from "./profile.module.css";
 import { db, storage } from "../../firebase";
 import { getAuth } from "firebase/auth";
-import { doc, getDoc, getDocs, collection, updateDoc } from "firebase/firestore";
+import { doc, getDoc, getDocs, collection, updateDoc, query, where, addDoc } from "firebase/firestore";
 import {ref, uploadBytes, getDownloadURL} from 'firebase/storage'
 import { FiPlus } from "react-icons/fi";
 import Modal from 'react-modal';
@@ -373,6 +373,39 @@ const updateUserSkills = async (updatedSkills) => {
 
   // 获取前三个元素
   const selected = shuffled.slice(0, 3);
+
+  const handleConnectClick = async (contactId) => {
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
+  
+    if (currentUser) {
+      const connectionsQuery = query(
+        collection(db, "connections"),
+        where("userId", "==", currentUser.uid),
+        where("contactId", "==", contactId)
+      );
+      const querySnapshot = await getDocs(connectionsQuery);
+  
+      if (!querySnapshot.empty) {
+        console.log("Connection request already exists");
+        return;
+      }
+  
+      const newConnection = {
+        userId: currentUser.uid,
+        contactId: contactId,
+        timestamp: new Date(),
+        status: "requested"
+      };
+  
+      try {
+        const docRef = await addDoc(collection(db, "connections"), newConnection);
+        console.log("Document written with ID: ", docRef.id);
+      } catch (e) {
+        console.error("Error adding document: ", e);
+      }
+    }
+  };
 
   return (
     <div>
