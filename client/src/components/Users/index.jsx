@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase';
 import { getAuth } from 'firebase/auth';
-import { collection, query, where, doc, addDoc, getDoc, getDocs } from 'firebase/firestore';
+import { collection, query, where, doc, addDoc, getDoc, getDocs, onSnapshot } from 'firebase/firestore';
 import styles from "./users.module.css"
 
 const Users = ({ type }) => {
+  const auth = getAuth();
+  const currentUser = auth.currentUser;
     const [contacts, setContacts] = useState([]);
     const [newConnections, setNewConnections] = useState([]);
 
@@ -35,8 +37,20 @@ const Users = ({ type }) => {
           }
         }
       };
-  
+
       fetchData();
+
+      const userDocRef = doc(db, "users", currentUser.uid);
+
+      const unsubscribe = onSnapshot(userDocRef, (doc) => {
+        if (doc.exists()) {
+          const userData = doc.data();
+          const contacts = userData.contacts;
+          setContacts(contacts);
+        } else {
+          console.log("No such document!");
+        }
+      });
 
       const fetchNewConnections = async () => {
         const connections = await getNewConnections();
@@ -44,6 +58,8 @@ const Users = ({ type }) => {
       };
     
       fetchNewConnections();
+
+      return () => unsubscribe();
     }, []);
 
       const handleConnectClick = async (contactId) => {
