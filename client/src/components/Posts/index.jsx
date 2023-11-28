@@ -203,6 +203,7 @@ const Posts = () => {
               <div key={index} className={styles.comments}>
                 <p className={styles.commentText}><b>{comment.username}</b></p>
                 <p className={styles.commentText}>{comment.text}</p>
+                <p className={styles.commentTime}>{comment.timestamp.toDate().toLocaleString()}</p>
                 <MdOutlineDelete onClick={() => handleDeleteComment(post.id, comment.id)} />
               </div>
             ))

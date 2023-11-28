@@ -284,6 +284,16 @@ margin: 0;
     margin: 0;
 }
 
+.commentTime{
+    font-size: 10px;
+    color: var(--gray-02100, #0A0A0A);
+    font-family: Inter;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 14px; /* 140% */
+    margin: 0;
+}
+
 .commentInput{
     width: 80%;
     padding: 0.3rem;
