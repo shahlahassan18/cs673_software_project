@@ -16,35 +16,36 @@ const Posts = () => {
   const [comments, setComments] = useState([])
   const [activePost,setActivePost] = useState(null)
 
+//Comment Form Submission
+const handleCommentSubmit = async(e,postId) =>{
+  e.preventDefault()
+  const auth = getAuth();
+  const currentUser = auth.currentUser;
 
-  //Comment Form Submission
-  const handleCommentSubmit = async(e,postId) =>{
-    e.preventDefault()
-    const auth = getAuth();
-    const currentUser = auth.currentUser;
+  if (!currentUser) {
+    console.log("User is NOT Authenticated");
+    return;
+  }
 
-    if (!currentUser) {
-      console.log("User is NOT Authenticated");
-      return;
-    }
+  const userId = currentUser.uid;
+  const userRef = doc(db, 'users', userId);
+  const userSnapshot = await getDoc(userRef);
+  const { firstName, lastName } = userSnapshot.data(); // Fetch the firstName and lastName from the user's data
+  const fullName = `${firstName} ${lastName}`; // Concatenate firstName and lastName to create a full name
+  const postRef = doc(db, 'posts', postId);
+  const commentsCollection = collection(postRef, 'comments');
+  const newComment = { userId, username: fullName, text: comment, timestamp: serverTimestamp() }; // Include the full name in the newComment object
 
-    const userId = currentUser.uid;
-    const userRef = doc(db, 'users', userId);
-    const userSnapshot = await getDoc(userRef);
-    const { firstName, lastName } = userSnapshot.data(); // Fetch the firstName and lastName from the user's data
-    const fullName = `${firstName} ${lastName}`; // Concatenate firstName and lastName to create a full name
-    const postRef = doc(db, 'posts', postId);
-    const commentsCollection = collection(postRef, 'comments');
-    const newComment = { userId, username: fullName, text: comment, timestamp: serverTimestamp() }; // Include the full name in the newComment object
+  const commentRef = await addDoc(commentsCollection, newComment);
+  const commentSnapshot = await getDoc(commentRef);
+  const commentData = commentSnapshot.data();
 
-    const commentRef = await addDoc(commentsCollection, newComment);
-
-     // Update the local state
-    setPosts(posts.map(post => post.id === postId 
-      ? {...post, comments: [...post.comments, {...newComment, id: commentRef.id}]} 
-      : post
-    ));
-    setComment('');
+  // Update the local state
+  setPosts(posts.map(post => post.id === postId 
+    ? {...post, comments: [...post.comments, {...commentData, id: commentRef.id, timestamp: commentData.timestamp.toDate()}]} 
+    : post
+  ));
+  setComment('');
 } 
 
   const handleDeleteComment = async (postId, commentId) => {
@@ -74,10 +75,13 @@ const Posts = () => {
         const postRef = doc(db, 'posts', docPost.id);
         const commentsCollection = collection(postRef, 'comments');
         const commentsSnapshot = await getDocs(commentsCollection);
-        const commentsData = commentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const commentsData = commentsSnapshot.docs.map(doc => {
+          const data = doc.data();
+          return { id: doc.id, ...data, timestamp: data.timestamp.toDate() };
+        });
         return { id: docPost.id, ...postData, ... userData, comments: commentsData };
       }));
-  
+    
       console.log('Posts data:', postsData); // Log the mapped posts data
       setPosts(postsData);
     });
@@ -203,7 +207,7 @@ const Posts = () => {
               <div key={index} className={styles.comments}>
                 <p className={styles.commentText}><b>{comment.username}</b></p>
                 <p className={styles.commentText}>{comment.text}</p>
-                <p className={styles.commentTime}>{comment.timestamp.toDate().toLocaleString()}</p>
+                <p className={styles.commentTime}>{comment.timestamp instanceof Date ? comment.timestamp.toLocaleString() : 'Loading...'}</p>
                 <MdOutlineDelete onClick={() => handleDeleteComment(post.id, comment.id)} />
               </div>
             ))
