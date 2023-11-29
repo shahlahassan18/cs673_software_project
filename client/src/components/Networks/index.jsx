@@ -182,12 +182,18 @@ const Networks = () => {
           >
             <p className={styles.txt}>Contacts</p>
           </div>
+          <div
+            className={`${styles.connection} ${activeTab === "Requests" ? styles.active : ""}`}
+            onClick={() => handleTabClick("Requests")}
+          >
+            <p className={styles.txt}>Requests</p>
+          </div>
         </div>
         <div className={styles.leftP}>
         <LeftProfile handleTabClick={handleTabClick}/>
         </div>
         <div className={styles.users}>
-                          {activeTab === "Connections" ?
+                          {/* {activeTab === "Connections" ?
                       <div className={styles.title}>
                            <h3>New Connections</h3>
                            <Users type="new-connections"/>
@@ -196,7 +202,27 @@ const Networks = () => {
                        <div className={styles.title}>
                            <h3>Contacts</h3>
                            <Users type="contacts"/>
-                       </div>}
+                       </div>} */}
+          {activeTab === "Connections" &&
+            <div className={styles.title}>
+              <h3>Connections</h3>
+              <Users type="new-connections" />
+            </div>
+          }
+          {activeTab === "Contacts" &&
+            <div className={styles.title}>
+              <h3>Contacts</h3>
+              <Users type="contacts" />
+            </div>
+          }
+
+          {activeTab === "Requests" &&
+            <div className={styles.title}>
+              <h3>Connection Requests</h3>
+              <Users type="requests" />
+            </div>
+          }
+                       
           </div>
         </div>
       

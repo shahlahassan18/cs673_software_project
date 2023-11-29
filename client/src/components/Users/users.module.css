@@ -20,14 +20,31 @@
     margin: 0;
 }
 
-.connectBtn{
+.connectBtn, .acceptBtn{
     border: 1px solid #604DCF;
     padding: 0.5rem;
     border-radius: 25px;
     background-color: white;
 }
 
-.connectBtn:hover{
+.connectBtn:hover, .acceptBtn:hover{
     background-color: #604DCF;
     color: white; 
+}
+
+.btns{
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    justify-content: flex-start;
+}
+
+.acceptBtn{
+    width: 15%;
+}
+
+.imgContainer{
+    width: 128px;
+    height: auto;
+    border-radius: 100%;
 }

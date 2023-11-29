@@ -227,6 +227,10 @@ const Navbars = ({onFindJobsClick,onSavedJobsClick, handleTabClick}) => {
               {/* <li className={styles.navMenu1ListItem} onClick={() => handleTabClick("Contacts")}> Contacts</li> */}
               <li className={styles.navMenu1ListItem} onClick={() => navigate("/network")}> Contacts</li>
             </Link>
+            <Link to="/network" className={styles.menuItemLink}>
+              {/* <li className={styles.navMenu1ListItem} onClick={() => handleTabClick("Contacts")}> Contacts</li> */}
+              <li className={styles.navMenu1ListItem} onClick={() => navigate("/network")}> Requests</li>
+            </Link>
           </div>
           }
           <li className={styles.navMenu1ListItem} onClick={() => toggleJobsMenu()}>Jobs</li>

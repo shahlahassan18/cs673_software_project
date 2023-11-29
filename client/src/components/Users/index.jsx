@@ -161,6 +161,27 @@ const Users = ({ type }) => {
             ))}
           </div>
         );
+      } else if (type ==='requests'){
+        return(
+          <div className={styles.user}>
+               <div className={styles.imgContainer}>
+               <img
+                  src={"https://andthegeekshall.files.wordpress.com/2014/03/request-icon.jpg"}
+                  alt={"requests"}
+                  className={styles.userImage}
+                />
+                <p className={styles.userName}>
+                  {/* {"firstName"} {"lastName"} */}
+                  Testing Requests
+                </p>
+               </div>
+                
+                <div className={styles.btns}>
+                <button className={styles.acceptBtn}>Accept</button>
+                <button className={styles.acceptBtn}>Ignore</button>
+                </div>
+          </div>
+        )
       }
 }
 

@@ -101,6 +101,13 @@ const LeftProfile = ({onFindJobsClick,onSavedJobsClick, handleTabClick}) => {
                 <p className={styles.menuText}> Contacts</p>
               </div>
             </Link>
+            <Link to="/network" className={styles.menuItemLink} onClick={() => handleTabClick("Requests")}>
+              <div className={styles.jobItem} onClick={onSavedJobsClick}>
+                <img className={styles.icon} src='./briefcase.svg' alt="Network" />
+                <p className={styles.menuText}> Requests</p>
+              </div>
+            </Link>
+
           </div>
         }
      
