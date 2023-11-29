@@ -17,7 +17,7 @@ const Profile = () => {
   const auth = getAuth();
   const currentUser = auth.currentUser;
   const [profilePicture, setprofilePicture] = useState("");
-  const [backPicture, setbackPicture] = useState("");
+  const [bannerPicture, setbannerPicture] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [title, setTitle] = useState("");
@@ -217,6 +217,19 @@ const updateUserSkills = async (updatedSkills) => {
     } catch (error) {
       console.error("Error uploading avatar: ", error);    }
   };
+
+  const handleBannerUpload = async (file) => {
+    if (!file) return;
+  
+    const fileRef = ref(storage, `banners/${file.name}`);
+  
+    try {
+      const snapshot = await uploadBytes(fileRef, file);
+      const url = await getDownloadURL(snapshot.ref);
+      return url;
+    } catch (error) {
+      console.error("Error uploading avatar: ", error);    }
+  };
   
 
   const handleLogoChange = async (event) => {
@@ -250,6 +263,25 @@ const updateUserSkills = async (updatedSkills) => {
     }
   };
   
+  const handleBannerChange = async (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const bannerUrl = await handleBannerUpload(file);
+      if (bannerUrl) {
+        setbannerPicture(bannerUrl); // 更新本地状态
+  
+        // 如果需要，更新用户文档
+        const userDocRef = doc(db, "users", currentUser.uid);
+        try {
+          await updateDoc(userDocRef, {
+            bannerPicture: bannerUrl
+          });
+        } catch (error) {
+          console.error("Error updating user's banner picture:", error);
+        }
+      }
+    }
+  };
   
   
   
@@ -319,7 +351,7 @@ const updateUserSkills = async (updatedSkills) => {
             setexperience(data.experience);
             setskills(data.skills);
             setinterests(data.interests);
-            setbackPicture(data.backPicture);
+            setbannerPicture(data.bannerPicture);
           } else {
             console.error("User document doesn't exist!");
           }
@@ -420,7 +452,7 @@ const updateUserSkills = async (updatedSkills) => {
             {/* 1st section */}
             <div className={styles.user}>
               <div className={styles.bannerContainer} onClick={openAddBannerModal}>
-                <img className={styles.banner} src={backPicture} />
+                <img className={styles.banner} src={bannerPicture} />
               </div>
               {/* <div className={styles.picContainer}> */}
               <div className={styles.userTitles}>
@@ -466,7 +498,10 @@ const updateUserSkills = async (updatedSkills) => {
                 <button onClick={closeAddBannerModal} className={styles.modalBtn}><IoCloseSharp/></button>
               </div>
               <form className={styles.experienceForm}>
-                <input type='file' placeholder="Upload Banner" className={styles.formInput} />
+                <input type='file' placeholder="Upload Banner" className={styles.formInput} onChange={handleBannerChange} />
+                {bannerPicture && (
+                  <img src={bannerPicture} alt="Profile Avatar" style={{ width: "100px", height: "100px" }} />
+                )}
                 <div className={styles.btns}>
                   <button className={styles.btn} >Submit</button>
                 </div>
@@ -596,6 +631,7 @@ const updateUserSkills = async (updatedSkills) => {
                 />
                 <textarea type='text' placeholder="Enter Description" name="description"  className={styles.formInput} 
                 onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.description} />
+                <p>Company Logo</p>
                 <input type='file' placeholder="Upload Company Logo" name="companyLogo"  className={styles.formInput} 
                 onChange={handleLogoChange} />
                 {experienceFormData.companyLogo && (
@@ -641,6 +677,7 @@ const updateUserSkills = async (updatedSkills) => {
                 />
                 <textarea type='text' placeholder="Enter Description" name="description"  className={styles.formInput} 
                 onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.description} />
+                <p>Company Logo</p>
                 <input type='file' placeholder="Upload Company Logo" name="companyLogo"  className={styles.formInput} 
                 onChange={handleLogoChange} />
                 {experienceFormData.companyLogo && (
