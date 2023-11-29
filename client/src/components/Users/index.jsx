@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase';
 import { getAuth } from 'firebase/auth';
-import { collection, query, where, doc, addDoc, getDoc, getDocs, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, doc, addDoc, getDoc, getDocs, onSnapshot, updateDoc, arrayUnion } from 'firebase/firestore';
 import styles from "./users.module.css"
 
 const Users = ({ type }) => {
   const auth = getAuth();
   const currentUser = auth.currentUser;
+  const currentUserId = currentUser.uid;
     const [contacts, setContacts] = useState([]);
     const [newConnections, setNewConnections] = useState([]);
+    const [requests, setRequests] = useState([]);
 
     useEffect(() => {
       const fetchData = async () => {
-        const auth = getAuth();
-        const currentUser = auth.currentUser;
   
         if (currentUser) {
           const userDocRef = doc(db, 'users', currentUser.uid);
@@ -47,12 +47,20 @@ const Users = ({ type }) => {
     
       fetchNewConnections();
 
+      const fetchAndSetRequests = async () => {
+        const requests = await fetchRequests();
+        setRequests(requests);
+      };
+
+      fetchAndSetRequests();
+
       const userDocRef = doc(db, "users", currentUser.uid);
 
       const unsubscribe = onSnapshot(userDocRef, (doc) => {
         if (doc.exists()) {
           fetchData();
           fetchNewConnections();
+          fetchAndSetRequests();
         } else {
           console.log("No such document!");
         }
@@ -122,6 +130,104 @@ const Users = ({ type }) => {
           return newConnections;
         }
       };
+
+      const fetchRequests = async () => {
+        const requestsRef = collection(db, "connections");
+        const q = query(requestsRef, where("contactId", "==", currentUser.uid), where("status", "==", "requested"));
+      
+        const querySnapshot = await getDocs(q);
+        const requests = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const requestsDetails = requests.map(async (request) => {
+          const userDocRef = doc(db, "users", request.userId);
+          const userDocSnap = await getDoc(userDocRef);
+          if (userDocSnap.exists()) {
+            return { ...request, userDetails: userDocSnap.data() };
+          } else {
+            return { ...request, userDetails: {} }; 
+          }
+        });
+
+        const requestsWithUserDetails = await Promise.all(requestsDetails);
+        return requestsWithUserDetails;
+      };
+
+      const acceptFriendRequest = async (id, requesterId, currentUserId) => {
+        const requestDocRef = doc(db, "connections", id);
+      
+        try {
+          // 更新好友请求状态为"accepted"
+          await updateDoc(requestDocRef, {
+            status: "accepted"
+          });
+      
+        } catch (error) {
+          console.error("Error updating friend request status: ", error);
+        }
+      };
+    
+      const rejectFriendRequest = async (id, requesterId, currentUserId) => {
+        const requestDocRef = doc(db, "connections", id);
+      
+        try {
+          // 更新好友请求状态为"rejected"
+          await updateDoc(requestDocRef, {
+            status: "rejected"
+          });
+      
+        } catch (error) {
+          console.error("Error updating friend request status: ", error);
+        }
+      };
+    
+      const updateUserContacts = async (currentUserId, requesterId) => {
+        const userDocRef = doc(db, "users", currentUserId);
+        const senderDocRef = doc(db, "users", requesterId);
+      
+        try {
+          // 将发起人的UID添加到当前用户的contacts数组中
+          await updateDoc(userDocRef, {
+            contacts: arrayUnion(requesterId)
+          });
+    
+          // 将当前用户的UID添加到发起人的contacts数组中
+          await updateDoc(senderDocRef, {
+            contacts: arrayUnion(currentUserId)
+          });
+      
+        } catch (error) {
+          console.error("Error updating user contacts: ", error);
+        }
+      };
+    
+      const handleAccept = async (id, requesterId) => {
+        console.log("Accept request from:", requesterId);
+        await acceptFriendRequest(id, requesterId, currentUserId);
+        await updateUserContacts(currentUserId, requesterId);
+        setRequests(prevRequests => prevRequests.filter(request => request.id !== id));
+      };
+    
+      const handleReject = async (id, requesterId) => {
+        console.log("Reject request from:", requesterId);
+        await rejectFriendRequest(id, requesterId, currentUserId);
+        setRequests(prevRequests => prevRequests.filter(request => request.id !== id));
+      };
+    
+      const handleIgnore = (id) => {
+        console.log("Ignore request from:", id);
+        setRequests(prevRequests => prevRequests.filter(request => request.id !== id));
+      };
+    
+      const FriendRequest = ({ request, onAccept, onReject, onIgnore }) => {
+        const [firstName, setFirstName] = useState('');
+        useEffect(() => {
+          const fetchFirstName = async () => {
+            const name = await getUserFirstName(request.requesterId);
+            setFirstName(name);
+          };
+      
+          fetchFirstName();
+        }, [request.requesterId]);
+      };
       
       if (type === "new-connections") {
         return (
@@ -163,24 +269,27 @@ const Users = ({ type }) => {
         );
       } else if (type ==='requests'){
         return(
-          <div className={styles.user}>
+          <div>
+          {requests.map((request, index) => (
+          <div key={index} className={styles.user}>
                <div className={styles.imgContainer}>
                <img
-                  src={"https://andthegeekshall.files.wordpress.com/2014/03/request-icon.jpg"}
+                  src={request.userDetails.profilePicture}
                   alt={"requests"}
                   className={styles.userImage}
                 />
                 <p className={styles.userName}>
-                  {/* {"firstName"} {"lastName"} */}
-                  Testing Requests
+                  {request.userDetails.firstName} {request.userDetails.lastName}
                 </p>
                </div>
                 
                 <div className={styles.btns}>
-                <button className={styles.acceptBtn}>Accept</button>
-                <button className={styles.acceptBtn}>Ignore</button>
+                <button className={styles.acceptBtn} onClick={() => handleAccept(request.id, request.userId)}>Accept</button>
+                <button className={styles.acceptBtn} onClick={() => handleIgnore(request.id, request.userId)}>Ignore</button>
                 </div>
           </div>
+            ))}
+            </div>
         )
       }
 }
