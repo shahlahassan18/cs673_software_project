@@ -285,7 +285,7 @@ const Users = ({ type }) => {
                 
                 <div className={styles.btns}>
                 <button className={styles.acceptBtn} onClick={() => handleAccept(request.id, request.userId)}>Accept</button>
-                <button className={styles.acceptBtn} onClick={() => handleIgnore(request.id, request.userId)}>Ignore</button>
+                <button className={styles.acceptBtn} onClick={() => handleReject(request.id, request.userId)}>Ignore</button>
                 </div>
           </div>
             ))}
