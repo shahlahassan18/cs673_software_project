@@ -3,7 +3,7 @@ import Navbars from "../Navbar";
 import styles from "./userProfile.module.css";
 import { db } from "../../firebase";
 import { getAuth } from "firebase/auth";
-import { doc, getDoc, getDocs, collection } from "firebase/firestore";
+import { doc, getDoc, getDocs, collection, query, where, addDoc } from "firebase/firestore";
 import { FiPlus } from "react-icons/fi";
 import Modal from 'react-modal';
 import { IoCloseSharp } from "react-icons/io5";
@@ -14,6 +14,8 @@ import LeftProfile from "../LeftProfile";
 
 
 const UserProfile = () => {
+  const auth = getAuth();
+  const currentUser = auth.currentUser;
   // const [profilePicture, setprofilePicture] = useState("");
   // const [backPicture, setbackPicture] = useState("");
   // const [firstName, setFirstName] = useState("");
@@ -195,8 +197,6 @@ const UserProfile = () => {
   // }
 
   useEffect(() => {
-    const auth = getAuth();
-    const currentUser = auth.currentUser;
 
     // if (currentUser) {
     //   const userDocRef = doc(db, "users", currentUser.uid);
@@ -232,8 +232,6 @@ const UserProfile = () => {
   }, []);
 
   const getNewConnections = async () => {
-    const auth = getAuth();
-    const currentUser = auth.currentUser;
 
     if (currentUser) {
       // Get all users
@@ -268,6 +266,38 @@ const UserProfile = () => {
 
   // // 获取前三个元素
   const selected = shuffled.slice(0, 3);
+
+  const handleConnectClick = async (contactId) => {
+  
+    if (currentUser) {
+      const connectionsQuery = query(
+        collection(db, "connections"),
+        where("userId", "==", currentUser.uid),
+        where("contactId", "==", contactId)
+      );
+      const querySnapshot = await getDocs(connectionsQuery);
+  
+      if (!querySnapshot.empty) {
+        console.log("Connection request already exists");
+        return;
+      }
+  
+      const newConnection = {
+        userId: currentUser.uid,
+        contactId: contactId,
+        timestamp: new Date(),
+        status: "requested"
+      };
+  
+      try {
+        const docRef = await addDoc(collection(db, "connections"), newConnection);
+        alert("Connection request sent!");
+        console.log("Document written with ID: ", docRef.id);
+      } catch (e) {
+        console.error("Error adding document: ", e);
+      }
+    }
+  };
 
   ///////////////
   const {userID} = useParams();
@@ -345,7 +375,7 @@ const UserProfile = () => {
                 <div className={styles.btns}>
                   <button className={styles.connectBtn}>
                     <img src="./connect.svg" className={styles.icon} />
-                    <p className={styles.btnTxt}> Connect</p>
+                    <p className={styles.btnTxt} onClick={()=>handleConnectClick(userProfileData?.userID)}> Connect</p>
                   </button>
                   <button className={styles.msgBtn}>
                     <img src="./Union.svg" className={styles.icon} />
@@ -395,13 +425,13 @@ const UserProfile = () => {
               </div>
               {userProfileData?.experience && userProfileData?.experience.map((exp, index) => (
                 <div key={index} className={styles.experienceContainer}>
-                  <img className={styles.companylogo} src={exp.companylogo} />
+                  <img className={styles.companylogo} src={exp.companyLogo} />
                   <div className={styles.experience}>
-                    <p className={styles.job}>{exp.jobTitle}</p>
-                    <p className={styles.jobCompany}>{exp.companyName}</p>
+                    <p className={styles.job}>{exp.title}</p>
+                    <p className={styles.jobCompany}>{exp.company}</p>
                     <p className={styles.jobDate}>
-                      {/* {exp.startDate} - {exp.endDate} */}
-                      {exp.dateRange}
+                      {exp.startDate} - {exp.endDate}
+                      {/* {exp.dateRange} */}
                     </p>
                     <p className={styles.jobDesc}>{exp.description}</p>
                   </div>
@@ -456,7 +486,7 @@ const UserProfile = () => {
         <img className={styles.background}
                         src='/public/profbackpic.svg' />
                         <h6>People you may know</h6>
-          {userProfileData?.selected?.map((user, index) => (
+          {selected?.map((user, index) => (
             <div key={index} className={styles.interestContainer}>
               <img
                 src={user.profilePicture}

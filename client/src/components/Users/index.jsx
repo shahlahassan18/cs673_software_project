@@ -40,22 +40,23 @@ const Users = ({ type }) => {
 
       fetchData();
 
-      const userDocRef = doc(db, "users", currentUser.uid);
-
-      const unsubscribe = onSnapshot(userDocRef, (doc) => {
-        if (doc.exists()) {
-          fetchData();
-        } else {
-          console.log("No such document!");
-        }
-      });
-
       const fetchNewConnections = async () => {
         const connections = await getNewConnections();
         setNewConnections(connections);
       };
     
       fetchNewConnections();
+
+      const userDocRef = doc(db, "users", currentUser.uid);
+
+      const unsubscribe = onSnapshot(userDocRef, (doc) => {
+        if (doc.exists()) {
+          fetchData();
+          fetchNewConnections();
+        } else {
+          console.log("No such document!");
+        }
+      });
 
       return () => unsubscribe();
     }, []);

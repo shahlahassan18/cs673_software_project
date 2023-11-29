@@ -400,6 +400,7 @@ const updateUserSkills = async (updatedSkills) => {
   
       try {
         const docRef = await addDoc(collection(db, "connections"), newConnection);
+        alert("Connection request sent!");
         console.log("Document written with ID: ", docRef.id);
       } catch (e) {
         console.error("Error adding document: ", e);
@@ -722,9 +723,9 @@ const updateUserSkills = async (updatedSkills) => {
                     src={interests.imageUrl}
                   />
                   <div className={styles.experience}>
-                    <p className={styles.job}>{interests.conpany}</p>
-                    <p className={styles.jobCompany}>TODO</p>
-                    <button className={styles.followBtn}>TODO</button>
+                    <p className={styles.job}>{interests.title}</p>
+                    <p className={styles.jobCompany}>{interests.company}</p>
+                    <button className={styles.followBtn}>Followed</button>
                   </div>
                 </div>
               ))}
