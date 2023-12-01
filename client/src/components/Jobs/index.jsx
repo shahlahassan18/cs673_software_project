@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { getDoc, collection, updateDoc, doc, arrayUnion, arrayRemove, setDoc, serverTimestamp, onSnapshot, query, where, orderBy, limit } from "firebase/firestore";
+import { getDoc,deleteDoc, collection, updateDoc, doc, arrayUnion, arrayRemove, setDoc, serverTimestamp, onSnapshot, query, where, orderBy, limit } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { db } from "../../firebase";
 import styles from "./jobs.module.css";
 import Navbars from "./../Navbar";
 import LeftProfile from "../LeftProfile";
 import { BsBookmark, BsBookmarkFill } from "react-icons/bs";
+import { MdOutlineModeEdit } from "react-icons/md";
+import { MdOutlineDelete } from "react-icons/md";
 import Modal from 'react-modal';
 import PlacesAutocomplete, {
   geocodeByAddress,
@@ -13,7 +15,9 @@ import PlacesAutocomplete, {
 } from 'react-places-autocomplete';
 import { IoCloseSharp } from "react-icons/io5";
 
-const JobItem = ({ job, onBookmarkClick, isBookmarked, onJobClick }) => (
+const JobItem = ({ job, onBookmarkClick, isBookmarked, onJobClick , onEditClick,onDeleteClick}) => {
+  
+  return(
   <div className={styles.job} onClick={() => onJobClick(job)}>
     <div className={styles.logo}>
       <img
@@ -39,9 +43,11 @@ const JobItem = ({ job, onBookmarkClick, isBookmarked, onJobClick }) => (
           onBookmarkClick(job);
         }}/>
       }
+      <MdOutlineModeEdit onClick={()=>onEditClick()} />
+      <MdOutlineDelete onClick={(e)=>{e.stopPropagation();onDeleteClick(job.id)}} />
     </div>
   </div>
-);
+)};
 
 const JobDetails = ({ job }) => (
   <div className={styles.job_details}>
@@ -70,6 +76,18 @@ const Jobs = () => {
   const [jobDescription, setJobDescription] = useState("");
   const [requirements, setRequirements] = useState("");
   const [selectedJob, setSelectedJob] = useState(null);
+  const [editJobOpen, setEditJobOpen] = useState(false);
+  const [editingJob, setEditingJob] = useState({
+    title: "",
+    company: "",
+    type: "",
+    salary: "",
+    location: "",
+    description: "",
+    requirements: ""
+  });
+
+
 
   const OpenCreateJobModal = () => {
     setcreateJobOpen(true);
@@ -79,10 +97,48 @@ const Jobs = () => {
     setcreateJobOpen(false);
   };
 
+  const OpenEditJobModal = () => {
+    setEditJobOpen(true);
+  };
+
+  const CloseEditJobModal = () => {
+    setEditJobOpen(false);
+  };
+
   const handleJobClick = (job) => () => {
     setSelectedJob(job);
     console.log("Handle Job Click function !@#")
   };
+
+  const handleDeleteJob = async (jobId) => {
+    try {
+      const auth = getAuth();
+      const currentUser = auth.currentUser;
+  
+      if (currentUser) {
+        const jobDocRef = doc(db, "jobs", jobId);
+        await deleteDoc(jobDocRef);
+  
+        // If the job was saved, also remove it from the user's saved jobs
+        const userDocRef = doc(db, "users", currentUser.uid);
+        await updateDoc(userDocRef, {
+          interests: arrayRemove(jobId),
+        });
+  
+        // Update the state to reflect the changes
+        setJobs((prevJobs) => prevJobs.filter((job) => job.id !== jobId));
+        setSavedJobs((prevSavedJobs) => prevSavedJobs.filter((job) => job.id !== jobId));
+  
+        // If the deleted job was the selected job, clear the selectedJob state
+        if (selectedJob && selectedJob.id === jobId) {
+          setSelectedJob(null);
+        }
+      }
+    } catch (error) {
+      console.error("Error deleting job:", error);
+    }
+  };
+  
 
   useEffect(() => {
     const jobsCol = collection(db, "jobs");
@@ -148,6 +204,45 @@ const Jobs = () => {
     // Close modal
     CloseCreateJobModal();
   };
+
+  const handleEditSubmit = async (event) => {
+    event.preventDefault();
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
+
+    if (!currentUser || !editingJob) {
+      console.log("User is NOT Authenticated or editingJob is undefined");
+      return;
+    }
+
+    const jobsColRef = collection(db, "jobs");
+    const editedJobDoc = doc(jobsColRef, editingJob.id);
+    await updateDoc(editedJobDoc, {
+      title: editingJob.title,
+      company: editingJob.company,
+      type: editingJob.type,
+      salary: editingJob.salary,
+      location: editingJob.location,
+      description: editingJob.description,
+      requirements: editingJob.requirements,
+    });
+
+    setEditingJob(null); // Clear the editing job state
+
+    // Clear form fields (optional, depending on your requirements)
+    setJobTitle("");
+    setCompanyName("");
+    setJobType("");
+    setSalary("");
+    setJobLocation("");
+    setJobDescription("");
+    setRequirements("");
+
+    // Close modal
+    CloseEditJobModal();
+  };
+  
+  
 
   const handleBookmarkClick = async (job) => {
     try {
@@ -230,6 +325,22 @@ const Jobs = () => {
     setCurrentView(view);
   };
 
+  const handleEditJobClick = (job) => {
+    console.log("Edit Job :", job)
+    setEditingJob(job);
+    OpenEditJobModal();
+ };
+
+ const handleInputChangeEditJob = (event) => {
+  const { name, value } = event.target;
+  setEditingJob((prevEditingJob) => ({
+    ...prevEditingJob,
+    [name]: value,
+  }));
+};
+
+ 
+
   return (
     <>
       <Navbars />
@@ -248,11 +359,12 @@ const Jobs = () => {
               onChange={e=> setSearchTerm(e.target.value)}
             ></input>
             <button className={styles.create_job} onClick={OpenCreateJobModal}>Post a Job</button>
+            {/* ADD A JOB POSTING */}
             <Modal
               isOpen={createJobOpen}
               onRequestClose={CloseCreateJobModal}
               ariaHideApp={false}
-              contentLabel="Job Posting Modal"
+              contentLabel="Add Job Posting Modal"
             >
               {/* <h2>Post a Job</h2> */}
               <div className={styles.title}>
@@ -314,10 +426,114 @@ const Jobs = () => {
                 className={styles.formInput}
                 onChange={(e) => setRequirements(e.target.value)}
               />
+              {/* <input
+                type="file"
+                placeholder="Upload Company Logo"
+                className={styles.formInput}
+                name="logo"
+                value={editingJob?.logo}
+                onChange={(event) => handleInputChangeEditJob(event)}
+              /> */}
               <div className={styles.btns}>
                 <button className={styles.btn} onClick={CloseCreateJobModal}>Close</button>
                 <button className={styles.btn} onClick={handleSubmit}>Submit</button>
               </div>
+            </Modal>
+
+            {/* EDIT A JOB POSTING */}
+            <Modal
+              isOpen={editJobOpen}
+              onRequestClose={CloseEditJobModal}
+              ariaHideApp={false}
+              contentLabel=" Edit Job Posting Modal"
+            >
+              {/* <h2>Post a Job</h2> */}
+              <div className={styles.title}>
+                <h2 className={styles.addExperienceTitle}> Edit a Job Posting</h2>
+                <button onClick={CloseEditJobModal} className={styles.modalBtn}><IoCloseSharp/></button>
+              </div>
+              <input
+                type="text"
+                placeholder="Job Title"
+                className={styles.formInput}
+                // value={jobTitle}
+                name="title"
+                value={editingJob?.title}
+                onChange={(event) => handleInputChangeEditJob(event)}
+              />
+              <input
+                type="text"
+                placeholder="Company Name"
+                className={styles.formInput}
+                // value={companyName}
+                name="company"
+                value={editingJob?.company}
+                onChange={(event) => handleInputChangeEditJob(event)}
+              />
+              <select
+                name="jobType"
+                id="jobType"
+                className={styles.formInput}
+                // value={jobType}
+                
+                value={editingJob?.type}
+                onChange={(event) => handleInputChangeEditJob(event)}
+              >
+                <option value="fullTime">Full Time</option>
+                <option value="partTime">Part Time</option>
+                <option value="internship">Internship</option>
+                <option value="contract">Contract</option>
+                <option value="temporary">Temporary</option>
+                <option value="volunteer">Volunteer</option>
+                <option value="other">Other</option>
+              </select>
+              <input
+                type="text"
+                placeholder="Salary"
+                className={styles.formInput}
+                // value={salary}
+                name="salary"
+                value={editingJob?.salary}
+                onChange={(event) => handleInputChangeEditJob(event)}
+              />
+              <input
+                type="text"
+                placeholder="Job Location"
+                className={styles.formInput}
+                // value={jobLocation}
+                name="location"
+                value={editingJob?.location}
+                onChange={(event) => handleInputChangeEditJob(event)}
+              />
+              <textarea
+                placeholder="Job Description"
+                // value={jobDescription}
+                value={editingJob?.description}
+                className={styles.formInput}
+                name="description"
+                onChange={(event) => handleInputChangeEditJob(event)}
+              />
+              <textarea
+                placeholder="Requirements"
+                // value={requirements}
+                value={editingJob?.requirements}
+                className={styles.formInput}
+                name="requirements"
+                onChange={(event) => handleInputChangeEditJob(event)}
+              />
+              <div className={styles.btns}>
+                <button className={styles.btn} onClick={CloseEditJobModal}>Close</button>
+                <button className={styles.btn} onClick={handleEditSubmit}>Submit</button>
+              </div>
+              {/* <input
+                type="file"
+                placeholder="Upload Company Logo"
+                className={styles.formInput}
+                // value={jobLocation}
+                name="logo"
+                value={editingJob?.logo}
+                onChange={(event) => handleInputChangeEditJob(event)}
+              /> */}
             </Modal>
           </div>
           <div style={{display: 'flex'}}>
@@ -327,13 +543,22 @@ const Jobs = () => {
                   <div className={styles.jobs}>
                   {jobs.map((job) => {
                     return (
+                      // <JobItem
+                      //   key={job.id}
+                      //   job={job}
+                      //   onBookmarkClick={handleBookmarkClick}
+                      //   isBookmarked={savedJobs.some((j) => j.id === job.id)}
+                      //   onJobClick={handleJobClick(job)}
+                      // />
                       <JobItem
                         key={job.id}
                         job={job}
                         onBookmarkClick={handleBookmarkClick}
                         isBookmarked={savedJobs.some((j) => j.id === job.id)}
                         onJobClick={handleJobClick(job)}
-                      />
+                        onEditClick={() => handleEditJobClick(job)}
+                        onDeleteClick={handleDeleteJob}
+/>
                     );
                   })}
                   </div>
@@ -351,6 +576,8 @@ const Jobs = () => {
                         isBookmarked={true}
                         onBookmarkClick={handleBookmarkClick}
                         onJobClick={handleJobClick(job)}
+                        onEditClick={() => handleEditJobClick(job)}
+                        onDeleteClick={handleDeleteJob}
                       />
                     );
                   }) : <h3>No Saved Jobs</h3>
