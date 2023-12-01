@@ -132,6 +132,43 @@ const handleCommentSubmit = async(e,postId) =>{
     }
   } 
 
+
+  //HANDLING REPOSTS 
+  const handleRepost = async (post) => {
+    
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) {
+      console.log("User is NOT Authenticated");
+      return;
+    }
+
+    const userId = currentUser.uid;
+
+    let newPost ;
+
+    if(!post.media){
+      newPost = {
+        userId: userId,
+        postCont: post.postCont,
+        // media: post.media,
+        TimeCreated: serverTimestamp(),
+        likes: [],
+      };
+    }else{
+      newPost = {
+        userId: userId,
+        postCont: post.postCont,
+        TimeCreated: serverTimestamp(),
+        likes: [],
+         media: post.media
+      };
+    }
+    await addDoc(collection(db, 'posts'), newPost);
+    setPosts((prevPosts) => [newPost, ...prevPosts]);
+  };
+
   return (
 
 
@@ -149,7 +186,8 @@ const handleCommentSubmit = async(e,postId) =>{
             <p className={styles.postUserJobTitle}>Product Designer</p>
             <div className={styles.jobTimer}>
               <img className={styles.jobTimerImg} src="./history-outline.svg" alt="timer" />
-              <p className={styles.jobTime}>{post.TimeCreated ? post.TimeCreated.toDate().toLocaleString() : 'Loading...'}</p>
+              {/* <p className={styles.jobTime}>{post.TimeCreated ? post.TimeCreated.toDate().toLocaleString() : 'Loading...'}</p> */}
+              <p className={styles.jobTime}>{post.TimeCreated && post.TimeCreated.toDate ? post.TimeCreated.toDate().toLocaleString() : 'Loading...'}</p>
             </div>
           </div>
           <div className={styles.addPostSettings}>
@@ -177,16 +215,16 @@ const handleCommentSubmit = async(e,postId) =>{
               <img className={styles.actionIcon} src='./ChatText.svg' alt='comment' />
               <p className={styles.actionText}>Comment {post.comments ? post.comments.length : 0}</p>
             </div>
-            <div className={styles.actionBtn}>
+            <div className={styles.actionBtn} onClick={()=>handleRepost(post)}>
               <img className={styles.actionIcon}
                 src='./ShareNetwork.svg' alt='search' />
               <p className={styles.actionText}>Repost</p>
             </div>
-            <div className={styles.actionBtn}>
+            {/* <div className={styles.actionBtn}>
               <img className={styles.actionIcon}
                 src='./Star.svg' alt='search' />
               <p className={styles.actionText}>Favourites</p>
-            </div>
+            </div> */}
             </div>
           </div>
           {activePost === post.id && 
