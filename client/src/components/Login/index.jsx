@@ -41,47 +41,26 @@ const Login = () => {
       });
   };
 
-  const handleGoogleSignIn = () => {
+  const handleGoogleSignIn = async () => {
     const provider = new GoogleAuthProvider();
     const auth = getAuth();
-
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        const user = result.user;
-        setUser(result.user);
-        checkUserInFirestore(user);
-        navigate("/feed");
-      })
-      .catch((error) => {
-        console.error("Error signing in with Google: ", error.message);
-        alert("Error signing in with Google: " + error.message);
-      });
-
-
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      setUser(user);
+      await checkUserInFirestore(user);
+      navigate("/feed");
+    } catch (error) {
+      console.error("Error signing in with Google: ", error.message);
+      alert("Error signing in with Google: " + error.message);
+    }
   };
+  
 
-  const addUserToFirestore = async (userData, formData) => {
+  const addUserToFirestore = async (userData) => {
     try {
       const userId = userData.uid;
-      const userProfile = {
-        userID: userId,
-        email: userData.email,
-        firstName: formData.firstName || "",
-        lastName: formData.lastName || "",
-        profilePicture: formData.profilePicture || "https://cdn.onlinewebfonts.com/svg/img_383214.png",
-        title: formData.title || "",
-        education: formData.education || "",
-        skills: formData.skills || [],
-        interests: formData.interests || [],
-        bio: formData.bio || "",
-        followersCount: 0,
-        posts: [],
-        comments: [],
-        experience: formData.experience || [],
-        contacts: formData.contacts || [],
-        createdAt: formData.createdAt || new Date(),
-        lastLogin: formData.lastLogin || new Date(),
-      };
+      const userProfile = createDefaultUserProfile(userData);
   
       await setDoc(doc(db, "users", userId), userProfile);
       console.log("User profile saved successfully");
@@ -97,31 +76,31 @@ const Login = () => {
     console.log("docSnap.exists(): ", docSnap.exists());
   
     if (!docSnap.exists()) {
-
-      const DefaultuserProfile = {
-        firstName: "",
-        lastName: "",
-        profilePicture: "https://cdn.onlinewebfonts.com/svg/img_383214.png",
-        title: "",
-        education: "",
-        skills: [],
-        interests: [],
-        bio: "",
-        followersCount: 0,
-        posts: [],
-        comments: [],
-        experience: [],
-        contacts: [],
-        createdAt: new Date(),
-        lastLogin: new Date(),
-      };
-
-      await addUserToFirestore(user, DefaultuserProfile);
+      await addUserToFirestore(user);
     }
     else {
       console.log("User already exists in Firestore");
     }
   };
+
+  const createDefaultUserProfile = (userData) => ({
+    firstName: userData.firstName || "",
+    lastName: userData.lastName || "",
+    email: userData.email || "",
+    profilePicture: "https://cdn.onlinewebfonts.com/svg/img_383214.png",
+    title: "",
+    education: "",
+    skills: [],
+    interests: [],
+    bio: "",
+    followersCount: 0,
+    posts: [],
+    comments: [],
+    experience: [],
+    contacts: [],
+    createdAt: new Date(),
+    lastLogin: new Date(),
+  });
 
   const [showPassword, setShowPassword] = useState(false);
   return (

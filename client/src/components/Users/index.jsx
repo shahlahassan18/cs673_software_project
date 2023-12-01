@@ -11,6 +11,7 @@ const Users = ({ type }) => {
     const [contacts, setContacts] = useState([]);
     const [newConnections, setNewConnections] = useState([]);
     const [requests, setRequests] = useState([]);
+    const [sentRequestIds, setSentRequestIds] = useState(new Set());
 
     useEffect(() => {
       const fetchData = async () => {
@@ -54,6 +55,13 @@ const Users = ({ type }) => {
 
       fetchAndSetRequests();
 
+      const fetchAndSetSentRequests = async () => {
+        const sentRequestIds = await fetchSentRequests();
+        setSentRequestIds(sentRequestIds);
+      };
+    
+      fetchAndSetSentRequests();
+
       const userDocRef = doc(db, "users", currentUser.uid);
 
       const unsubscribe = onSnapshot(userDocRef, (doc) => {
@@ -61,6 +69,7 @@ const Users = ({ type }) => {
           fetchData();
           fetchNewConnections();
           fetchAndSetRequests();
+          fetchAndSetSentRequests();
         } else {
           console.log("No such document!");
         }
@@ -97,6 +106,8 @@ const Users = ({ type }) => {
             const docRef = await addDoc(collection(db, "connections"), newConnection);
             console.log("Document written with ID: ", docRef.id);
             alert("Connection request sent!");
+
+            setSentRequestIds(prev => new Set([...prev, contactId]));
           } catch (e) {
             console.error("Error adding document: ", e);
           }
@@ -150,6 +161,16 @@ const Users = ({ type }) => {
         const requestsWithUserDetails = await Promise.all(requestsDetails);
         return requestsWithUserDetails;
       };
+
+      const fetchSentRequests = async () => {
+        const sentRequestsRef = collection(db, "connections");
+        const q = query(sentRequestsRef, where("userId", "==", currentUser.uid), where("status", "==", "requested"));
+      
+        const querySnapshot = await getDocs(q);
+        const sentRequests = querySnapshot.docs.map(doc => doc.data().contactId);
+        return new Set(sentRequests); // 使用Set来提高检查效率
+      };
+      
 
       const acceptFriendRequest = async (id, requesterId, currentUserId) => {
         const requestDocRef = doc(db, "connections", id);
@@ -242,8 +263,12 @@ const Users = ({ type }) => {
                 <p className={styles.userName}>
                   {user.firstName} {user.lastName}
                 </p>
-                <button onClick={() => handleConnectClick(user.id)} className={styles.connectBtn}>
-                  Connect
+                <button
+                  onClick={() => handleConnectClick(user.id)}
+                  className={styles.connectBtn}
+                  disabled={sentRequestIds.has(user.id)} // 如果已发送请求，则禁用按钮
+                >
+                  {sentRequestIds.has(user.id) ? "Connection request sent" : "Connect"}
                 </button>
               </div>
             ))}
