@@ -655,7 +655,7 @@ const Profile = () => {
             </Modal>
 
             {/* 3rd SECTION */}
-            <div className={styles.activity}>
+            {/* <div className={styles.activity}>
               <h6>Activity</h6>
               <p className={styles.followers}>{followersCount} folowers</p>
               <div className={styles.btns}>
@@ -667,7 +667,7 @@ const Profile = () => {
                 <p className={styles.showPosts}> Show all posts</p>
                 <img src="./Arrow.svg" className={styles.icon} />
               </div>
-            </div>
+            </div> */}
 
             {/* 4th SECTION */}
             <div className={styles.experienceSection}>

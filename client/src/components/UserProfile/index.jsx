@@ -377,11 +377,11 @@ const UserProfile = () => {
                     <img src="./connect.svg" className={styles.icon} />
                     <p className={styles.btnTxt} onClick={()=>handleConnectClick(userProfileData?.userID)}> Connect</p>
                   </button>
-                  <button className={styles.msgBtn}>
+                  {/* <button className={styles.msgBtn}>
                     <img src="./Union.svg" className={styles.icon} />
                     <p className={styles.btnTxt}> Message</p>
                   </button>
-                  <button className={styles.moreBtn}>More</button>
+                  <button className={styles.moreBtn}>More</button> */}
                 </div>
               </div>
             </div>
@@ -403,7 +403,7 @@ const UserProfile = () => {
             
 
             {/* 3rd SECTION */}
-            <div className={styles.activity}>
+            {/* <div className={styles.activity}>
               <h6>Activity</h6>
               <p className={styles.followers}>{userProfileData?.followersCount} folowers</p>
               <div className={styles.btns}>
@@ -415,7 +415,7 @@ const UserProfile = () => {
                 <p className={styles.showPosts}> Show all posts</p>
                 <img src="./Arrow.svg" className={styles.icon} />
               </div>
-            </div>
+            </div> */}
 
             {/* 4th SECTION */}
             <div className={styles.experienceSection}>
@@ -454,16 +454,16 @@ const UserProfile = () => {
                   
                 </div>
               ))}
-              <div className={styles.showPostsContainer}>
+              {/* <div className={styles.showPostsContainer}>
                 <p className={styles.showPosts}> Show all skills</p>
                 <img src="./Arrow.svg" className={styles.icon} />
-              </div>
+              </div> */}
             </div>
 
           
 
             {/* 6th SECTION */}
-            <div className={styles.interestSection}>
+            {/* <div className={styles.interestSection}>
               <h6>Interests</h6>
               <p>Companies</p>
               {userProfileData?.interests?.map((interests, index) => (
@@ -479,7 +479,7 @@ const UserProfile = () => {
                   </div>
                 </div>
               ))}
-            </div>
+            </div> */}
           </div>
         </div>
         <div className={styles.others}>
