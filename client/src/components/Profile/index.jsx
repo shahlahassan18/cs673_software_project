@@ -32,8 +32,7 @@ const Profile = () => {
   const [addProfilePicModal, setAddProfilePicModal] = useState(false)
   const [addBannerModal, setAddBannerModal] = useState(false)
   const [infoModal, setInfoModal] = useState(false)
-  const [generalInfoInput, setGeneralInfoInput] = useState("")
-  const [generalInfo, setGeneralInfo] = useState("")
+  const [generalInfoInput , setGeneralInfoInput] = useState("")
   const [experienceFormData, setExperienceFormData] = useState({
     title: '',
     company: '',
@@ -349,11 +348,28 @@ const Profile = () => {
   }
 
   //General information form submission
-  function handleGeneralInfoSubmit(e) {
-    e.preventDefault()
-    console.log(generalInfoInput)
-    setGeneralInfo(generalInfoInput)
-    closeInfoModal()
+  async function handleGeneralInfoSubmit(e){
+    e.preventDefault();
+  
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
+  
+    if (currentUser) {
+      const userDocRef = doc(db, "users", currentUser.uid);
+  
+      await updateDoc(userDocRef, {
+        bio: generalInfoInput
+      })
+      .then(() => {
+        console.log("User document updated successfully");
+        // Update the state here
+        setBio(generalInfoInput);
+        closeInfoModal();
+      })
+      .catch((error) => {
+        console.error("Error updating user document:", error);
+      });
+    }
   }
 
   useEffect(() => {
@@ -371,6 +387,7 @@ const Profile = () => {
             setLastName(data.lastName);
             setTitle(data.title);
             setBio(data.bio);
+            setGeneralInfoInput(data.bio);
             setfollowersCount(data.followersCount);
             setexperience(data.experience);
             setskills(data.skills);
@@ -606,15 +623,15 @@ const Profile = () => {
             {/* 2nd SECTION */}
             <div className={styles.info}>
               <div className={styles.infoContainer}>
-                <h6>General Information</h6>
-                {generalInfo ?
-                  <MdOutlineModeEdit onClick={openInfoModal} />
-                  :
-                  <FiPlus onClick={openInfoModal} />}
-              </div>
+              <h6>General Information</h6>
+              {bio ? 
+              <MdOutlineModeEdit onClick={openInfoModal}/> 
+              : 
+              <FiPlus onClick={openInfoModal}/>}
+              </div>    
               {/* <p className={styles.generalText}>{bio}</p> */}
-              {generalInfo &&
-                <p>{generalInfo}</p>
+              {bio &&
+              <p>{bio}</p>
               }
             </div>
 
