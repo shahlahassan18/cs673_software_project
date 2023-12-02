@@ -44,7 +44,9 @@
 }
 
 .imgContainer{
-    width: 128px;
+    /* width: 128px; */
+    display: grid;
+    place-items: center;
     height: auto;
     border-radius: 100%;
 }

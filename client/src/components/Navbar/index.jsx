@@ -151,20 +151,26 @@ const Navbars = ({onFindJobsClick,onSavedJobsClick, handleTabClick}) => {
           {!isActive &&
           <div className={styles.menu}>
           <div className={styles.menuItem}>
+          <Link to="/feed" className={styles.menuItemLink}>
             <img className={styles.icon} src='./home.svg' alt="home" style={{ fill: '#9F9BB9' }} />
+          </Link>
           </div>
           <div className={styles.menuItem}>
+          <Link to="/network" className={styles.menuItemLink}>
             <img className={styles.icon} src='./layers.svg' alt="network" />
+            </Link>
           </div>
           <div className={styles.menuItem}>
+          <Link to="/jobs" className={styles.menuItemLink}>
             <img className={styles.icon} src='./briefcase.svg' alt="jobs" />
+          </Link>
           </div>
-          <div className={styles.menuItem}>
+          {/* <div className={styles.menuItem}>
             <img className={styles.icon} src='./message-square.svg' alt="Messaging" />
-          </div>
-          <div className={styles.menuItem}>
+          </div> */}
+          {/* <div className={styles.menuItem}>
             <img className={styles.icon} src='./monitor.svg' alt="business" />
-          </div>
+          </div> */}
         </div> }
           <ImMenu size={40} className={styles.menuIcon} onClick={(() => setIsActive(!isActive))} />
         </div>

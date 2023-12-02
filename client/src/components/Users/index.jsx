@@ -255,6 +255,7 @@ const Users = ({ type }) => {
           <div className={styles.users}>
             {newConnections.map((user, index) => (
               <div key={index} className={styles.user}>
+                <div className={styles.imgContainer}>
                 <img
                   src={user.profilePicture}
                   alt={user.firstName}
@@ -263,12 +264,13 @@ const Users = ({ type }) => {
                 <p className={styles.userName}>
                   {user.firstName} {user.lastName}
                 </p>
+                </div>
                 <button
                   onClick={() => handleConnectClick(user.id)}
                   className={styles.connectBtn}
                   disabled={sentRequestIds.has(user.id)} // 如果已发送请求，则禁用按钮
                 >
-                  {sentRequestIds.has(user.id) ? "Connection request sent" : "Connect"}
+                  {sentRequestIds.has(user.id) ? "Request Sent" : "Connect"}
                 </button>
               </div>
             ))}
@@ -279,6 +281,7 @@ const Users = ({ type }) => {
           <div className={styles.users}>
             {contacts.map((contact, index) => (
               <div key={index} className={styles.user}>
+                <div className={styles.imgContainer}>
                 <img
                   src={contact.profilePicture}
                   alt={contact.firstName}
@@ -287,6 +290,7 @@ const Users = ({ type }) => {
                 <p className={styles.userName}>
                   {contact.firstName} {contact.lastName}
                 </p>
+                </div>
                 <button className={styles.connectBtn}>Connected</button>
               </div>
             ))}

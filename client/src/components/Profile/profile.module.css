@@ -11,6 +11,8 @@
 .profile{
     display: inline-flex;
     /* height: 1676.182px; */
+    width: 100%;
+    height: auto;
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
@@ -19,23 +21,29 @@
 }
 
 .user{
-    width: 782.922px;
-    height: 477.036px;
+    /* width: 782.922px; */
+    width: 100%;
+    /* height: auto; */
+    /* height: 477.036px; */
+    height: 497.036px;
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
     position: relative;
 }
 
-/* .bannerContainer{
-    width: 782.922px;
-    height: 477.036px;
-    flex-shrink: 0;
-} */
+.bannerContainer{
+    /* width: 782.922px; */
+    width: 100%;
+    /* height: 477.036px;
+    flex-shrink: 0; */
+}
 
 .banner{
-    width: 782.922px;
-    height: 196.45px;
+    /* width: 782.922px; */
+    width: 100%;
+    /* height: 196.45px; */
+    height: 296.45px;
     flex-shrink: 0;
     border-radius: 6px 6px 0px 0px;
     background: url(<path-to-image>), lightgray 9.235px -10.649px / 100% 188.747% no-repeat;
@@ -57,6 +65,7 @@
     padding: 2rem;
     position: absolute;
     top: 4rem;
+    top: 10rem;
     gap: 1rem;
 }
 .pic{
@@ -163,11 +172,11 @@ width: auto;
 
 .info{
     /* width: 782.922px; */
-    width: 745.922px;
-    /* width: auto;
-    height: 123.615px; */
-    max-width: 100%;
-    /* height: auto; */
+    /* width: 745.922px; */
+     width: 100%;
+    /* height: 123.615px; */ 
+    /* max-width: 100%; */
+    height: auto;
     flex-shrink: 0;
     border-radius: 6px;
 border: 1px solid #E0DFDC;
@@ -196,8 +205,10 @@ padding: 1rem;
 
 
 .activity{
-    width: 783.626px;
-height: 179.118px;
+    /* width: 783.626px;
+height: 179.118px; */
+width: 100%;
+height: auto;
 flex-shrink: 0;
 border-radius: 6px;
 border: 1px solid #E0DFDC;
@@ -255,8 +266,10 @@ padding: 1rem;
 }
 
 .experienceSection{
-    width: 782.922px;
-    height: 344.613px;
+    /* width: 782.922px; */
+    width: 100%;
+height: auto;
+    /* height: 344.613px; */
     flex-shrink: 0;
     border-radius: 6px;
 border: 1px solid #E0DFDC;
@@ -267,8 +280,10 @@ padding: 1rem;
 }
 
 .experienceContainer{
-    width: 731.424px;
-    height: 136px;
+    /* width: 731.424px; */
+    /* height: 136px; */
+    width: 100%;
+height: auto;
     flex-shrink: 0;
     display: flex;
     flex-direction: row;
@@ -317,16 +332,20 @@ padding: 1rem;
 .jobDesc{
     color: #181818;
     font-family: Montserrat;
-    font-size: 10px;
+    font-size: 13px;
     font-style: normal;
     font-weight: 400;
     line-height: 150%; /* 15px */
-    width: 598.307px;
+    /* width: 598.307px; */
+    width: 100%;
+    height: auto;
 }
 
 .skillSection{
-    width: 782.922px;
-    height: 231.422px;
+    /* width: 782.922px;
+    height: 231.422px; */
+    width: 100%;
+    height: auto;
     flex-shrink: 0;
     border-radius: 6px;
     border: 1px solid #E0DFDC;
@@ -426,12 +445,13 @@ padding-right: 1rem;
 
 .addExperienceTitle{
     margin-left: 1rem;
+    text-wrap : nowrap;
 }
 .modalBtn{
     all:unset
 }
 
-.formInput{
+.formInput,.formInput1{
     border-radius: 10px;
     background: linear-gradient(0deg, #F4EDFE 0%, #F4EDFE 100%), #F4EDFE;
     width: 290%;
@@ -439,6 +459,10 @@ padding-right: 1rem;
     margin: 1rem;
     padding: 1rem;
     border: none;
+}
+
+.formInput1{
+    width: 90%;
 }
 
 .btns{
@@ -457,7 +481,7 @@ padding-right: 1rem;
 }
 
 
-@media screen and (max-width : 750px) {
+@media screen and (max-width : 1200px) {
     .container{
         display: flex;
         flex-direction: column;
@@ -465,14 +489,26 @@ padding-right: 1rem;
        
     }
 
-    .left,.btnTxt{
-        display: none;
+    .experienceSection{
+        width: 100%;
+        height: auto;
     }
+
+    /* .right{
+        display: none;
+    } */
+    /* .left,.btnTxt{
+        display: none;
+    } */
 
     /* .connectBtn,.msgBtn{
         width:10%
     } */
+   
+}
 
-
-    
+@media screen and (max-width : 750px){
+    .left,.btnTxt{
+        display: none;
+    }
 }
