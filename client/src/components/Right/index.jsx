@@ -49,9 +49,9 @@ const RightNews = () => {
 
         </div>
         <div className={styles.joblists}>
-          {jobs.map((job, index) => (
+          {jobs.slice(0, 4).map((job, index) => (
             <div key={index} className={styles.jobItems}>
-              <img className={styles.jobImg} src={job.img} alt="job" />
+              <img className={styles.jobImg} src={job.imageUrl} alt="job" />
               <div className={styles.job}>
                 <p className={styles.jobName}>{job.title}</p>
                 <p className={styles.jobCompany}>{job.company}</p>

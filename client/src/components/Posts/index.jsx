@@ -141,8 +141,8 @@ const Posts = () => {
     const userSnapshot = await getDoc(userRef);
     if (userSnapshot.exists()) {
       const userData = userSnapshot.data();
-      const { firstName, lastName, profilePicture } = userData; // Replace 'firstName' and 'lastName' with your actual field names
-      return { firstName, lastName, profilePicture };
+      const { firstName, lastName, profilePicture, title } = userData;
+      return { firstName, lastName, profilePicture, title };
     } else {
       console.log('No such user!');
       return null;
@@ -262,7 +262,7 @@ const Posts = () => {
           </div>
           <div className={styles.postUser}>
             <p className={styles.postUserName}>{post.firstName} {post.lastName}</p>
-            <p className={styles.postUserJobTitle}>Product Designer</p>
+            <p className={styles.postUserJobTitle}>{post.title}</p>
             <div className={styles.jobTimer}>
               <img className={styles.jobTimerImg} src="./history-outline.svg" alt="timer" />
               {/* <p className={styles.jobTime}>{post.TimeCreated ? post.TimeCreated.toDate().toLocaleString() : 'Loading...'}</p> */}

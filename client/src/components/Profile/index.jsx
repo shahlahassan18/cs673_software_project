@@ -54,20 +54,29 @@ const Profile = () => {
   const onOpenUserModal = () => setUserModal(true)
   const onCloseUserModal = () => setUserModal(false)
 
-  const handleEditUserSubmit = async () => {
+  const handleEditUserSubmit = async (e) => {
+    e.preventDefault();
     try {
-      const userDocRef = doc(db, "users", currentUser.uid);
-      await updateDoc(userDocRef, {
-        firstName: editedFirstName,
-        lastName: editedLastName,
-        title: editedTitle,
-      });
-
-      onCloseUserModal();
+      if (currentUser) {
+        const userDocRef = doc(db, "users", currentUser.uid);
+    
+        await updateDoc(userDocRef, {
+          firstName: editedFirstName,
+          lastName: editedLastName,
+          title: editedTitle,
+        });
+        console.log("User document updated successfully");
+        // Update the state here
+        setFirstName(editedFirstName);
+        setLastName(editedLastName);
+        setTitle(editedTitle);
+        onCloseUserModal();
+      }
     } catch (error) {
       console.error("Error editing user information:", error);
     }
-  };
+  }
+  
 
   const handleEditSkill = (index) => {
     setEditSkillIndex(index);
@@ -271,9 +280,8 @@ const Profile = () => {
     if (file) {
       const avatarUrl = await handleAvatarUpload(file);
       if (avatarUrl) {
-        setprofilePicture(avatarUrl); // 更新本地状态
+        setprofilePicture(avatarUrl);
 
-        // 如果需要，更新用户文档
         const userDocRef = doc(db, "users", currentUser.uid);
         try {
           await updateDoc(userDocRef, {
@@ -291,9 +299,8 @@ const Profile = () => {
     if (file) {
       const bannerUrl = await handleBannerUpload(file);
       if (bannerUrl) {
-        setbannerPicture(bannerUrl); // 更新本地状态
+        setbannerPicture(bannerUrl);
 
-        // 如果需要，更新用户文档
         const userDocRef = doc(db, "users", currentUser.uid);
         try {
           await updateDoc(userDocRef, {
@@ -350,9 +357,6 @@ const Profile = () => {
   //General information form submission
   async function handleGeneralInfoSubmit(e){
     e.preventDefault();
-  
-    const auth = getAuth();
-    const currentUser = auth.currentUser;
   
     if (currentUser) {
       const userDocRef = doc(db, "users", currentUser.uid);
@@ -524,7 +528,7 @@ const Profile = () => {
                       <h2 className={styles.addExperienceTitle}>Edit Profile Information</h2>
                       <button onClick={onCloseUserModal}><IoCloseSharp /></button>
                     </div>
-                    <form className={styles.experienceForm} onSubmit={handleEditUserSubmit}></form>
+                    <form className={styles.experienceForm} onSubmit={handleEditUserSubmit}>
                     {/* <div> */}
 
                       <input
@@ -556,9 +560,10 @@ const Profile = () => {
                       />
                     {/* </div> */}
                     <div className={styles.btns}>
-                    {/* <button className={styles.btn} onClick={handleEditUserSubmit}>Submit</button> */}
-                    <button className={styles.btn} type='submit'>Submit</button>
+                    <button className={styles.btn} onClick={handleEditUserSubmit}>Submit</button>
+                    {/* <button className={styles.btn} type='submit'>Submit</button> */}
                     </div>
+                    </form>
                   </div>
                 </Modal>
 
@@ -795,7 +800,7 @@ const Profile = () => {
                 <h6>Skills</h6>
                 <FiPlus onClick={openSkillModal} />
               </div>
-              {skills.map((skill, index) => (
+              {skills && skills.map((skill, index) => (
                 <div key={index} className={styles.showPostsContainer}>
                   <p>{skill}</p>
                   <div className={styles.btns}>
