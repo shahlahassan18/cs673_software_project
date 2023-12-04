@@ -6,12 +6,14 @@ import { AiOutlineLike } from "react-icons/ai";
 import {BiCommentDetail, BiRepost} from "react-icons/bi";
 import {BsFillSendFill} from "react-icons/bs";
 import {db} from '../../firebase'
-import { collection, addDoc, getDoc, getDocs, updateDoc, deleteDoc, onSnapshot, doc, query, orderBy, serverTimestamp} from 'firebase/firestore';
+import { collection, addDoc, getDoc, getDocs, updateDoc, deleteDoc, onSnapshot, doc, query, orderBy, serverTimestamp, where} from 'firebase/firestore';
 import { getAuth } from 'firebase/auth'
 import { MdOutlineDelete } from "react-icons/md";
 
 
 const Posts = () => {
+  const auth = getAuth();
+  const currentUser = auth.currentUser;
   const [posts, setPosts] = useState([]);
   const [comment, setComment] = useState("")
   const [comments, setComments] = useState([])
@@ -24,8 +26,6 @@ const Posts = () => {
   //Comment Form Submission
   const handleCommentSubmit = async(e,postId) =>{
     e.preventDefault()
-    const auth = getAuth();
-    const currentUser = auth.currentUser;
 
     if (!currentUser) {
       console.log("User is NOT Authenticated");
@@ -65,8 +65,16 @@ const Posts = () => {
   };
 
   useEffect(() => {
+    const fetchPosts = async () => {
+
+    // get current user's contacts
+    const userDocRef = doc(db, 'users', currentUser.uid);
+    const userDocSnapshot = await getDoc(userDocRef);
+    const userContacts = userDocSnapshot.exists() ? userDocSnapshot.data().contacts || [] : [];
+    userContacts.push(currentUser.uid); // Add the current user's ID to the array
+    
     const postsCollection = collection(db, 'posts');
-    const postsQuery = query(postsCollection, orderBy('TimeCreated', 'desc')); // Order by 'createdAt' in descending order
+    const postsQuery = query(postsCollection, where('userId', 'in', userContacts), orderBy('TimeCreated', 'desc'));// Order by 'createdAt' in descending order
   
     const unsubscribe = onSnapshot(postsQuery, async (snapshot) => {
       console.log('Snapshot received:', snapshot); // Log the received snapshot
@@ -92,7 +100,9 @@ const Posts = () => {
   
     // Clean up the subscription on unmount
     return () => unsubscribe();
-  }, []);
+    };
+    fetchPosts();
+  }, [currentUser]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -109,8 +119,7 @@ const Posts = () => {
 
   const handleLike = async (postId) => {
     const postRef = doc(db, 'posts', postId);
-    const auth = getAuth();
-    const currentUser = auth.currentUser;
+
 
     if (!currentUser) {
       console.log("User is NOT Authenticated");
@@ -153,8 +162,6 @@ const Posts = () => {
   //HANDLING REPOSTS 
   const handleRepost = async (post) => {
     
-    const auth = getAuth();
-    const currentUser = auth.currentUser;
 
     if (!currentUser) {
       console.log("User is NOT Authenticated");
@@ -196,8 +203,6 @@ const Posts = () => {
   
   const handleDeletePost = async (postId) => {
     const postRef = doc(db, 'posts', postId);
-    const auth = getAuth();
-    const currentUser = auth.currentUser;
   
     if (!currentUser) {
       console.log("User is NOT Authenticated");
