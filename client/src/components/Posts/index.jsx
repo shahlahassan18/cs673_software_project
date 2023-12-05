@@ -6,26 +6,29 @@ import { AiOutlineLike } from "react-icons/ai";
 import {BiCommentDetail, BiRepost} from "react-icons/bi";
 import {BsFillSendFill} from "react-icons/bs";
 import {db} from '../../firebase'
-import { collection, addDoc, getDoc, getDocs, updateDoc, deleteDoc, onSnapshot, doc, query, orderBy, serverTimestamp, where} from 'firebase/firestore';
+import { collection, addDoc, getDoc, getDocs, updateDoc, deleteDoc, onSnapshot, doc, query, orderBy, serverTimestamp} from 'firebase/firestore';
 import { getAuth } from 'firebase/auth'
 import { MdOutlineDelete } from "react-icons/md";
 
 
 const Posts = () => {
-  const auth = getAuth();
-  const currentUser = auth.currentUser;
   const [posts, setPosts] = useState([]);
   const [comment, setComment] = useState("")
   const [comments, setComments] = useState([])
   const [activePostOptions, setActivePostOptions] = useState(null);
   const [activePost,setActivePost] = useState(null)
+  const [activeCommentOptions, setActiveCommentOptions] = useState(null);
   const [UpdatePostModalOpen, setUpdatePostModalOpen] = useState(false);
   const [formContent, setFormContent] = useState("");
   const [editingPostId, setEditingPostId] = useState(null);
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [commentFormContent, setCommentFormContent] = useState("");
 
   //Comment Form Submission
   const handleCommentSubmit = async(e,postId) =>{
     e.preventDefault()
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
 
     if (!currentUser) {
       console.log("User is NOT Authenticated");
@@ -65,16 +68,8 @@ const Posts = () => {
   };
 
   useEffect(() => {
-    const fetchPosts = async () => {
-
-    // get current user's contacts
-    const userDocRef = doc(db, 'users', currentUser.uid);
-    const userDocSnapshot = await getDoc(userDocRef);
-    const userContacts = userDocSnapshot.exists() ? userDocSnapshot.data().contacts || [] : [];
-    userContacts.push(currentUser.uid); // Add the current user's ID to the array
-    
     const postsCollection = collection(db, 'posts');
-    const postsQuery = query(postsCollection, where('userId', 'in', userContacts), orderBy('TimeCreated', 'desc'));// Order by 'createdAt' in descending order
+    const postsQuery = query(postsCollection, orderBy('TimeCreated', 'desc')); // Order by 'createdAt' in descending order
   
     const unsubscribe = onSnapshot(postsQuery, async (snapshot) => {
       console.log('Snapshot received:', snapshot); // Log the received snapshot
@@ -100,9 +95,7 @@ const Posts = () => {
   
     // Clean up the subscription on unmount
     return () => unsubscribe();
-    };
-    fetchPosts();
-  }, [currentUser]);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -117,9 +110,23 @@ const Posts = () => {
     };
   }, [activePostOptions, styles.postOptionsDropdown]);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (activeCommentOptions && !event.target.closest(`.${styles.commentOptionsDropdown}`)) {
+        setActiveCommentOptions(null);
+      }
+    };
+  
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [activeCommentOptions, styles.commentOptionsDropdown]);
+  
   const handleLike = async (postId) => {
     const postRef = doc(db, 'posts', postId);
-
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
 
     if (!currentUser) {
       console.log("User is NOT Authenticated");
@@ -162,6 +169,8 @@ const Posts = () => {
   //HANDLING REPOSTS 
   const handleRepost = async (post) => {
     
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
 
     if (!currentUser) {
       console.log("User is NOT Authenticated");
@@ -203,6 +212,8 @@ const Posts = () => {
   
   const handleDeletePost = async (postId) => {
     const postRef = doc(db, 'posts', postId);
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
   
     if (!currentUser) {
       console.log("User is NOT Authenticated");
@@ -233,6 +244,33 @@ const Posts = () => {
     setFormContent(post.postCont);
     setEditingPostId(postId);
     setUpdatePostModalOpen(true); // Open the modal
+  };
+
+  const openCommentEditForm = (postId, commentId) => {
+    const post = posts.find(post => post.id === postId);
+    if (!post) {
+      console.log("Post not found");
+      return;
+    }
+    const comment = post.comments.find(comment => comment.id === commentId);
+    if (!comment) {
+      console.log("Comment not found");
+      return;
+    }
+    setCommentFormContent(comment.text);
+    setEditingCommentId(commentId);
+  };
+
+  const handleEditComment = async (postId, commentId, newContent) => {
+    const postRef = doc(db, 'posts', postId);
+    const commentRef = doc(postRef, 'comments', commentId);
+    await updateDoc(commentRef, { text: newContent, edited: true });
+    setPosts(posts.map(post => post.id === postId 
+      ? {...post, comments: post.comments.map(comment => comment.id === commentId ? {...comment, text: newContent, edited: true} : comment)} 
+      : post
+    ));
+    setCommentFormContent("");
+    setEditingCommentId(null);
   };
 
   return (
@@ -336,17 +374,43 @@ const Posts = () => {
           {/* </div> */}
           
           {post.comments && post.comments
-            .sort((a, b) => b.timestamp - a.timestamp) // Sort comments by timestamp in descending order
-            .slice(0, 3) // Take the first 3 comments
-            .map((comment, index) => (
-              <div key={index} className={styles.comments}>
-                <p className={styles.commentText}><b>{comment.username}</b></p>
-                <p className={styles.commentText}>{comment.text}</p>
-                <p className={styles.commentTime}>{comment.timestamp instanceof Date ? comment.timestamp.toLocaleString() : 'Loading...'}</p>
-                <MdOutlineDelete onClick={() => handleDeleteComment(post.id, comment.id)} />
-              </div>
-            ))
-          }
+  .sort((a, b) => b.timestamp - a.timestamp) // Sort comments by timestamp in descending order
+  .slice(0, 3) // Take the first 3 comments
+  .map((comment, index) => (
+    <div key={index} className={styles.comments}>
+      <p className={styles.commentText}><b>{comment.username}</b></p>
+      {editingCommentId === comment.id ? (
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          handleEditComment(post.id, comment.id, commentFormContent);
+        }}>
+          <textarea
+            value={commentFormContent}
+            onChange={(e) => setCommentFormContent(e.target.value)}
+          />
+          <button type="submit">Submit</button>
+        </form>
+      ) : (
+        <p className={styles.commentText}>{comment.text}</p>
+      )}
+      <p className={styles.commentTime}>{comment.timestamp instanceof Date ? comment.timestamp.toLocaleString() : 'Loading...'}</p>
+      <img
+        src='./DotsThree.svg'
+        alt='settings'
+        onClick={(event) => {
+          event.stopPropagation();
+          setActiveCommentOptions(comment.id);
+        }}
+      />
+      {activeCommentOptions === comment.id && (
+        <div className={styles.commentOptionsDropdown}>
+          <button onClick={() => openCommentEditForm(post.id, comment.id)}>Edit</button>
+          <button onClick={() => handleDeleteComment(post.id, comment.id)}>Delete</button>
+        </div>
+      )}
+    </div>
+  ))
+}
             </>
           )
           }
