@@ -1,52 +1,56 @@
 
 import React, {useEffect, useState} from 'react'
+import Modal from 'react-modal';
 import styles from "./posts.module.css"
 import { AiOutlineLike } from "react-icons/ai";
 import {BiCommentDetail, BiRepost} from "react-icons/bi";
 import {BsFillSendFill} from "react-icons/bs";
 import {db} from '../../firebase'
-import { collection, addDoc, getDoc, getDocs, updateDoc, deleteDoc, onSnapshot, doc, query, orderBy, serverTimestamp} from 'firebase/firestore';
+import { collection, addDoc, getDoc, getDocs, updateDoc, deleteDoc, onSnapshot, doc, query, orderBy, serverTimestamp, where} from 'firebase/firestore';
 import { getAuth } from 'firebase/auth'
 import { MdOutlineDelete } from "react-icons/md";
 
 
 const Posts = () => {
+  const auth = getAuth();
+  const currentUser = auth.currentUser;
   const [posts, setPosts] = useState([]);
   const [comment, setComment] = useState("")
   const [comments, setComments] = useState([])
+  const [activePostOptions, setActivePostOptions] = useState(null);
   const [activePost,setActivePost] = useState(null)
+  const [UpdatePostModalOpen, setUpdatePostModalOpen] = useState(false);
+  const [formContent, setFormContent] = useState("");
+  const [editingPostId, setEditingPostId] = useState(null);
 
-//Comment Form Submission
-const handleCommentSubmit = async(e,postId) =>{
-  e.preventDefault()
-  const auth = getAuth();
-  const currentUser = auth.currentUser;
+  //Comment Form Submission
+  const handleCommentSubmit = async(e,postId) =>{
+    e.preventDefault()
 
-  if (!currentUser) {
-    console.log("User is NOT Authenticated");
-    return;
-  }
+    if (!currentUser) {
+      console.log("User is NOT Authenticated");
+      return;
+    }
 
-  const userId = currentUser.uid;
-  const userRef = doc(db, 'users', userId);
-  const userSnapshot = await getDoc(userRef);
-  const { firstName, lastName } = userSnapshot.data(); // Fetch the firstName and lastName from the user's data
-  const fullName = `${firstName} ${lastName}`; // Concatenate firstName and lastName to create a full name
-  const postRef = doc(db, 'posts', postId);
-  const commentsCollection = collection(postRef, 'comments');
-  const newComment = { userId, username: fullName, text: comment, timestamp: serverTimestamp() }; // Include the full name in the newComment object
+    const userId = currentUser.uid;
+    const userRef = doc(db, 'users', userId);
+    const userSnapshot = await getDoc(userRef);
+    const { firstName, lastName } = userSnapshot.data(); // Fetch the firstName and lastName from the user's data
+    const fullName = `${firstName} ${lastName}`; // Concatenate firstName and lastName to create a full name
+    const postRef = doc(db, 'posts', postId);
+    const commentsCollection = collection(postRef, 'comments');
+    const newComment = { userId, username: fullName, text: comment, timestamp: serverTimestamp() }; // Include the full name in the newComment object
+    const commentRef = await addDoc(commentsCollection, newComment);
+    const commentSnapshot = await getDoc(commentRef);
+    const commentData = commentSnapshot.data();
 
-  const commentRef = await addDoc(commentsCollection, newComment);
-  const commentSnapshot = await getDoc(commentRef);
-  const commentData = commentSnapshot.data();
-
-  // Update the local state
-  setPosts(posts.map(post => post.id === postId 
-    ? {...post, comments: [...post.comments, {...commentData, id: commentRef.id, timestamp: commentData.timestamp.toDate()}]} 
-    : post
-  ));
-  setComment('');
-} 
+    // Update the local state
+    setPosts(posts.map(post => post.id === postId 
+      ? {...post, comments: [...post.comments, {...commentData, id: commentRef.id, timestamp: commentData.timestamp.toDate()}]} 
+      : post
+    ));
+    setComment('');
+  } 
 
   const handleDeleteComment = async (postId, commentId) => {
     const postRef = doc(db, 'posts', postId);
@@ -61,8 +65,16 @@ const handleCommentSubmit = async(e,postId) =>{
   };
 
   useEffect(() => {
+    const fetchPosts = async () => {
+
+    // get current user's contacts
+    const userDocRef = doc(db, 'users', currentUser.uid);
+    const userDocSnapshot = await getDoc(userDocRef);
+    const userContacts = userDocSnapshot.exists() ? userDocSnapshot.data().contacts || [] : [];
+    userContacts.push(currentUser.uid); // Add the current user's ID to the array
+    
     const postsCollection = collection(db, 'posts');
-    const postsQuery = query(postsCollection, orderBy('TimeCreated', 'desc')); // Order by 'createdAt' in descending order
+    const postsQuery = query(postsCollection, where('userId', 'in', userContacts), orderBy('TimeCreated', 'desc'));// Order by 'createdAt' in descending order
   
     const unsubscribe = onSnapshot(postsQuery, async (snapshot) => {
       console.log('Snapshot received:', snapshot); // Log the received snapshot
@@ -88,12 +100,26 @@ const handleCommentSubmit = async(e,postId) =>{
   
     // Clean up the subscription on unmount
     return () => unsubscribe();
-  }, []);
+    };
+    fetchPosts();
+  }, [currentUser]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (activePostOptions && !event.target.closest(`.${styles.postOptionsDropdown}`)) {
+        setActivePostOptions(null);
+      }
+    };
+  
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [activePostOptions, styles.postOptionsDropdown]);
 
   const handleLike = async (postId) => {
     const postRef = doc(db, 'posts', postId);
-    const auth = getAuth();
-    const currentUser = auth.currentUser;
+
 
     if (!currentUser) {
       console.log("User is NOT Authenticated");
@@ -124,8 +150,8 @@ const handleCommentSubmit = async(e,postId) =>{
     const userSnapshot = await getDoc(userRef);
     if (userSnapshot.exists()) {
       const userData = userSnapshot.data();
-      const { firstName, lastName, profilePicture } = userData; // Replace 'firstName' and 'lastName' with your actual field names
-      return { firstName, lastName, profilePicture };
+      const { firstName, lastName, profilePicture, title } = userData;
+      return { firstName, lastName, profilePicture, title };
     } else {
       console.log('No such user!');
       return null;
@@ -136,8 +162,6 @@ const handleCommentSubmit = async(e,postId) =>{
   //HANDLING REPOSTS 
   const handleRepost = async (post) => {
     
-    const auth = getAuth();
-    const currentUser = auth.currentUser;
 
     if (!currentUser) {
       console.log("User is NOT Authenticated");
@@ -169,10 +193,70 @@ const handleCommentSubmit = async(e,postId) =>{
     setPosts((prevPosts) => [newPost, ...prevPosts]);
   };
 
+  const handleEditPost = async (postId, newContent) => {
+    const postRef = doc(db, 'posts', postId);
+    await updateDoc(postRef, { postCont: newContent, edited: true });
+    setPosts(posts.map(post => post.id === postId ? {...post, postCont: newContent, edited: true} : post));
+    setFormContent("");
+    setUpdatePostModalOpen(false);
+  };
+  
+  const handleDeletePost = async (postId) => {
+    const postRef = doc(db, 'posts', postId);
+  
+    if (!currentUser) {
+      console.log("User is NOT Authenticated");
+      return;
+    }
+  
+    // Check if the current user is the author of the post
+    const postSnapshot = await getDoc(postRef);
+    const postAuthorId = postSnapshot.data().userId;
+    if (postAuthorId !== currentUser.uid) {
+      console.log("User is not the author of the post");
+      return;
+    }
+  
+    // Delete the post from Firestore
+    await deleteDoc(postRef);
+  
+    // Delete the post from the local state
+    setPosts(posts.filter(post => post.id !== postId));
+  };
+
+  const openEditForm = (postId) => {
+    const post = posts.find(post => post.id === postId);
+    if (!post) {
+      console.log("Post not found");
+      return;
+    }
+    setFormContent(post.postCont);
+    setEditingPostId(postId);
+    setUpdatePostModalOpen(true); // Open the modal
+  };
+
   return (
 
-
     <div className={styles.postContainer}>
+      <Modal
+        isOpen={UpdatePostModalOpen}
+        onRequestClose={() => setUpdatePostModalOpen(false)}
+        contentLabel="Edit Post"
+        ariaHideApp={false}
+      >
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          handleEditPost(editingPostId, formContent);
+          setUpdatePostModalOpen(false);
+        }}>
+          <textarea
+            value={formContent}
+            onChange={(e) => setFormContent(e.target.value)}
+          />
+          <button type="submit">Update Post</button>
+          <button type="button" onClick={() => setUpdatePostModalOpen(false)}>Cancel</button>
+        </form>
+      </Modal>
       {posts.map((post) => (
 
       <div className={styles.post} key = {post.id}>
@@ -183,20 +267,33 @@ const handleCommentSubmit = async(e,postId) =>{
           </div>
           <div className={styles.postUser}>
             <p className={styles.postUserName}>{post.firstName} {post.lastName}</p>
-            <p className={styles.postUserJobTitle}>Product Designer</p>
+            <p className={styles.postUserJobTitle}>{post.title}</p>
             <div className={styles.jobTimer}>
               <img className={styles.jobTimerImg} src="./history-outline.svg" alt="timer" />
               {/* <p className={styles.jobTime}>{post.TimeCreated ? post.TimeCreated.toDate().toLocaleString() : 'Loading...'}</p> */}
-              <p className={styles.jobTime}>{post.TimeCreated && post.TimeCreated.toDate ? post.TimeCreated.toDate().toLocaleString() : 'Loading...'}</p>
+              <p className={styles.jobTime}>{post.TimeCreated && post.TimeCreated.toDate ? post.TimeCreated.toDate().toLocaleString() : 'Loading...'}{post.edited && <span> (edited)</span>}</p>
             </div>
           </div>
           <div className={styles.addPostSettings}>
             <img className={styles.settingsIcon}
-              src='./DotsThree.svg' alt='settings' />
+              src='./DotsThree.svg' alt='settings'
+              onClick={(event) => {
+                event.stopPropagation();
+                setActivePostOptions(post.id)
+              }} // Add this line
+            />
+            {activePostOptions === post.id && ( // Add this block
+              <div className={styles.postOptionsDropdown}>
+                <button onClick={() => openEditForm(post.id)}>Edit</button>
+                <button onClick={() => handleDeletePost(post.id)}>Delete</button>
+              </div>
+            )}
           </div>
         </div>
         {post.postCont.split('\n').map((line, index) => (
-          <p key={index} className={styles.postContent} style={{margin: 0}}>{line}</p>
+          <p key={index} className={styles.postContent} style={{margin: 0}}>
+            {line}
+          </p>
         ))}
         <div className={styles.postMedia}>
           {post.media && post.media.map((urlObject, index) =>

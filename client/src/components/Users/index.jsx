@@ -168,7 +168,7 @@ const Users = ({ type }) => {
       
         const querySnapshot = await getDocs(q);
         const sentRequests = querySnapshot.docs.map(doc => doc.data().contactId);
-        return new Set(sentRequests); // 使用Set来提高检查效率
+        return new Set(sentRequests);
       };
       
 
@@ -176,7 +176,7 @@ const Users = ({ type }) => {
         const requestDocRef = doc(db, "connections", id);
       
         try {
-          // 更新好友请求状态为"accepted"
+          // update friend request status to "accepted"
           await updateDoc(requestDocRef, {
             status: "accepted"
           });
@@ -190,7 +190,7 @@ const Users = ({ type }) => {
         const requestDocRef = doc(db, "connections", id);
       
         try {
-          // 更新好友请求状态为"rejected"
+          // update friend request status to "rejected"
           await updateDoc(requestDocRef, {
             status: "rejected"
           });
@@ -205,12 +205,12 @@ const Users = ({ type }) => {
         const senderDocRef = doc(db, "users", requesterId);
       
         try {
-          // 将发起人的UID添加到当前用户的contacts数组中
+          // update current user's contacts
           await updateDoc(userDocRef, {
             contacts: arrayUnion(requesterId)
           });
     
-          // 将当前用户的UID添加到发起人的contacts数组中
+          // update sender's contacts
           await updateDoc(senderDocRef, {
             contacts: arrayUnion(currentUserId)
           });
@@ -231,23 +231,6 @@ const Users = ({ type }) => {
         console.log("Reject request from:", requesterId);
         await rejectFriendRequest(id, requesterId, currentUserId);
         setRequests(prevRequests => prevRequests.filter(request => request.id !== id));
-      };
-    
-      const handleIgnore = (id) => {
-        console.log("Ignore request from:", id);
-        setRequests(prevRequests => prevRequests.filter(request => request.id !== id));
-      };
-    
-      const FriendRequest = ({ request, onAccept, onReject, onIgnore }) => {
-        const [firstName, setFirstName] = useState('');
-        useEffect(() => {
-          const fetchFirstName = async () => {
-            const name = await getUserFirstName(request.requesterId);
-            setFirstName(name);
-          };
-      
-          fetchFirstName();
-        }, [request.requesterId]);
       };
       
       if (type === "new-connections") {
