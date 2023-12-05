@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { getDoc,deleteDoc, collection, updateDoc, doc, arrayUnion, arrayRemove, setDoc, serverTimestamp, onSnapshot, query, where, orderBy, limit } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
-import { db } from "../../firebase";
+import { db,storage } from "../../firebase";
 import styles from "./jobs.module.css";
 import Navbars from "./../Navbar";
 import LeftProfile from "../LeftProfile";
@@ -14,11 +14,21 @@ import PlacesAutocomplete, {
   getLatLng,
 } from 'react-places-autocomplete';
 import { IoCloseSharp } from "react-icons/io5";
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 
-const JobItem = ({ job, onBookmarkClick, isBookmarked, onJobClick , onEditClick,onDeleteClick}) => {
+const JobItem = ({ job, onBookmarkClick, isBookmarked, onJobClick , onEditClick,onDeleteClick,scrollToJob}) => {
+
   
+ 
+  const handleOnJobClick = job =>{
+    onJobClick(job)
+    scrollToJob()
+    
+  }
+
+ 
   return(
-  <div className={styles.job} onClick={() => onJobClick(job)}>
+  <div className={styles.job}   onClick={() => handleOnJobClick(job)}>
     <div className={styles.logo}>
       <img
         className={styles.job_logo}
@@ -26,7 +36,7 @@ const JobItem = ({ job, onBookmarkClick, isBookmarked, onJobClick , onEditClick,
         alt={`${job.company} logo`}
       />
     </div>
-    <div className={styles.details}>
+    <div className={styles.details}  >
       <h4 className={styles.job_title}>{job.title}</h4>
       <p className={styles.job_company_name}>{job.company}</p>
       <p className={styles.job_location}>{job.location}</p>
@@ -49,8 +59,8 @@ const JobItem = ({ job, onBookmarkClick, isBookmarked, onJobClick , onEditClick,
   </div>
 )};
 
-const JobDetails = ({ job }) => (
-  <div className={styles.job_details}>
+const JobDetails = ({ job, jobRef }) => (
+  <div className={styles.job_details} ref={jobRef}>
     <h2>{job.title}</h2>
     <h3>{job.company}</h3>
     <p>{job.location}</p>
@@ -86,7 +96,8 @@ const Jobs = () => {
     description: "",
     requirements: ""
   });
-
+const [logo, setLogo] = useState("")
+const [logoFile, setLogoFile] = useState(null);
 
 
   const OpenCreateJobModal = () => {
@@ -139,50 +150,114 @@ const Jobs = () => {
     }
   };
   
+  const handleLogoUpload = async (file) => {
+    if (!file) return;
+
+    const fileRef = ref(storage, `logos/${file.name}`);
+
+    try {
+      const snapshot = await uploadBytes(fileRef, file);
+      const url = await getDownloadURL(snapshot.ref);
+      return url;
+    } catch (error) {
+      console.error("Error uploading logo: ", error);
+    }
+  };
+
+  const handleLogoChange = async (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const logoUrl = await handleLogoUpload(file);
+      console.log(logoUrl)
+      setLogoFile(file); // Set the file state
+      setLogo(logoUrl);
+    }
+  };
+
+  // useEffect(() => {
+  //   const jobsCol = collection(db, "jobs");
+      
+  //   const unsubscribe = onSnapshot(jobsCol, (snapshot) => {
+  //     const jobsData = snapshot.docs.map((doc) => ({
+  //       ...doc.data(),
+  //       id: doc.id,
+  //     }));
+  //     setJobs(jobsData);
+
+  //     if (searchTerm) {
+  //       // Filter jobs based on the search term
+  //       console.log("search", searchTerm)
+  //       const filteredJobs = jobsData.filter((job) =>
+  //         job.title.toLowerCase().includes(searchTerm.toLowerCase())
+  //       );
+
+  //       setJobs(filteredJobs);
+
+  //     }
+
+  //     // Check for duplicate job IDs
+  //     const jobIds = jobsData.map(job => job.id);
+  //     const hasDuplicateJobIds = jobIds.length !== new Set(jobIds).size;
+  //     console.log('Has duplicate job IDs:', hasDuplicateJobIds);
+  //   }, [searchTerm]);
+  
+  //   // Clean up the listener when the component is unmounted
+  //   return () => unsubscribe();
+  // }, [searchTerm]);
 
   useEffect(() => {
     const jobsCol = collection(db, "jobs");
-      
-    const unsubscribe = onSnapshot(jobsCol, (snapshot) => {
-      const jobsData = snapshot.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      }));
-      setJobs(jobsData);
-
-      if (searchTerm) {
-        // Filter jobs based on the search term
-        console.log("search", searchTerm)
-        const filteredJobs = jobsData.filter((job) =>
-          job.title.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-
-        setJobs(filteredJobs);
-
-      }
-
-      // Check for duplicate job IDs
-      const jobIds = jobsData.map(job => job.id);
-      const hasDuplicateJobIds = jobIds.length !== new Set(jobIds).size;
-      console.log('Has duplicate job IDs:', hasDuplicateJobIds);
-    }, [searchTerm]);
+  
+    const unsubscribe = onSnapshot(
+      query(jobsCol, orderBy("posted On", "desc")), // Sort by "posted On" in descending order
+      (snapshot) => {
+        const jobsData = snapshot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
+        setJobs(jobsData);
+  
+        if (searchTerm) {
+          // Filter jobs based on the search term
+          const filteredJobs = jobsData.filter((job) =>
+            job.title.toLowerCase().includes(searchTerm.toLowerCase())
+          );
+  
+          setJobs(filteredJobs);
+        }
+  
+        // Check for duplicate job IDs
+        const jobIds = jobsData.map((job) => job.id);
+        const hasDuplicateJobIds = jobIds.length !== new Set(jobIds).size;
+        console.log("Has duplicate job IDs:", hasDuplicateJobIds);
+      },
+      [searchTerm]
+    );
   
     // Clean up the listener when the component is unmounted
     return () => unsubscribe();
   }, [searchTerm]);
+  
+
+  
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     const auth = getAuth();
     const currentUser = auth.currentUser;
-
+  
     if (!currentUser) {
       console.log("User is NOT Authenticated");
       return;
     }
-
+  
+    // Upload the logo first
+    const logoUrl = await handleLogoUpload(logoFile);
+  
+    // Now, you can use the logoUrl when creating the job
     const jobsColRef = collection(db, "jobs");
     const newJobDoc = doc(jobsColRef);
+  
     await setDoc(newJobDoc, {
       title: jobTitle,
       company: companyName,
@@ -192,31 +267,96 @@ const Jobs = () => {
       description: jobDescription,
       requirements: requirements,
       'posted On': serverTimestamp(),
-      'posted By': currentUser.uid
+      'posted By': currentUser.uid,
+      imageUrl: logoUrl, // Add the logo URL to the job data
     });
+  
     // Clear form fields
-    setJobTitle("")
+    setJobTitle("");
     setCompanyName("");
     setJobType("");
+    setSalary("");
     setJobLocation("");
     setJobDescription("");
     setRequirements("");
+    setLogoFile(null); // Clear the logo file
+    setLogo(""); // Clear the logo URL
+  
     // Close modal
     CloseCreateJobModal();
   };
+  
+
+
+  
+
+  // const handleEditSubmit = async (event) => {
+  //   event.preventDefault();
+  //   const auth = getAuth();
+  //   const currentUser = auth.currentUser;
+  
+  //   if (!currentUser || !editingJob) {
+  //     console.log("User is NOT Authenticated or editingJob is undefined");
+  //     return;
+  //   }
+  
+  //   // Upload the logo first
+  //   const logoUrl = await handleLogoUpload(logoFile);
+  
+  //   // Now, you can use the logoUrl when updating the job
+  //   const jobsColRef = collection(db, "jobs");
+  //   const editedJobDoc = doc(jobsColRef, editingJob.id);
+  
+  //   await updateDoc(editedJobDoc, {
+  //     title: editingJob.title,
+  //     company: editingJob.company,
+  //     type: editingJob.type,
+  //     salary: editingJob.salary,
+  //     location: editingJob.location,
+  //     description: editingJob.description,
+  //     requirements: editingJob.requirements,
+  //     imageUrl: logoUrl, // Add the logo URL to the job data
+  //   });
+  
+  //   setEditingJob(null); // Clear the editing job state
+  
+  //   // Clear form fields (optional, depending on your requirements)
+  //   setJobTitle("");
+  //   setCompanyName("");
+  //   setJobType("");
+  //   setSalary("");
+  //   setJobLocation("");
+  //   setJobDescription("");
+  //   setRequirements("");
+  //   setLogoFile(null); // Clear the logo file
+  //   setLogo(""); // Clear the logo URL
+  
+  //   // Close modal
+  //   CloseEditJobModal();
+  // };
 
   const handleEditSubmit = async (event) => {
     event.preventDefault();
     const auth = getAuth();
     const currentUser = auth.currentUser;
-
+  
     if (!currentUser || !editingJob) {
       console.log("User is NOT Authenticated or editingJob is undefined");
       return;
     }
-
+  
+    // Check if a new logo is selected
+    let logoUrl = editingJob.imageUrl; // Use the existing imageUrl by default
+  
+    if (logoFile) {
+      // Upload the new logo if available
+      logoUrl = await handleLogoUpload(logoFile);
+    }
+  
+    // Now, you can use the logoUrl when updating the job
     const jobsColRef = collection(db, "jobs");
     const editedJobDoc = doc(jobsColRef, editingJob.id);
+  
     await updateDoc(editedJobDoc, {
       title: editingJob.title,
       company: editingJob.company,
@@ -225,10 +365,11 @@ const Jobs = () => {
       location: editingJob.location,
       description: editingJob.description,
       requirements: editingJob.requirements,
+      imageUrl: logoUrl, // Use the updated logoUrl
     });
-
+  
     setEditingJob(null); // Clear the editing job state
-
+  
     // Clear form fields (optional, depending on your requirements)
     setJobTitle("");
     setCompanyName("");
@@ -237,10 +378,14 @@ const Jobs = () => {
     setJobLocation("");
     setJobDescription("");
     setRequirements("");
-
+    setLogoFile(null); // Clear the logo file
+    setLogo(""); // Clear the logo URL
+  
     // Close modal
     CloseEditJobModal();
   };
+  
+  
   
   
 
@@ -333,23 +478,51 @@ const Jobs = () => {
 
  const handleInputChangeEditJob = (event) => {
   const { name, value } = event.target;
+  if (event.target.type === "file") {
+    event.target.value = "";
+  }
   setEditingJob((prevEditingJob) => ({
     ...prevEditingJob,
     [name]: value,
   }));
 };
 
- 
+const jobRef = useRef();
+
+const scrollToJob = () => {
+  if (jobRef.current) {
+    jobRef.current.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+    });
+  }
+};
+
+//HANDLING LEFT NAVIGATION BAR FOR SMALL SIZES
+const [showLeftProfile, setShowLeftProfile] = useState(true);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setShowLeftProfile(window.innerWidth > 800);
+    };
+    window.addEventListener("resize", handleResize);   
+    handleResize();
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   return (
     <>
       <Navbars />
       <div className={styles.jobs_section}>
+      
+        {showLeftProfile && (
         <LeftProfile
-          className={styles.left}
           onFindJobsClick={() => toggleView("recommended")}
           onSavedJobsClick={() => toggleView("saved")}
         />
+      )}
         <div className={styles.right}>
           <div className={styles.search_post}>
             <input
@@ -426,14 +599,14 @@ const Jobs = () => {
                 className={styles.formInput}
                 onChange={(e) => setRequirements(e.target.value)}
               />
-              {/* <input
+              <input
                 type="file"
                 placeholder="Upload Company Logo"
                 className={styles.formInput}
                 name="logo"
-                value={editingJob?.logo}
-                onChange={(event) => handleInputChangeEditJob(event)}
-              /> */}
+                // value={logoFile ? logoFile.name : ""}
+                onChange={(event) => handleLogoChange(event)}
+              />
               <div className={styles.btns}>
                 <button className={styles.btn} onClick={CloseCreateJobModal}>Close</button>
                 <button className={styles.btn} onClick={handleSubmit}>Submit</button>
@@ -521,23 +694,24 @@ const Jobs = () => {
                 name="requirements"
                 onChange={(event) => handleInputChangeEditJob(event)}
               />
-              <div className={styles.btns}>
-                <button className={styles.btn} onClick={CloseEditJobModal}>Close</button>
-                <button className={styles.btn} onClick={handleEditSubmit}>Submit</button>
-              </div>
-              {/* <input
+              <input
                 type="file"
                 placeholder="Upload Company Logo"
                 className={styles.formInput}
                 // value={jobLocation}
                 name="logo"
-                value={editingJob?.logo}
-                onChange={(event) => handleInputChangeEditJob(event)}
-              /> */}
+                // value={editingJob?.logo}
+                onChange={(event) => handleLogoChange(event)}
+              />
+              <div className={styles.btns}>
+                <button className={styles.btn} onClick={CloseEditJobModal}>Close</button>
+                <button className={styles.btn} onClick={handleEditSubmit}>Submit</button>
+              </div>
+              
             </Modal>
           </div>
-          <div style={{display: 'flex'}}>
-            <div className={styles.jobs_container}>
+          <div className ={styles.jobsMain}style={{display: 'flex'}}>
+            <div className={styles.jobs_container} >
               {currentView === "recommended" && (
                 <div className={styles.recommended}>
                   <div className={styles.jobs}>
@@ -558,6 +732,8 @@ const Jobs = () => {
                         onJobClick={handleJobClick(job)}
                         onEditClick={() => handleEditJobClick(job)}
                         onDeleteClick={handleDeleteJob}
+                        scrollToJob={scrollToJob}
+                        jobRef={jobRef}
 />
                     );
                   })}
@@ -588,7 +764,7 @@ const Jobs = () => {
             </div>   
             {selectedJob && (
               <div className={styles.job_details_column}>
-                <JobDetails job={selectedJob} />
+                <JobDetails job={selectedJob} jobRef={jobRef} />
               </div>
             )}
           </div>
