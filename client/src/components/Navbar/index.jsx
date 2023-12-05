@@ -31,7 +31,7 @@ const Navbars = ({onFindJobsClick,onSavedJobsClick, handleTabClick}) => {
   const auth = getAuth();
   const currentUser = auth.currentUser;
 
-  const [searchName, setSearchName] = useState(null)
+  const [searchName, setSearchName] = useState("")
   const [searchResults, setSearchResults] = useState([])
 
 
@@ -87,9 +87,9 @@ const Navbars = ({onFindJobsClick,onSavedJobsClick, handleTabClick}) => {
   useEffect(() => {
     const handleSearch = async () => {
       //Clearing out the search results
-      if(searchName===""){
-        setSearchName(null)
-      }
+      // if(searchName===""){
+      //   setSearchName(null)
+      // }
       try {
             const usersCollection = collection(db, "users");
         
@@ -194,7 +194,7 @@ const Navbars = ({onFindJobsClick,onSavedJobsClick, handleTabClick}) => {
           placeholder="Search" value={searchName} />
         </div>
         
-        {searchResults.length >0 && 
+        {searchName!=="" && searchResults.length >0 && 
         <div  className={styles.searchResults}>
         { searchResults.map((ele,i)=>(
             <p key={i} onClick={()=>navigate(`/:${ele.id}`)}
@@ -272,3 +272,5 @@ const Navbars = ({onFindJobsClick,onSavedJobsClick, handleTabClick}) => {
 }
 
 export default Navbars;
+
+
