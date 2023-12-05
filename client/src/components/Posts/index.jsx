@@ -247,6 +247,7 @@ const Posts = () => {
   };
 
   const openCommentEditForm = (postId, commentId) => {
+
     const post = posts.find(post => post.id === postId);
     if (!post) {
       console.log("Post not found");
@@ -374,43 +375,43 @@ const Posts = () => {
           {/* </div> */}
           
           {post.comments && post.comments
-  .sort((a, b) => b.timestamp - a.timestamp) // Sort comments by timestamp in descending order
-  .slice(0, 3) // Take the first 3 comments
-  .map((comment, index) => (
-    <div key={index} className={styles.comments}>
-      <p className={styles.commentText}><b>{comment.username}</b></p>
-      {editingCommentId === comment.id ? (
-        <form onSubmit={(e) => {
-          e.preventDefault();
-          handleEditComment(post.id, comment.id, commentFormContent);
-        }}>
-          <textarea
-            value={commentFormContent}
-            onChange={(e) => setCommentFormContent(e.target.value)}
-          />
-          <button type="submit">Submit</button>
-        </form>
-      ) : (
-        <p className={styles.commentText}>{comment.text}</p>
-      )}
-      <p className={styles.commentTime}>{comment.timestamp instanceof Date ? comment.timestamp.toLocaleString() : 'Loading...'}</p>
-      <img
-        src='./DotsThree.svg'
-        alt='settings'
-        onClick={(event) => {
-          event.stopPropagation();
-          setActiveCommentOptions(comment.id);
-        }}
-      />
-      {activeCommentOptions === comment.id && (
-        <div className={styles.commentOptionsDropdown}>
-          <button onClick={() => openCommentEditForm(post.id, comment.id)}>Edit</button>
-          <button onClick={() => handleDeleteComment(post.id, comment.id)}>Delete</button>
-        </div>
-      )}
-    </div>
-  ))
-}
+            .sort((a, b) => b.timestamp - a.timestamp) // Sort comments by timestamp in descending order
+            .slice(0, 3) // Take the first 3 comments
+            .map((comment, index) => (
+              <div key={index} className={styles.comments}>
+                <p className={styles.commentText}><b>{comment.username}</b></p>
+                {editingCommentId === comment.id ? (
+                  <form onSubmit={(e) => {
+                    e.preventDefault();
+                    handleEditComment(post.id, comment.id, commentFormContent);
+                  }}>
+                    <textarea
+                      value={commentFormContent}
+                      onChange={(e) => setCommentFormContent(e.target.value)}
+                    />
+                    <button type="submit">Submit</button>
+                  </form>
+                ) : (
+                  <p className={styles.commentText}>{comment.text}</p>
+                )}
+                <p className={styles.commentTime}>{comment.timestamp instanceof Date ? comment.timestamp.toLocaleString() : 'Loading...'}</p>
+                <img
+                  src='./DotsThree.svg'
+                  alt='settings'
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setActiveCommentOptions(comment.id);
+                  }}
+                />
+                {activeCommentOptions === comment.id && (
+                  <div className={styles.commentOptionsDropdown}>
+                    <button onClick={() => openCommentEditForm(post.id, comment.id)}>Edit</button>
+                    <button onClick={() => handleDeleteComment(post.id, comment.id)}>Delete</button>
+                  </div>
+                )}
+              </div>
+            ))
+          }
             </>
           )
           }
