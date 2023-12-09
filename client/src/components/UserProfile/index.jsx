@@ -11,218 +11,16 @@ import { MdOutlineModeEdit } from "react-icons/md";
 import { MdOutlineDelete } from "react-icons/md";
 import { useParams } from "react-router-dom";
 import LeftProfile from "../LeftProfile";
+import { set } from "react-hook-form";
 
 
 const UserProfile = () => {
   const auth = getAuth();
   const currentUser = auth.currentUser;
-  // const [profilePicture, setprofilePicture] = useState("");
-  // const [backPicture, setbackPicture] = useState("");
-  // const [firstName, setFirstName] = useState("");
-  // const [lastName, setLastName] = useState("");
-  // const [title, setTitle] = useState("");
-  // const [bio, setBio] = useState("");
-  // const [followersCount, setfollowersCount] = useState("");
-  // const [experience, setexperience] = useState([]);
-  // const [skills, setskills] = useState([]);
-  // const [interests, setinterests] = useState([]);
   const [newConnections, setNewConnections] = useState([]);
-  // const [experienceModal, setExperienceModal] = useState(false);
-  // const [skillModal, setSkillModal] = useState(false)
-  // const [addProfilePicModal, setAddProfilePicModal] = useState(false)
-  // const [addBannerModal, setAddBannerModal] = useState(false)
-  // const [infoModal, setInfoModal] = useState(false)
-  // const [generalInfoInput , setGeneralInfoInput] = useState("")
-  // const [generalInfo , setGeneralInfo] = useState("")
-  // const [experienceFormData, setExperienceFormData] = useState({
-  //   jobTitle: '',
-  //   companyName: '',
-  //   dateRange: '',
-  //   description: '',
-  //   companyLogo : '',
-  // });
-//   const [skillFormData, setSkillFormData ]= useState("")
-//   const [editExperienceIndex, setEditExperienceIndex] = useState(null);
-//   const [editExperienceModal, setEditExperienceModal] = useState(false);
-//   const [editSkillIndex, setEditSkillIndex] = useState(null);
-// const [editSkillModal, setEditSkillModal] = useState(false);
-
-// const handleEditSkill = (index) => {
-//   setEditSkillIndex(index);
-//   setSkillFormData(skills[index]);
-//   setEditSkillModal(true);
-// };
-
-// const closeEditSkillModal = () => {
-//   setEditSkillIndex(null);
-//   setEditSkillModal(false);
-//   setSkillModal(false)
-//   setSkillFormData('');
-// };
-
-// const handleDeleteSkill = (index) => {
-//   setskills((prev) => {
-//     const updatedSkills = [...prev];
-//     updatedSkills.splice(index, 1);
-//     return updatedSkills;
-//   });
-// };
-
-// const handleSkillFormSubmit = (event) => {
-//   event.preventDefault();
-
-//   if (editSkillIndex !== null) {
-//     setskills((prev) => {
-//       const updatedSkills = [...prev];
-//       updatedSkills[editSkillIndex] = skillFormData;
-//       return updatedSkills;
-//     });
-//   } else {
-//     setskills((prev) => (prev ? [...prev, skillFormData] : [skillFormData]));
-//   }
-
-//   setSkillFormData('');
-//   closeEditSkillModal();
-// };
-
-  
-//   const handleEditExperience = (index) => {
-//     setEditExperienceIndex(index);
-//     setExperienceFormData(experience[index]);
-//     setEditExperienceModal(true);
-//   };
-  
-//   const closeEditExperienceModal = () => {
-//     setEditExperienceIndex(null);
-//     setEditExperienceModal(false);
-//     setExperienceFormData({
-//       jobTitle: '',
-//       companyName: '',
-//       dateRange: '',
-//       description: '',
-//       companyLogo: '',
-//     });
-//     setExperienceModal(false)
-//   };
-  
-//   const handleExperienceFormSubmit = (event) => {
-//     event.preventDefault();
-  
-//     if (editExperienceIndex !== null) {
-//       setexperience((prev) => {
-//         const updatedExperience = [...prev];
-//         updatedExperience[editExperienceIndex] = experienceFormData;
-//         return updatedExperience;
-//       });
-//     } else {
-//       setexperience((prev) => (prev ? [...prev, experienceFormData] : [experienceFormData]));
-//     }
-//     setExperienceFormData({
-//       jobTitle: '',
-//       companyName: '',
-//       dateRange: '',
-//       description: '',
-//       companyLogo: '',
-//     });
-//     closeEditExperienceModal();
-//   };
-  
-//   const handleDeleteExperience = (index) => {
-//     setexperience((prev) => {
-//       const updatedExperience = [...prev];
-//       updatedExperience.splice(index, 1);
-//       return updatedExperience;
-//     });
-//   };
-    
-
-
-//   const handleInputChangeExperienceForm = (event) => {
-//     const { name, value } = event.target;
-//     setExperienceFormData({ ...experienceFormData, [name]: value });
-//   };
-
-//   const handleInputChangeSkillForm = (event) => {
-//     const {value } = event.target;
-//     setSkillFormData(value);
-//   };
-
-  
-
-  //OPEN AND CLOSE MODAL FUNCTIONS
-  // function openExperienceModal() {
-  //   setExperienceModal(true);
-  // }
-
-  // function closeExperienceModal() {
-  //   setExperienceModal(false);
-  // }
-  // function openSkillModal() {
-  //   setSkillModal(true);
-  // }
-
-  // function closeSkillModal() {
-  //   setSkillModal(false);
-  // }
-
-  // function openAddProfilePicModal() {
-  //   setAddProfilePicModal(true);
-  // }
-
-  // function closeAddProfilePicModal() {
-  //   setAddProfilePicModal(false);
-  // }
-  // function openAddBannerModal() {
-  //   setAddBannerModal(true);
-  // }
-
-  // function closeAddBannerModal() {
-  //   setAddBannerModal(false);
-  // }
-
-  // function openInfoModal() {
-  //   setInfoModal(true);
-  // }
-
-  // function closeInfoModal() {
-  //   setInfoModal(false);
-  // }
-
-  // //General information form submission
-  // function handleGeneralInfoSubmit(e){
-  //   e.preventDefault()
-  //   console.log(generalInfoInput)
-  //   setGeneralInfo(generalInfoInput)
-  //   closeInfoModal()
-  // }
-
   useEffect(() => {
 
-    // if (currentUser) {
-    //   const userDocRef = doc(db, "users", currentUser.uid);
-    //   getDoc(userDocRef)
-    //     .then((docSnapshot) => {
-    //       if (docSnapshot.exists()) {
-    //         console.log("User docSnapshot",docSnapshot.data())
-    //         const data = docSnapshot.data();
-    //         setprofilePicture(data.profilePicture);
-    //         setFirstName(data.firstName);
-    //         setLastName(data.lastName);
-    //         setTitle(data.title);
-    //         setBio(data.bio);
-    //         setfollowersCount(data.followersCount);
-    //         setexperience(data.experience);
-    //         setskills(data.skills);
-    //         setinterests(data.interests);
-    //         setbackPicture(data.backPicture);
-    //       } else {
-    //         console.error("User document doesn't exist!");
-    //       }
-    //     })
-    //     .catch((err) => {
-    //       console.error("Error fetching user data:", err);
-    //     });
-    // }
+
 
     const fetchNewConnections = async () => {
       const connections = await getNewConnections();
@@ -264,8 +62,40 @@ const UserProfile = () => {
 
   const shuffled = newConnections.sort(() => 0.5 - Math.random());
 
-  // // 获取前三个元素
+  // 获取前三个元素
   const selected = shuffled.slice(0, 3);
+
+  const [buttonText, setButtonText] = useState();
+
+  const checkConnectionStatus = async (contactId) => {
+    if (currentUser) {
+      const connectionsQuery = query(
+        collection(db, "connections"),
+        where("userId", "==", currentUser.uid),
+        where("contactId", "==", contactId)
+      );
+      const querySnapshot = await getDocs(connectionsQuery);
+  
+      if (!querySnapshot.empty) {
+        console.log("Connection request already exists");
+        if (querySnapshot.docs[0].data().status === "accepted") {
+          setButtonText("Connected");
+          console.log("Connected");
+        } else if (querySnapshot.docs[0].data().status === "requested") {
+          setButtonText("request is sent");
+          console.log("Connection request already sent");
+        }
+        else if (querySnapshot.docs[0].data().status === "rejected") {
+          setButtonText("Rejected");
+        }
+        return true;
+      }
+      else{
+        setButtonText("Connect");
+        return false;
+      }
+    }
+  };
 
   const handleConnectClick = async (contactId) => {
   
@@ -279,6 +109,13 @@ const UserProfile = () => {
   
       if (!querySnapshot.empty) {
         console.log("Connection request already exists");
+        if (querySnapshot.docs[0].data().status === "accepted") {
+          setButtonText("Connected");
+          alert("You are already connected with this user");
+        } else if (querySnapshot.docs[0].data().status === "requested") {
+          setButtonText("request is sent");
+          alert("Connection request already sent");
+        }
         return;
       }
   
@@ -330,6 +167,9 @@ const UserProfile = () => {
       }
     }
     fetchUserData()
+
+    checkConnectionStatus(newUserID);
+
     
   },[userID])
 
@@ -375,7 +215,7 @@ const UserProfile = () => {
                 <div className={styles.btns}>
                   <button className={styles.connectBtn}>
                     <img src="./connect.svg" className={styles.icon} />
-                    <p className={styles.btnTxt} onClick={()=>handleConnectClick(userProfileData?.userID)}> Connect</p>
+                    <p className={styles.btnTxt} onClick={()=>handleConnectClick(userProfileData?.userID)}> {buttonText}</p>
                   </button>
                   {/* <button className={styles.msgBtn}>
                     <img src="./Union.svg" className={styles.icon} />
