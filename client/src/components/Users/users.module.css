@@ -45,6 +45,7 @@
 
 .imgContainer{
     /* width: 128px; */
+      width: 208px;
     display: grid;
     place-items: center;
     height: auto;

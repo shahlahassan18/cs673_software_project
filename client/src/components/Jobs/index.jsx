@@ -64,7 +64,7 @@ const JobDetails = ({ job, jobRef }) => (
     <h2>{job.title}</h2>
     <h3>{job.company}</h3>
     <p>{job.location}</p>
-    <button className={styles.btn} >Apply</button>
+    <button className={styles.btn}><a href={job.link} className={styles.JobALink}>Apply</a></button>
     <p>{job.description}</p>
     <p>{job.requirements}</p>
     {/* Add more fields as needed */}
@@ -85,6 +85,7 @@ const Jobs = () => {
   const [jobLocation, setJobLocation] = useState("");
   const [jobDescription, setJobDescription] = useState("");
   const [requirements, setRequirements] = useState("");
+  const [jobLink, setJobLink] = useState("");
   const [selectedJob, setSelectedJob] = useState(null);
   const [editJobOpen, setEditJobOpen] = useState(false);
   const [editingJob, setEditingJob] = useState({
@@ -94,7 +95,8 @@ const Jobs = () => {
     salary: "",
     location: "",
     description: "",
-    requirements: ""
+    requirements: "",
+    link:""
   });
 const [logo, setLogo] = useState("")
 const [logoFile, setLogoFile] = useState(null);
@@ -174,36 +176,7 @@ const [logoFile, setLogoFile] = useState(null);
     }
   };
 
-  // useEffect(() => {
-  //   const jobsCol = collection(db, "jobs");
-      
-  //   const unsubscribe = onSnapshot(jobsCol, (snapshot) => {
-  //     const jobsData = snapshot.docs.map((doc) => ({
-  //       ...doc.data(),
-  //       id: doc.id,
-  //     }));
-  //     setJobs(jobsData);
-
-  //     if (searchTerm) {
-  //       // Filter jobs based on the search term
-  //       console.log("search", searchTerm)
-  //       const filteredJobs = jobsData.filter((job) =>
-  //         job.title.toLowerCase().includes(searchTerm.toLowerCase())
-  //       );
-
-  //       setJobs(filteredJobs);
-
-  //     }
-
-  //     // Check for duplicate job IDs
-  //     const jobIds = jobsData.map(job => job.id);
-  //     const hasDuplicateJobIds = jobIds.length !== new Set(jobIds).size;
-  //     console.log('Has duplicate job IDs:', hasDuplicateJobIds);
-  //   }, [searchTerm]);
   
-  //   // Clean up the listener when the component is unmounted
-  //   return () => unsubscribe();
-  // }, [searchTerm]);
 
   useEffect(() => {
     const jobsCol = collection(db, "jobs");
@@ -269,6 +242,7 @@ const [logoFile, setLogoFile] = useState(null);
       'posted On': serverTimestamp(),
       'posted By': currentUser.uid,
       imageUrl: logoUrl, // Add the logo URL to the job data
+      link: jobLink,
     });
   
     // Clear form fields
@@ -281,14 +255,13 @@ const [logoFile, setLogoFile] = useState(null);
     setRequirements("");
     setLogoFile(null); // Clear the logo file
     setLogo(""); // Clear the logo URL
+    setJobLink("");
   
     // Close modal
     CloseCreateJobModal();
   };
   
 
-
-  
 
   // const handleEditSubmit = async (event) => {
   //   event.preventDefault();
@@ -300,8 +273,13 @@ const [logoFile, setLogoFile] = useState(null);
   //     return;
   //   }
   
-  //   // Upload the logo first
-  //   const logoUrl = await handleLogoUpload(logoFile);
+  //   // Check if a new logo is selected
+  //   let logoUrl = editingJob.imageUrl; // Use the existing imageUrl by default
+  
+  //   if (logoFile) {
+  //     // Upload the new logo if available
+  //     logoUrl = await handleLogoUpload(logoFile);
+  //   }
   
   //   // Now, you can use the logoUrl when updating the job
   //   const jobsColRef = collection(db, "jobs");
@@ -315,7 +293,8 @@ const [logoFile, setLogoFile] = useState(null);
   //     location: editingJob.location,
   //     description: editingJob.description,
   //     requirements: editingJob.requirements,
-  //     imageUrl: logoUrl, // Add the logo URL to the job data
+  //     imageUrl: logoUrl, // Use the updated logoUrl
+  //     link: editingJob.link,
   //   });
   
   //   setEditingJob(null); // Clear the editing job state
@@ -330,6 +309,7 @@ const [logoFile, setLogoFile] = useState(null);
   //   setRequirements("");
   //   setLogoFile(null); // Clear the logo file
   //   setLogo(""); // Clear the logo URL
+  //   setJobLink("");
   
   //   // Close modal
   //   CloseEditJobModal();
@@ -366,6 +346,13 @@ const [logoFile, setLogoFile] = useState(null);
       description: editingJob.description,
       requirements: editingJob.requirements,
       imageUrl: logoUrl, // Use the updated logoUrl
+      link: editingJob.link,
+    });
+  
+    // Update the selectedJob state with the edited job details
+    setSelectedJob({
+      ...editingJob,
+      imageUrl: logoUrl, // Update the logo URL in the selectedJob state
     });
   
     setEditingJob(null); // Clear the editing job state
@@ -380,10 +367,12 @@ const [logoFile, setLogoFile] = useState(null);
     setRequirements("");
     setLogoFile(null); // Clear the logo file
     setLogo(""); // Clear the logo URL
+    setJobLink("");
   
     // Close modal
     CloseEditJobModal();
   };
+  
   
   
   
@@ -607,6 +596,13 @@ const [showLeftProfile, setShowLeftProfile] = useState(true);
                 // value={logoFile ? logoFile.name : ""}
                 onChange={(event) => handleLogoChange(event)}
               />
+              <input
+                type="text"
+                placeholder="Job Link"
+                className={styles.formInput}
+                value={jobLink}
+                onChange={(event) => setJobLink(event.target.value)}
+              />
               <div className={styles.btns}>
                 <button className={styles.btn} onClick={CloseCreateJobModal}>Close</button>
                 <button className={styles.btn} onClick={handleSubmit}>Submit</button>
@@ -703,6 +699,14 @@ const [showLeftProfile, setShowLeftProfile] = useState(true);
                 // value={editingJob?.logo}
                 onChange={(event) => handleLogoChange(event)}
               />
+              <input
+                type="text"
+                placeholder="Job Link"
+                className={styles.formInput}
+                name="link"
+                value={editingJob?.link}
+                onChange={(event) => handleInputChangeEditJob(event)}
+              />
               <div className={styles.btns}>
                 <button className={styles.btn} onClick={CloseEditJobModal}>Close</button>
                 <button className={styles.btn} onClick={handleEditSubmit}>Submit</button>
@@ -714,16 +718,10 @@ const [showLeftProfile, setShowLeftProfile] = useState(true);
             <div className={styles.jobs_container} >
               {currentView === "recommended" && (
                 <div className={styles.recommended}>
+                  <h3 className={styles.jobSectionTitle}>Recommended Jobs</h3>
                   <div className={styles.jobs}>
                   {jobs.map((job) => {
                     return (
-                      // <JobItem
-                      //   key={job.id}
-                      //   job={job}
-                      //   onBookmarkClick={handleBookmarkClick}
-                      //   isBookmarked={savedJobs.some((j) => j.id === job.id)}
-                      //   onJobClick={handleJobClick(job)}
-                      // />
                       <JobItem
                         key={job.id}
                         job={job}
@@ -742,6 +740,7 @@ const [showLeftProfile, setShowLeftProfile] = useState(true);
               )}
               {currentView === "saved" && (
                 <div className={styles.recommended}>
+                  <h3 className={styles.jobSectionTitle}>Saved Jobs</h3>
                   <div className={styles.jobs}>
                   {savedJobs.length>0 ? savedJobs.map((job) => {
                     console.log('Job:', job);

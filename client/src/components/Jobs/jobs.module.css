@@ -198,6 +198,18 @@ margin: 0;
     height: 51px;
 }
 
+.jobSectionTitle{
+    padding-left: 2rem;
+    padding-top: 1rem;
+    margin-bottom: 0;
+    /* padding: 1rem; */
+}
+
+.JobALink{
+    color: white;
+    text-decoration: none;
+}
+
 @media screen and (max-width : 1000px) {
     .left{
         display: none;
@@ -210,6 +222,7 @@ margin: 0;
         grid-template-columns: minmax(0, 14fr);
     }
 
+   
  
 
 }

@@ -237,6 +237,33 @@ margin: 0;
   
   
 
+  .form{
+    width: 100%;
+  }
+  .articleInput {
+    width: 100%;
+    height: 60vh;
+    padding: 1rem;
+    border: none;
+    margin-top: 1rem;
+}
+
+.btns{
+    display: flex;
+    flex-direction: row;
+    gap:1rem;
+    justify-content: end;
+    margin: 1rem;
+}
+
+.btn, .btn:hover{
+    background:  #604DCF;
+    color: white;
+    width: 125px;
+    height: 51px;
+}
+
+
 @media screen and (max-width: 750px) {
 
     .actionText{

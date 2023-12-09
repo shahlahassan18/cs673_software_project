@@ -274,6 +274,9 @@ const Posts = () => {
     setEditingCommentId(null);
   };
 
+  const auth = getAuth();
+  const currentUser = auth.currentUser;
+
   return (
 
     <div className={styles.postContainer}>
@@ -283,17 +286,22 @@ const Posts = () => {
         contentLabel="Edit Post"
         ariaHideApp={false}
       >
-        <form onSubmit={(e) => {
+        <form className={styles.form} onSubmit={(e) => {
           e.preventDefault();
           handleEditPost(editingPostId, formContent);
           setUpdatePostModalOpen(false);
+          
         }}>
           <textarea
             value={formContent}
+            className={styles.articleInput}
             onChange={(e) => setFormContent(e.target.value)}
           />
-          <button type="submit">Update Post</button>
-          <button type="button" onClick={() => setUpdatePostModalOpen(false)}>Cancel</button>
+          <div className={styles.btns}>
+          <button className={styles.btn} type="submit">Update Post</button>
+          <button className={styles.btn} type="button" onClick={() => setUpdatePostModalOpen(false)}>Cancel</button>
+          </div>
+          
         </form>
       </Modal>
       {posts.map((post) => (
@@ -314,14 +322,18 @@ const Posts = () => {
             </div>
           </div>
           <div className={styles.addPostSettings}>
-            <img className={styles.settingsIcon}
-              src='./DotsThree.svg' alt='settings'
-              onClick={(event) => {
-                event.stopPropagation();
-                setActivePostOptions(post.id)
-              }} // Add this line
-            />
-            {activePostOptions === post.id && ( // Add this block
+            {currentUser && currentUser.uid === post.userId && (
+              <img
+                className={styles.settingsIcon}
+                src='./DotsThree.svg'
+                alt='settings'
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setActivePostOptions(post.id);
+                }}
+              />
+            )}
+            {activePostOptions === post.id && (
               <div className={styles.postOptionsDropdown}>
                 <button onClick={() => openEditForm(post.id)}>Edit</button>
                 <button onClick={() => handleDeletePost(post.id)}>Delete</button>
@@ -356,11 +368,6 @@ const Posts = () => {
                 src='./ShareNetwork.svg' alt='search' />
               <p className={styles.actionText}>Repost</p>
             </div>
-            {/* <div className={styles.actionBtn}>
-              <img className={styles.actionIcon}
-                src='./Star.svg' alt='search' />
-              <p className={styles.actionText}>Favourites</p>
-            </div> */}
             </div>
           </div>
           {activePost === post.id && 
