@@ -21,12 +21,6 @@ const Login = () => {
   // const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (user) {
-      navigate("/feed");
-    }
-  }, [user, navigate]);
-
   const onSubmit = (data) => {
     const auth = getAuth();
 
