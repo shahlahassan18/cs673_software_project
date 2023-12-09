@@ -451,11 +451,11 @@ padding-right: 1rem;
     all:unset
 }
 
-.formInput,.formInput1{
+.formInput,.formInput1,.formInputTextArea{
     border-radius: 10px;
     background: linear-gradient(0deg, #F4EDFE 0%, #F4EDFE 100%), #F4EDFE;
     width: 290%;
-    height: 68px;
+    /* height: 68px; */
     margin: 1rem;
     padding: 1rem;
     border: none;
@@ -463,6 +463,10 @@ padding-right: 1rem;
 
 .formInput1{
     width: 90%;
+}
+
+.formInputTextArea{
+ height: 400px
 }
 
 .btns{

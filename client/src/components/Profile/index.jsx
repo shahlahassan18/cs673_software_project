@@ -635,9 +635,8 @@ const Profile = () => {
               <FiPlus onClick={openInfoModal}/>}
               </div>    
               {/* <p className={styles.generalText}>{bio}</p> */}
-              {bio &&
-              <p>{bio}</p>
-              }
+             
+              {bio && bio.split('\n').map((paragraph, index) => <p key={index}>{paragraph}</p>)}
             </div>
 
             {/* ADD /EDIT  GENERAL INFORMATION MODAL */}
@@ -652,27 +651,13 @@ const Profile = () => {
               </div>
               <form className={styles.experienceForm} onSubmit={handleGeneralInfoSubmit}>
                 <textarea type='text' value={generalInfoInput} onChange={e => setGeneralInfoInput(e.target.value)}
-                  placeholder="Enter General Information" className={styles.formInput} />
+                  placeholder="Enter General Information" className={styles.formInputTextArea} />
                 <div className={styles.btns}>
                   <button className={styles.btn} >Submit</button>
                 </div>
               </form>
             </Modal>
 
-            {/* 3rd SECTION */}
-            {/* <div className={styles.activity}>
-              <h6>Activity</h6>
-              <p className={styles.followers}>{followersCount} folowers</p>
-              <div className={styles.btns}>
-                <button className={styles.btn}>Posts</button>
-                <button className={styles.btn}>Activity</button>
-              </div>
-
-              <div className={styles.showPostsContainer}>
-                <p className={styles.showPosts}> Show all posts</p>
-                <img src="./Arrow.svg" className={styles.icon} />
-              </div>
-            </div> */}
 
             {/* 4th SECTION */}
             <div className={styles.experienceSection}>
@@ -689,7 +674,8 @@ const Profile = () => {
                     <p className={styles.jobDate}>
                       {exp.startDate} - {exp.endDate}
                     </p>
-                    <p className={styles.jobDesc}>{exp.description}</p>
+                    {/* <p className={styles.jobDesc}>{exp.description}</p> */}
+                    {exp.description && exp.description.split('\n').map((paragraph, index) => <p key={index} className={styles.jobDesc}>{paragraph}</p>)}
                   </div>
                   <div className={styles.btns}>
                   <MdOutlineModeEdit onClick={() => handleEditExperience(index)} />

@@ -65,8 +65,10 @@ const JobDetails = ({ job, jobRef }) => (
     <h3>{job.company}</h3>
     <p>{job.location}</p>
     <button className={styles.btn}><a href={job.link} className={styles.JobALink}>Apply</a></button>
-    <p>{job.description}</p>
-    <p>{job.requirements}</p>
+    {/* <p>{job.description}</p>
+    <p>{job.requirements}</p> */}
+    {job.description && job.description.split('\n').map((paragraph, index) => <p key={index}>{paragraph}</p>)}
+    {job.requirements && job.requirements.split('\n').map((paragraph, index) => <p key={index}>{paragraph}</p>)}
     {/* Add more fields as needed */}
   </div>
 );
