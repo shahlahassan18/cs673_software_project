@@ -18,16 +18,6 @@ const UserProfile = () => {
   const auth = getAuth();
   const currentUser = auth.currentUser;
   const [newConnections, setNewConnections] = useState([]);
-  useEffect(() => {
-
-
-
-    const fetchNewConnections = async () => {
-      const connections = await getNewConnections();
-      setNewConnections(connections);
-    };
-    fetchNewConnections();
-  }, []);
 
   const getNewConnections = async () => {
 
@@ -85,14 +75,9 @@ const UserProfile = () => {
           setButtonText("request is sent");
           console.log("Connection request already sent");
         }
-        else if (querySnapshot.docs[0].data().status === "rejected") {
-          setButtonText("Rejected");
-        }
-        return true;
       }
       else{
         setButtonText("Connect");
-        return false;
       }
     }
   };
@@ -141,6 +126,13 @@ const UserProfile = () => {
   const [userProfileData, setUserProfileData] = useState(null)
 
   useEffect(()=>{
+
+    const fetchNewConnections = async () => {
+      const connections = await getNewConnections();
+      setNewConnections(connections);
+    };
+    fetchNewConnections();
+
     console.log("id",userID)
     let newUserID = userID.slice(1)
     // console.log(userID.split("").slice(0,1).join(""))
@@ -211,18 +203,21 @@ const UserProfile = () => {
 
 
 
-
+                {buttonText == "Connect" && (
                 <div className={styles.btns}>
                   <button className={styles.connectBtn}>
                     <img src="./connect.svg" className={styles.icon} />
                     <p className={styles.btnTxt} onClick={()=>handleConnectClick(userProfileData?.userID)}> {buttonText}</p>
                   </button>
+
                   {/* <button className={styles.msgBtn}>
                     <img src="./Union.svg" className={styles.icon} />
                     <p className={styles.btnTxt}> Message</p>
                   </button>
                   <button className={styles.moreBtn}>More</button> */}
                 </div>
+                  )
+                }
               </div>
             </div>
             {/* 2nd SECTION */}
