@@ -795,10 +795,10 @@ const Profile = () => {
                   </div>
                 </div>
               ))}
-              <div className={styles.showPostsContainer}>
+              {/* <div className={styles.showPostsContainer}>
                 <p className={styles.showPosts}> Show all skills</p>
                 <img src="./Arrow.svg" className={styles.icon} />
-              </div>
+              </div> */}
             </div>
 
             {/* ADD SKILL MODAL */}

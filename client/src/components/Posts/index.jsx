@@ -9,6 +9,7 @@ import {db} from '../../firebase'
 import { collection, addDoc, getDoc, getDocs, updateDoc, deleteDoc, onSnapshot, doc, query, orderBy, serverTimestamp} from 'firebase/firestore';
 import { getAuth } from 'firebase/auth'
 import { MdOutlineDelete } from "react-icons/md";
+import { Document, Page } from 'react-pdf';
 
 
 const Posts = () => {
@@ -347,9 +348,34 @@ const Posts = () => {
           </p>
         ))}
         <div className={styles.postMedia}>
-          {post.media && post.media.map((urlObject, index) =>
+          {/* {post.media && post.media.map((urlObject, index) =>
             <img key={index} src={urlObject.url} alt={urlObject.url} />
-          )}
+          )} */}
+          {post.media && post.media.map((media, index) => {
+              if (media.type.startsWith('image/')) {
+                return <img key={index} src={media.url} alt={media.url} />;
+              } else if (media.type === 'application/pdf') {
+                return (
+                  <div key={index}>
+                    <a href={media.url} target="_blank" rel="noopener noreferrer">
+                      View PDF
+                    </a>
+
+                  </div>
+                );
+              } else if (media.type.startsWith('video/')) {
+                return (
+                  <div key={index}>
+                    <video controls width="320" height="240">
+                      <source src={media.url} type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+                  </div>
+                );
+              } else {
+                return null;
+              }
+            })}
         </div>
         <div className={styles.btns}>
           <div className={styles.actionBtns}>
