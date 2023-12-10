@@ -75,6 +75,22 @@ const UserProfile = () => {
 
   const checkConnectionStatus = async (contactId) => {
     if (currentUser) {
+
+      // Get current user's contacts
+      const userDocRef = doc(db, "users", currentUser.uid);
+      const userDocSnapshot = await getDoc(userDocRef);
+      let contacts = [];
+      if (userDocSnapshot.exists()) {
+        const userData = userDocSnapshot.data();
+        contacts = userData.contacts || [];
+      }
+      if (contacts.includes(contactId)) {
+        setButtonText("Connected");
+        console.log("Connected by checking contacts");
+        setShowButton(false);
+        return;
+      }
+
       const connectionsQuery = query(
         collection(db, "connections"),
         where("userId", "==", currentUser.uid),

@@ -861,7 +861,7 @@ const Profile = () => {
         {/* </div> */}
         <div className={styles.others}>
           <img className={styles.background}
-            src='/public/profbackpic.svg' />
+            src='/profbackpic.svg' />
           <h6>People you may know</h6>
           {selected.map((user, index) => (
             <div key={index} className={styles.interestContainer}>

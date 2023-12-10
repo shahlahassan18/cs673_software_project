@@ -14,7 +14,7 @@ const Banner = () => {
               </div>
           </div>
           <div className={styles.bannerImg}>
-          <img src= '/public/banner.svg'
+          <img src= '/banner.svg'
           alt="Your Logo" className={styles.banner} />
           </div>
 
