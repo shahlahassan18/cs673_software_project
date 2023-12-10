@@ -18,6 +18,7 @@ const UserProfile = () => {
   const auth = getAuth();
   const currentUser = auth.currentUser;
   const [newConnections, setNewConnections] = useState([]);
+  const [showButton, setShowButton] = useState(true);
 
   const getNewConnections = async () => {
 
@@ -68,6 +69,7 @@ const UserProfile = () => {
   
       if (!querySnapshot.empty) {
         console.log("Connection request already exists");
+        setShowButton(false);
         if (querySnapshot.docs[0].data().status === "accepted") {
           setButtonText("Connected");
           console.log("Connected");
@@ -83,6 +85,7 @@ const UserProfile = () => {
   };
 
   const handleConnectClick = async (contactId) => {
+    console.log(currentUser.uid, contactId)
   
     if (currentUser) {
       const connectionsQuery = query(
@@ -115,6 +118,7 @@ const UserProfile = () => {
         const docRef = await addDoc(collection(db, "connections"), newConnection);
         alert("Connection request sent!");
         console.log("Document written with ID: ", docRef.id);
+        setShowButton(false);
       } catch (e) {
         console.error("Error adding document: ", e);
       }
@@ -137,7 +141,7 @@ const UserProfile = () => {
     let newUserID = userID.slice(1)
     // console.log(userID.split("").slice(0,1).join(""))
     // userID = userID.split("").splice(0,1).join("")
-    console.log(" after",newUserID)
+    console.log("after",newUserID)
     console.log(typeof(userID))
     const fetchUserData = async()=>{
       try{
@@ -203,11 +207,11 @@ const UserProfile = () => {
 
 
 
-                {buttonText == "Connect" && (
+                {showButton && buttonText == "Connect" && (
                 <div className={styles.btns}>
                   <button className={styles.connectBtn}>
-                    <img src="./connect.svg" className={styles.icon} />
-                    <p className={styles.btnTxt} onClick={()=>handleConnectClick(userProfileData?.userID)}> {buttonText}</p>
+                    <img src="/connect.svg" className={styles.icon} />
+                    <p className={styles.btnTxt} onClick={()=>handleConnectClick(userID.slice(1))}> Connect</p>
                   </button>
 
                   {/* <button className={styles.msgBtn}>
@@ -319,7 +323,7 @@ const UserProfile = () => {
         </div>
         <div className={styles.others}>
         <img className={styles.background}
-                        src='/public/profbackpic.svg' />
+                        src='/profbackpic.svg' />
                         <h6>People you may know</h6>
           {selected?.map((user, index) => (
             <div key={index} className={styles.interestContainer}>
