@@ -11,11 +11,13 @@ import { MdOutlineModeEdit } from "react-icons/md";
 import { MdOutlineDelete } from "react-icons/md";
 import { useParams } from "react-router-dom";
 import LeftProfile from "../LeftProfile";
+import { set } from "react-hook-form";
 
 
 const UserProfile = () => {
   const auth = getAuth();
   const currentUser = auth.currentUser;
+
   
   const [newConnections, setNewConnections] = useState([]);
   
@@ -28,6 +30,10 @@ const UserProfile = () => {
     };
     fetchNewConnections();
   }, []);
+
+  // const [newConnections, setNewConnections] = useState([]);
+  const [showButton, setShowButton] = useState(true);
+
 
   const getNewConnections = async () => {
 
@@ -62,10 +68,39 @@ const UserProfile = () => {
 
   const shuffled = newConnections.sort(() => 0.5 - Math.random());
 
-  // // 获取前三个元素
+  // 获取前三个元素
   const selected = shuffled.slice(0, 3);
 
+  const [buttonText, setButtonText] = useState();
+
+  const checkConnectionStatus = async (contactId) => {
+    if (currentUser) {
+      const connectionsQuery = query(
+        collection(db, "connections"),
+        where("userId", "==", currentUser.uid),
+        where("contactId", "==", contactId)
+      );
+      const querySnapshot = await getDocs(connectionsQuery);
+  
+      if (!querySnapshot.empty) {
+        console.log("Connection request already exists");
+        setShowButton(false);
+        if (querySnapshot.docs[0].data().status === "accepted") {
+          setButtonText("Connected");
+          console.log("Connected");
+        } else if (querySnapshot.docs[0].data().status === "requested") {
+          setButtonText("request is sent");
+          console.log("Connection request already sent");
+        }
+      }
+      else{
+        setButtonText("Connect");
+      }
+    }
+  };
+
   const handleConnectClick = async (contactId) => {
+    console.log(currentUser.uid, contactId)
   
     if (currentUser) {
       const connectionsQuery = query(
@@ -77,6 +112,13 @@ const UserProfile = () => {
   
       if (!querySnapshot.empty) {
         console.log("Connection request already exists");
+        if (querySnapshot.docs[0].data().status === "accepted") {
+          setButtonText("Connected");
+          alert("You are already connected with this user");
+        } else if (querySnapshot.docs[0].data().status === "requested") {
+          setButtonText("request is sent");
+          alert("Connection request already sent");
+        }
         return;
       }
   
@@ -91,6 +133,7 @@ const UserProfile = () => {
         const docRef = await addDoc(collection(db, "connections"), newConnection);
         alert("Connection request sent!");
         console.log("Document written with ID: ", docRef.id);
+        setShowButton(false);
       } catch (e) {
         console.error("Error adding document: ", e);
       }
@@ -102,9 +145,21 @@ const UserProfile = () => {
   const [userProfileData, setUserProfileData] = useState(null)
 
   useEffect(()=>{
+
+    const fetchNewConnections = async () => {
+      const connections = await getNewConnections();
+      setNewConnections(connections);
+    };
+    fetchNewConnections();
+
     console.log("id",userID)
     let newUserID = userID.slice(1)
-    
+
+    // console.log(userID.split("").slice(0,1).join(""))
+    // userID = userID.split("").splice(0,1).join("")
+    console.log("after",newUserID)
+    console.log(typeof(userID))
+
     const fetchUserData = async()=>{
       try{
        const userDocRef = doc(db, 'users', newUserID)
@@ -125,6 +180,9 @@ const UserProfile = () => {
       }
     }
     fetchUserData()
+
+    checkConnectionStatus(newUserID);
+
     
   },[userID])
 
@@ -166,14 +224,25 @@ const UserProfile = () => {
 
 
 
-
+                {showButton && buttonText == "Connect" && (
                 <div className={styles.btns}>
                   <button className={styles.connectBtn}>
-                    <img src="./connect.svg" className={styles.icon} />
-                    <p className={styles.btnTxt} onClick={()=>handleConnectClick(userProfileData?.userID)}> Connect</p>
+                    <img src="/connect.svg" className={styles.icon} />
+                    <p className={styles.btnTxt} onClick={()=>handleConnectClick(userID.slice(1))}> Connect</p>
                   </button>
+
                  
+
+
+                  {/* <button className={styles.msgBtn}>
+                    <img src="./Union.svg" className={styles.icon} />
+                    <p className={styles.btnTxt}> Message</p>
+                  </button>
+                  <button className={styles.moreBtn}>More</button> */}
+
                 </div>
+                  )
+                }
               </div>
             </div>
             {/* 2nd SECTION */}
@@ -238,7 +307,7 @@ const UserProfile = () => {
         </div>
         <div className={styles.others}>
         <img className={styles.background}
-                        src='/public/profbackpic.svg' />
+                        src='/profbackpic.svg' />
                         <h6>People you may know</h6>
           {selected?.map((user, index) => (
             <div key={index} className={styles.interestContainer}>
