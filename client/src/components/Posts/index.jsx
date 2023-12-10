@@ -348,12 +348,19 @@ const Posts = () => {
           </p>
         ))}
         <div className={styles.postMedia}>
+        {/* <div > */}
           {/* {post.media && post.media.map((urlObject, index) =>
             <img key={index} src={urlObject.url} alt={urlObject.url} />
           )} */}
           {post.media && post.media.map((media, index) => {
               if (media.type.startsWith('image/')) {
-                return <img key={index} src={media.url} alt={media.url} />;
+
+                return(
+                  // <div className={styles.postMedia}>
+                    <img key={index} src={media.url} alt={media.url} />
+                  // </div>
+                )
+
               } else if (media.type === 'application/pdf') {
                 return (
                   <div key={index}>
@@ -366,11 +373,11 @@ const Posts = () => {
               } else if (media.type.startsWith('video/')) {
                 return (
                   <div key={index}>
-                    <video controls width="320" height="240">
+                    <video controls width="550" height="440">
                       <source src={media.url} type="video/mp4" />
                       Your browser does not support the video tag.
                     </video>
-                  </div>
+                   </div>
                 );
               } else {
                 return null;
