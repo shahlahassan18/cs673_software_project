@@ -10,7 +10,6 @@
 
 .manage_network_section {
     display: none;
-    /* flex-direction: column; */
 
 }
 
@@ -22,7 +21,6 @@
     padding: 1rem;
     color: #666666;
     cursor: pointer;
-    /* padding: 1rem; */
 
 }
 
@@ -133,11 +131,11 @@ h3 {
 
     }
 
-    .leftP{
+    .leftP {
         display: none;
     }
-  
-    .manage_network_section{
+
+    .manage_network_section {
         display: flex;
         flex-direction: column;
     }

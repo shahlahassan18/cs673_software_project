@@ -70,24 +70,10 @@ const Feed = () => {
     const queryallDocs = await getDocs(collection(db, 'posts'))
     queryallDocs.forEach(element => {
 
-      // console.log(element.id, " => ", element.data())
-
-      //console.log(element.id, " => ", element.data())
-
     });
   }
   readdocs()
   const [posts, setPosts] = useState([]);
-  /* 
-  const fetchPosts = async () => {
-    const req = await db.collection("posts").orderBy("TimeCreated", "desc").get();
-    console.log(req)
-  }
-
-  useEffect(() => {
-    fetchPosts();
-  }, [])
-  */
 
   return (
     <div className={styles.feed}>

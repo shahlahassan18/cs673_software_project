@@ -86,10 +86,6 @@ const Navbars = ({onFindJobsClick,onSavedJobsClick, handleTabClick}) => {
 
   useEffect(() => {
     const handleSearch = async () => {
-      //Clearing out the search results
-      // if(searchName===""){
-      //   setSearchName(null)
-      // }
       try {
             const usersCollection = collection(db, "users");
         
@@ -125,7 +121,6 @@ const Navbars = ({onFindJobsClick,onSavedJobsClick, handleTabClick}) => {
             const results = [...firstNameResults, ...lastNameResults];
             
             setSearchResults(results);
-            // console.log("res +", results);
           } catch (error) {
             console.error("Error searching users:", error);
           }
@@ -136,7 +131,6 @@ const Navbars = ({onFindJobsClick,onSavedJobsClick, handleTabClick}) => {
   
   
 
-  // console.log("res +", searchResults);
 
 
 
@@ -165,25 +159,14 @@ const Navbars = ({onFindJobsClick,onSavedJobsClick, handleTabClick}) => {
             <img className={styles.icon} src='./briefcase.svg' alt="jobs" />
           </Link>
           </div>
-          {/* <div className={styles.menuItem}>
-            <img className={styles.icon} src='./message-square.svg' alt="Messaging" />
-          </div> */}
-          {/* <div className={styles.menuItem}>
-            <img className={styles.icon} src='./monitor.svg' alt="business" />
-          </div> */}
+         
         </div> }
           <ImMenu size={40} className={styles.menuIcon} onClick={(() => setIsActive(!isActive))} />
         </div>
-        {/* <img className={styles.navLogo}
-      src="https://s3-alpha-sig.figma.com/img/c286/c76e/9a08ebe78cd93da9cd3ab7a7d8ae9630?Expires=1698019200&Signature=oduQ3~F5ajF2eW9oXDAOmTUCETxrTSxAaff2na52wW4YJoQy8y7cBZysDL26RO3~qpFEvI-Hpffc3WuY6U59mn~Bk-r6~VMziXHkCkrx2LJO4to4dMCD0y~khdELSfKPHo~g4tCLwSQ9hM4cI7X8h1jVQhGO6avRFYg3aMGYRVWUVaNEOT54qBrkcxw9OkkqYAHmpymbAM5WSQsxA8pcGe6E3I-Sy69tIoZkUPSLQzq-hc8uPo~H8Ggni0wmAhiEqDlwtJ7SZvNqfj0WLpJ2X4EKs8qvoFm0mMnF3qvLIe9Ft1r6WLlUhZ6z6Hx-bR82DQ-GjiZZjUk13qkhFaA0~g__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4" alt="logo" />
-      <ImMenu size={40} className={styles.menuIcon} onClick={(()=>setIsActive(!isActive))} /> */}
+       
       <div className={styles.navMenu1}>
         <ul className={styles.navMenu1List}>
-          {/* <li className={styles.navMenu1ListItem}>Settings & Privacy</li>
-          <li className={styles.navMenu1ListItem}>Help</li>
-          <li className={styles.navMenu1ListItem}>Posts & Activity</li>
-          <li className={styles.navMenu1ListItem}>Job Posting Account</li> */}
-          {/* <li className={styles.navMenu1ListItem} onClick={handleLogout}>Logout</li> */}
+         
         </ul>
       </div>
       <div className={styles.navMenu2}>
@@ -204,12 +187,7 @@ const Navbars = ({onFindJobsClick,onSavedJobsClick, handleTabClick}) => {
         </div>
         }
        
-        {/* <img className={styles.icons}
-          src='./layers.svg' alt='layers' />
-      <img className={styles.icons}
-          src='./notifications_none.svg' alt='notifications' />
-      <img className={styles.icons}
-          src='./mail.svg' alt='mail' /> */}
+       
       <div className={styles.navMenu1ListItem} onClick={handleLogout}>Logout</div>
       <div className={styles.profilePicContainer}>
       <img className={styles.profilePic}
@@ -226,15 +204,15 @@ const Navbars = ({onFindJobsClick,onSavedJobsClick, handleTabClick}) => {
           {showNetWorksMenu &&   
           <div className={styles.job_tabs}>
             <Link to="/network" className={styles.menuItemLink}>
-              {/* <li className={styles.navMenu1ListItem} onClick={() => handleTabClick("Connections")}> New Connections</li>  */}
+              
               <li className={styles.navMenu1ListItem} onClick={() => navigate("/network")}> New Connections</li> 
             </Link>
             <Link to="/network" className={styles.menuItemLink}>
-              {/* <li className={styles.navMenu1ListItem} onClick={() => handleTabClick("Contacts")}> Contacts</li> */}
+             
               <li className={styles.navMenu1ListItem} onClick={() => navigate("/network")}> Contacts</li>
             </Link>
             <Link to="/network" className={styles.menuItemLink}>
-              {/* <li className={styles.navMenu1ListItem} onClick={() => handleTabClick("Contacts")}> Contacts</li> */}
+             
               <li className={styles.navMenu1ListItem} onClick={() => navigate("/network")}> Requests</li>
             </Link>
           </div>
@@ -250,11 +228,7 @@ const Navbars = ({onFindJobsClick,onSavedJobsClick, handleTabClick}) => {
             </Link>
           </div>
           }
-          {/* <li className={styles.navMenu1ListItem}>Messaging</li>
-          <li className={styles.navMenu1ListItem}>For Business</li>
-          <li className={styles.navMenu1ListItem}>Settings & Privacy</li>
-          <li className={styles.navMenu1ListItem}>Help</li>
-          <li className={styles.navMenu1ListItem}>Job Posting Account</li> */}
+         
           <li className={styles.navMenu1ListItem} onClick={()=>navigate("/profile")}>Profile</li>
           <li className={styles.navMenu1ListItem} onClick={handleLogout}>Logout</li>
         </ul>

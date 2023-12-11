@@ -1,57 +1,56 @@
-.users{
+.users {
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
 }
 
-.user{
+.user {
     display: flex;
     flex-direction: column;
-    gap:0.5rem;
+    gap: 0.5rem;
 }
 
-.userImage{
+.userImage {
     width: 128px;
     height: 128px;
     border-radius: 100%;
 }
 
-.userName{
+.userName {
     margin: 0;
 }
 
-.connectBtn, .acceptBtn{
+.connectBtn,
+.acceptBtn {
     border: 1px solid #604DCF;
     padding: 0.5rem;
     border-radius: 25px;
     background-color: white;
 }
 
-.connectBtn:hover, .acceptBtn:hover{
+.connectBtn:hover,
+.acceptBtn:hover {
     background-color: #604DCF;
-    color: white; 
+    color: white;
 }
 
-.btns{
+.btns {
     display: flex;
     flex-direction: row;
     gap: 0.5rem;
     justify-content: flex-start;
 }
 
-/* .acceptBtn{
-    width: 15%;
-} */
 
-.requests{
+
+.requests {
     display: flex;
-    flex-wrap: nowrap;
-    gap:1rem
+    flex-wrap: wrap;
+    gap: 1rem
 }
 
-.imgContainer{
-    /* width: 128px; */
-      width: 208px;
+.imgContainer {
+    width: 208px;
     display: grid;
     place-items: center;
     height: auto;

@@ -19,7 +19,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 const JobItem = ({ job, onBookmarkClick, isBookmarked, onJobClick , onEditClick,onDeleteClick,scrollToJob}) => {
 
   
- 
+ //For mobile, On clicking job title, it will scroll to the job details section
   const handleOnJobClick = job =>{
     onJobClick(job)
     scrollToJob()
@@ -65,11 +65,8 @@ const JobDetails = ({ job, jobRef }) => (
     <h3>{job.company}</h3>
     <p>{job.location}</p>
     <button className={styles.btn}><a href={job.link} className={styles.JobALink}>Apply</a></button>
-    {/* <p>{job.description}</p>
-    <p>{job.requirements}</p> */}
     {job.description && job.description.split('\n').map((paragraph, index) => <p key={index}>{paragraph}</p>)}
     {job.requirements && job.requirements.split('\n').map((paragraph, index) => <p key={index}>{paragraph}</p>)}
-    {/* Add more fields as needed */}
   </div>
 );
 
@@ -215,7 +212,7 @@ const [logoFile, setLogoFile] = useState(null);
   
 
   
-
+//Form Submission After Adding the Job Posting
   const handleSubmit = async (event) => {
     event.preventDefault();
     const auth = getAuth();
@@ -226,14 +223,12 @@ const [logoFile, setLogoFile] = useState(null);
       return;
     }
   
-    // Upload the logo first
-    // const logoUrl = await handleLogoUpload(logoFile);
     let logoUrl
     if(logoFile){
        logoUrl = await handleLogoUpload(logoFile);
     }
   
-    // Now, you can use the logoUrl when creating the job
+   
     const jobsColRef = collection(db, "jobs");
     const newJobDoc = doc(jobsColRef);
   
@@ -247,7 +242,7 @@ const [logoFile, setLogoFile] = useState(null);
       requirements: requirements,
       'posted On': serverTimestamp(),
       'posted By': currentUser.uid,
-      imageUrl: logoUrl || "", // Add the logo URL to the job data
+      imageUrl: logoUrl || "", 
       link: jobLink,
     });
   
@@ -259,8 +254,8 @@ const [logoFile, setLogoFile] = useState(null);
     setJobLocation("");
     setJobDescription("");
     setRequirements("");
-    setLogoFile(null); // Clear the logo file
-    setLogo(""); // Clear the logo URL
+    setLogoFile(null); 
+    setLogo(""); 
     setJobLink("");
   
     // Close modal
@@ -269,58 +264,8 @@ const [logoFile, setLogoFile] = useState(null);
   
 
 
-  // const handleEditSubmit = async (event) => {
-  //   event.preventDefault();
-  //   const auth = getAuth();
-  //   const currentUser = auth.currentUser;
   
-  //   if (!currentUser || !editingJob) {
-  //     console.log("User is NOT Authenticated or editingJob is undefined");
-  //     return;
-  //   }
-  
-  //   // Check if a new logo is selected
-  //   let logoUrl = editingJob.imageUrl; // Use the existing imageUrl by default
-  
-  //   if (logoFile) {
-  //     // Upload the new logo if available
-  //     logoUrl = await handleLogoUpload(logoFile);
-  //   }
-  
-  //   // Now, you can use the logoUrl when updating the job
-  //   const jobsColRef = collection(db, "jobs");
-  //   const editedJobDoc = doc(jobsColRef, editingJob.id);
-  
-  //   await updateDoc(editedJobDoc, {
-  //     title: editingJob.title,
-  //     company: editingJob.company,
-  //     type: editingJob.type,
-  //     salary: editingJob.salary,
-  //     location: editingJob.location,
-  //     description: editingJob.description,
-  //     requirements: editingJob.requirements,
-  //     imageUrl: logoUrl, // Use the updated logoUrl
-  //     link: editingJob.link,
-  //   });
-  
-  //   setEditingJob(null); // Clear the editing job state
-  
-  //   // Clear form fields (optional, depending on your requirements)
-  //   setJobTitle("");
-  //   setCompanyName("");
-  //   setJobType("");
-  //   setSalary("");
-  //   setJobLocation("");
-  //   setJobDescription("");
-  //   setRequirements("");
-  //   setLogoFile(null); // Clear the logo file
-  //   setLogo(""); // Clear the logo URL
-  //   setJobLink("");
-  
-  //   // Close modal
-  //   CloseEditJobModal();
-  // };
-
+//Form Submission After Editing the Job Posting
   const handleEditSubmit = async (event) => {
     event.preventDefault();
     const auth = getAuth();
@@ -331,15 +276,14 @@ const [logoFile, setLogoFile] = useState(null);
       return;
     }
   
-    // Check if a new logo is selected
-    let logoUrl = editingJob.imageUrl; // Use the existing imageUrl by default
+    
+    let logoUrl = editingJob.imageUrl; 
   
     if (logoFile) {
-      // Upload the new logo if available
       logoUrl = await handleLogoUpload(logoFile);
     }
   
-    // Now, you can use the logoUrl when updating the job
+  
     const jobsColRef = collection(db, "jobs");
     const editedJobDoc = doc(jobsColRef, editingJob.id);
   
@@ -351,19 +295,19 @@ const [logoFile, setLogoFile] = useState(null);
       location: editingJob.location,
       description: editingJob.description,
       requirements: editingJob.requirements,
-      imageUrl: logoUrl, // Use the updated logoUrl
+      imageUrl: logoUrl, 
       link: editingJob.link,
     });
   
-    // Update the selectedJob state with the edited job details
+   
     setSelectedJob({
       ...editingJob,
-      imageUrl: logoUrl, // Update the logo URL in the selectedJob state
+      imageUrl: logoUrl, 
     });
   
-    setEditingJob(null); // Clear the editing job state
+    setEditingJob(null); 
   
-    // Clear form fields (optional, depending on your requirements)
+    // Clear form fields 
     setJobTitle("");
     setCompanyName("");
     setJobType("");
@@ -371,8 +315,8 @@ const [logoFile, setLogoFile] = useState(null);
     setJobLocation("");
     setJobDescription("");
     setRequirements("");
-    setLogoFile(null); // Clear the logo file
-    setLogo(""); // Clear the logo URL
+    setLogoFile(null); 
+    setLogo(""); 
     setJobLink("");
   
     // Close modal
@@ -383,7 +327,7 @@ const [logoFile, setLogoFile] = useState(null);
   
   
   
-
+//Adding the job to the Saved Jobs list
   const handleBookmarkClick = async (job) => {
     try {
       const auth = getAuth();
@@ -534,7 +478,6 @@ const [showLeftProfile, setShowLeftProfile] = useState(true);
               ariaHideApp={false}
               contentLabel="Add Job Posting Modal"
             >
-              {/* <h2>Post a Job</h2> */}
               <div className={styles.title}>
                 <h2 className={styles.addExperienceTitle}>Post A Job</h2>
                 <button onClick={CloseCreateJobModal} className={styles.modalBtn}><IoCloseSharp/></button>
@@ -599,8 +542,6 @@ const [showLeftProfile, setShowLeftProfile] = useState(true);
                 placeholder="Upload Company Logo"
                 className={styles.formInput}
                 name="logo"
-                required
-                // value={logoFile ? logoFile.name : ""}
                 onChange={(event) => handleLogoChange(event)}
               />
               <input
@@ -623,7 +564,7 @@ const [showLeftProfile, setShowLeftProfile] = useState(true);
               ariaHideApp={false}
               contentLabel=" Edit Job Posting Modal"
             >
-              {/* <h2>Post a Job</h2> */}
+             
               <div className={styles.title}>
                 <h2 className={styles.addExperienceTitle}> Edit a Job Posting</h2>
                 <button onClick={CloseEditJobModal} className={styles.modalBtn}><IoCloseSharp/></button>
@@ -632,7 +573,6 @@ const [showLeftProfile, setShowLeftProfile] = useState(true);
                 type="text"
                 placeholder="Job Title"
                 className={styles.formInput}
-                // value={jobTitle}
                 name="title"
                 value={editingJob?.title}
                 onChange={(event) => handleInputChangeEditJob(event)}
@@ -641,7 +581,6 @@ const [showLeftProfile, setShowLeftProfile] = useState(true);
                 type="text"
                 placeholder="Company Name"
                 className={styles.formInput}
-                // value={companyName}
                 name="company"
                 value={editingJob?.company}
                 onChange={(event) => handleInputChangeEditJob(event)}
@@ -650,7 +589,6 @@ const [showLeftProfile, setShowLeftProfile] = useState(true);
                 name="jobType"
                 id="jobType"
                 className={styles.formInput}
-                // value={jobType}
                 
                 value={editingJob?.type}
                 onChange={(event) => handleInputChangeEditJob(event)}
@@ -667,7 +605,6 @@ const [showLeftProfile, setShowLeftProfile] = useState(true);
                 type="text"
                 placeholder="Salary"
                 className={styles.formInput}
-                // value={salary}
                 name="salary"
                 value={editingJob?.salary}
                 onChange={(event) => handleInputChangeEditJob(event)}
@@ -676,14 +613,12 @@ const [showLeftProfile, setShowLeftProfile] = useState(true);
                 type="text"
                 placeholder="Job Location"
                 className={styles.formInput}
-                // value={jobLocation}
                 name="location"
                 value={editingJob?.location}
                 onChange={(event) => handleInputChangeEditJob(event)}
               />
               <textarea
                 placeholder="Job Description"
-                // value={jobDescription}
                 value={editingJob?.description}
                 className={styles.formInput}
                 name="description"
@@ -691,7 +626,6 @@ const [showLeftProfile, setShowLeftProfile] = useState(true);
               />
               <textarea
                 placeholder="Requirements"
-                // value={requirements}
                 value={editingJob?.requirements}
                 className={styles.formInput}
                 name="requirements"
@@ -701,9 +635,7 @@ const [showLeftProfile, setShowLeftProfile] = useState(true);
                 type="file"
                 placeholder="Upload Company Logo"
                 className={styles.formInput}
-                // value={jobLocation}
                 name="logo"
-                // value={editingJob?.logo}
                 onChange={(event) => handleLogoChange(event)}
               />
               <input

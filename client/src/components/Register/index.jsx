@@ -11,7 +11,7 @@ import { useUser } from "../../features/contexts/UserContext";
 import LogoContainer from "./../LogoContainer";
 import Button from "react-bootstrap/Button";
 import Divider from "../Divider";
-// import "font-awesome/css/font-awesome.min.css";
+
 
 const Register = () => {
   const { user, setUser } = useUser();
@@ -31,7 +31,6 @@ const Register = () => {
         console.log("Registered successfully!", user);
         alert("Registered successfully! ");
         navigate("/create-profile");
-        // navigate("/login");
       })
       .catch((error) => {
         console.error("Error registering:", error.message);
@@ -88,32 +87,7 @@ const Register = () => {
         createdAt: new Date(),
         lastLogin: new Date(),
         birthday: formData.birthday || "",
-        // userID: Unique user identifier.
-        // firstName: The user's first name.
-        // lastName: Last name of the user.
-        // profilePicture: URL of the user's avatar.(maybe)
-        // title: The user's title or job position.
-        // education: The user's educational background, e.g. "Master's Student (Computer Science) - Boston University".
-        // skills: A list or array of all the skills listed by the user.
-        // interests: A list or array of companies or other interests that the user follows.
-        // bio: A profile or personal description of the user.
-
-        // followersCount: The number of followers the user has.
-        // posts: A list of IDs of posts related to the user.
-        // comments: A list of IDs of comments related to the user.
-
-        // experience: A list or array of items, each of which contains the following fields:
-        // position: The name of the position.
-        // company: The name of the company or organization.
-        // location: Location of the job.
-        // startDate: Start date.
-        // endDate: End date or current.
-        // description: Description or responsibility for the experience.
-
-        // contacts: A list or array of all the contact information provided by the user, such as email, phone number, etc.
-
-        // createdAt: The date and time the user created the account.
-        // lastLogin: The date and time the user last logged in.
+        
       };
   
       await setDoc(doc(db, "users", userId), userProfile);

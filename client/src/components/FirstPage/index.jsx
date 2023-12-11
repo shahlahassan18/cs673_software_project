@@ -33,8 +33,6 @@ const FirstPage = () => {
               <div className={styles.linksContainer}>
                 <button className={styles.linkBtn}><Link to="/register" className={styles.link}>JOIN NOW</Link></button>
                 <button className={styles.linkBtn}><Link to="/login" className={styles.link}>SIGN IN</Link></button>
-                {/* <Link to="/register" className={styles.link}>Join Now</Link>
-                <Link to="/login" className={styles.link}>Sign In</Link> */}
               </div>
             </div>
      

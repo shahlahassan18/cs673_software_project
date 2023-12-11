@@ -1,8 +1,5 @@
 import React, {useState, useEffect} from 'react'
 import styles from "./addpost.module.css"
-import {MdOutlinePermMedia} from "react-icons/md";
-import {FaSuitcase} from "react-icons/fa";
-import {RiArticleLine} from "react-icons/ri";
 import Modal from 'react-modal';
 import { db, storage } from '../../firebase';
 import { collection, addDoc, serverTimestamp, arrayUnion, doc, getDoc } from 'firebase/firestore';
@@ -159,9 +156,8 @@ const AddPost = () => {
           <img className={styles.profilePic}
             src={profilePicture} alt='profile' />
         </div>
-        {/* <div className={styles.addPostInput}> */}
+        
         <input type="text" className={styles.addPostInput} value={postContent} onChange={(e) => setPostContent(e.target.value)}/>
-        {/* </div> */}
 
       </div>
       <div className={styles.addPostBtns}>
@@ -223,7 +219,6 @@ const AddPost = () => {
               )}
             </div>
             <div>
-              {/* <h2>Add Caption</h2> */}
               <textarea type="text" className={styles.captionInput} placeholder="Enter caption" onChange={(e) => setPostContent(e.target.value)}/>
             </div>
             <div className={styles.btns}>

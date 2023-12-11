@@ -31,7 +31,7 @@ const UserProfile = () => {
     fetchNewConnections();
   }, []);
 
-  // const [newConnections, setNewConnections] = useState([]);
+
   const [showButton, setShowButton] = useState(true);
 
 
@@ -220,15 +220,14 @@ const UserProfile = () => {
             {/* 1st section */}
             <div className={styles.user}>
               <div className={styles.bannerContainer} >
-                {/* <img className={styles.banner} src={userProfileData.backPicture != null && userProfileData.backPicture} /> */}
+               
                 <img className={styles.banner} src={userProfileData?.bannerPicture} />
               </div>
-              {/* <div className={styles.picContainer}> */}
+             
               <div className={styles.userTitles}>
                 <img className={styles.pic} 
                  src={userProfileData?.profilePicture} />
-                {/* // src={profilePicture} /> */}
-                {/* </div> */}
+           
                 <div className={styles.titleContainer}>
                   <h6 className={styles.username}>
                     {userProfileData?.firstName} {userProfileData?.lastName}
@@ -251,11 +250,7 @@ const UserProfile = () => {
                  
 
 
-                  {/* <button className={styles.msgBtn}>
-                    <img src="./Union.svg" className={styles.icon} />
-                    <p className={styles.btnTxt}> Message</p>
-                  </button>
-                  <button className={styles.moreBtn}>More</button> */}
+                 
 
                 </div>
                   )

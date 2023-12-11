@@ -14,9 +14,8 @@ const Home = () => {
           <LeftProfile />
           <Feed/>
           <RightNews/>
-          {/* <FooterSearch /> */}
       </div>
-      <FooterSearch />
+      
     </div>
   )
 }

@@ -1,13 +1,13 @@
 
-import React , {useState, useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 import styles from "./leftprofile.module.css"
-import {Link, useNavigate} from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { db } from '../../firebase';
 import { getAuth } from 'firebase/auth';
-import {doc, getDoc} from 'firebase/firestore';
-// import axios from 'axios';
+import { doc, getDoc } from 'firebase/firestore';
 
-const LeftProfile = ({onFindJobsClick,onSavedJobsClick, handleTabClick}) => {
+
+const LeftProfile = ({ onFindJobsClick, onSavedJobsClick, handleTabClick }) => {
 
   const [showJobsMenu, setShowJobsMenu] = useState(false);
   const [showNetWorksMenu, setShowNetWorksMenu] = useState(false);
@@ -60,36 +60,30 @@ const LeftProfile = ({onFindJobsClick,onSavedJobsClick, handleTabClick}) => {
 
   return (
     <div className={styles.left}>
-    <div className={styles.user}>
-      <img className={styles.userImage}
-      src={profilePicture} alt="user"  />
-      <p className={styles.name}>{firstName} {lastName}</p>
-      <p className={styles.jobTitle}>{title}</p>
-      <button className={styles.viewProfileBtn} onClick={handleViewProfile}>View Profile</button>    </div>
-    <div className={styles.menu}>
-    <Link to="/feed" className={styles.homeMenuItemLink}>
-      <div className={styles.menuItem}>  
-        <img className={styles.icon} src='./home.svg' alt="home"/>
-        <p className={styles.menuText}> Home</p>
-           
-      </div>
-      </Link>  
+      <div className={styles.user}>
+        <img className={styles.userImage}
+          src={profilePicture} alt="user" />
+        <p className={styles.name}>{firstName} {lastName}</p>
+        <p className={styles.jobTitle}>{title}</p>
+        <button className={styles.viewProfileBtn} onClick={handleViewProfile}>View Profile</button>    </div>
+      <div className={styles.menu}>
+        <Link to="/feed" className={styles.homeMenuItemLink}>
+          <div className={styles.menuItem}>
+            <img className={styles.icon} src='./home.svg' alt="home" />
+            <p className={styles.menuText}> Home</p>
 
-      {/* <Link to="/network" className={styles.menuItemLink}>
-      <div className={styles.menuItem}>
-        <img className={styles.icon} src='./layers.svg' alt="network"/>
-        <p className={styles.menuText}> My Network</p>
-      </div>
-      </Link> */}
-   
-     <div className={styles.JobmenuItem} onClick={() => toggleNetorkMenu()}>
+          </div>
+        </Link>
+
+
+        <div className={styles.JobmenuItem} onClick={() => toggleNetorkMenu()}>
           <img className={styles.icon} src='./layers.svg' alt="Network" />
           <p className={styles.menuText}> My Network</p>
         </div>
         {showNetWorksMenu &&
 
           <div className={styles.job_tabs}>
-            <Link to="/network" className={styles.menuItemLink}  onClick={() => handleTabClick("Connections")}>
+            <Link to="/network" className={styles.menuItemLink} onClick={() => handleTabClick("Connections")}>
               <div className={styles.jobItem} onClick={onFindJobsClick}>
                 <img className={styles.icon} src='./briefcase.svg' alt="Network" />
                 <p className={styles.menuText}> New Connections</p>
@@ -110,51 +104,32 @@ const LeftProfile = ({onFindJobsClick,onSavedJobsClick, handleTabClick}) => {
 
           </div>
         }
-     
-     
-        {/* <Link to="/jobs" className={styles.menuItemLink}> */}
 
-          <div className={styles.JobmenuItem} onClick={() => toggleJobsMenu()}>
-            <img className={styles.icon} src='./briefcase.svg' alt="jobs" />
-            <p className={styles.menuText}> Jobs</p>
-          </div>
-          {showJobsMenu &&
-          
-            <div className={styles.job_tabs}>
-              <Link to="/jobs" className={styles.menuItemLink}>
+
+
+        <div className={styles.JobmenuItem} onClick={() => toggleJobsMenu()}>
+          <img className={styles.icon} src='./briefcase.svg' alt="jobs" />
+          <p className={styles.menuText}> Jobs</p>
+        </div>
+        {showJobsMenu &&
+
+          <div className={styles.job_tabs}>
+            <Link to="/jobs" className={styles.menuItemLink}>
               <div className={styles.jobItem} onClick={onFindJobsClick}>
                 <img className={styles.icon} src='./briefcase.svg' alt="jobs" />
                 <p className={styles.menuText}> Find Jobs</p>
               </div>
-              </Link>
-              <Link to="/jobs" className={styles.menuItemLink}>
+            </Link>
+            <Link to="/jobs" className={styles.menuItemLink}>
               <div className={styles.jobItem} onClick={onSavedJobsClick}>
                 <img className={styles.icon} src='./briefcase.svg' alt="jobs" />
                 <p className={styles.menuText}> Saved Jobs</p>
               </div>
-              </Link>
-            </div>
-            }
-
-       
-
-        
-
-     
-
-        {/* <Link to="/messaging" className={styles.menuItemLink}>
-          <div className={styles.menuItem}>
-            <img className={styles.icon} src='./message-square.svg' alt="Messaging" />
-            <p className={styles.menuText}> Messaging</p>
+            </Link>
           </div>
-        </Link>   */}
-       
-      {/* <div className={styles.menuItem}>
-        <img className={styles.icon} src='./monitor.svg' alt="business"/>
-        <p className={styles.menuText}> For Business</p>
-      </div> */}
+        }
 
-    </div>
+      </div>
     </div>
   )
 }

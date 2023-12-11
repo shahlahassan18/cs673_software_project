@@ -186,7 +186,6 @@ const Posts = () => {
       newPost = {
         userId: userId,
         postCont: post.postCont,
-        // media: post.media,
         TimeCreated: serverTimestamp(),
         likes: [],
       };
@@ -244,7 +243,7 @@ const Posts = () => {
     }
     setFormContent(post.postCont);
     setEditingPostId(postId);
-    setUpdatePostModalOpen(true); // Open the modal
+    setUpdatePostModalOpen(true); 
   };
 
   const openCommentEditForm = (postId, commentId) => {
@@ -318,7 +317,6 @@ const Posts = () => {
             <p className={styles.postUserJobTitle}>{post.title}</p>
             <div className={styles.jobTimer}>
               <img className={styles.jobTimerImg} src="./history-outline.svg" alt="timer" />
-              {/* <p className={styles.jobTime}>{post.TimeCreated ? post.TimeCreated.toDate().toLocaleString() : 'Loading...'}</p> */}
               <p className={styles.jobTime}>{post.TimeCreated && post.TimeCreated.toDate ? post.TimeCreated.toDate().toLocaleString() : 'Loading...'}{post.edited && <span> (edited)</span>}</p>
             </div>
           </div>
@@ -348,15 +346,12 @@ const Posts = () => {
           </p>
         ))}
         <div className={styles.postMedia}>
-        {/* <div > */}
-          {/* {post.media && post.media.map((urlObject, index) =>
-            <img key={index} src={urlObject.url} alt={urlObject.url} />
-          )} */}
+      
           {post.media && post.media.map((media, index) => {
               if (media.type.startsWith('image/')) {
 
                 return(
-                  // <div className={styles.postMedia}>
+                 
                     <img key={index} src={media.url} alt={media.url} />
                   // </div>
                 )
@@ -461,7 +456,7 @@ const Posts = () => {
 
 
 
-      // </div>
+
 
       ))}
     </div>

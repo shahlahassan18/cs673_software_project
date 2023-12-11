@@ -43,16 +43,6 @@ const Networks = () => {
         <LeftProfile handleTabClick={handleTabClick}/>
         </div>
         <div className={styles.users}>
-                          {/* {activeTab === "Connections" ?
-                      <div className={styles.title}>
-                           <h3>New Connections</h3>
-                           <Users type="new-connections"/>
-                       </div>
-                       :
-                       <div className={styles.title}>
-                           <h3>Contacts</h3>
-                           <Users type="contacts"/>
-                       </div>} */}
           {activeTab === "Connections" &&
             <div className={styles.title}>
               <h3>Connections</h3>

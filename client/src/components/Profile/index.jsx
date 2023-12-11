@@ -366,7 +366,6 @@ const Profile = () => {
       })
       .then(() => {
         console.log("User document updated successfully");
-        // Update the state here
         setBio(generalInfoInput);
         closeInfoModal();
       })
@@ -496,18 +495,18 @@ const Profile = () => {
         <div className={styles.left}>
           <LeftProfile />
         </div>
-        {/* <div className={styles.profileContainer}> */}
+  
           <div className={styles.profile}>
             {/* 1st section */}
             <div className={styles.user}>
               <div className={styles.bannerContainer} onClick={openAddBannerModal}>
                 <img className={styles.banner} src={bannerPicture} />
               </div>
-              {/* <div className={styles.picContainer}> */}
+             
               <div className={styles.userTitles}>
                 <img className={styles.pic} onClick={openAddProfilePicModal}
                   src={profilePicture} />
-                {/* </div> */}
+     
                 <div className={styles.titleContainer}>
                   <h6 className={styles.username}>
                     {firstName} {lastName}
@@ -529,7 +528,7 @@ const Profile = () => {
                       <button onClick={onCloseUserModal}><IoCloseSharp /></button>
                     </div>
                     <form className={styles.experienceForm} onSubmit={handleEditUserSubmit}>
-                    {/* <div> */}
+             
 
                       <input
                         type="text"
@@ -538,8 +537,7 @@ const Profile = () => {
                         className={styles.formInput1}
                         onChange={(e) => setEditedFirstName(e.target.value)}
                       />
-                    {/* </div>
-                    <div> */}
+              
 
                       <input
                         type="text"
@@ -548,8 +546,7 @@ const Profile = () => {
                         className={styles.formInput1}
                         onChange={(e) => setEditedLastName(e.target.value)}
                       />
-                    {/* </div> */}
-                    {/* <div> */}
+                 
 
                       <input
                         type="text"
@@ -558,10 +555,9 @@ const Profile = () => {
                         className={styles.formInput1}
                         onChange={(e) => setEditedTitle(e.target.value)}
                       />
-                    {/* </div> */}
+
                     <div className={styles.btns}>
                     <button className={styles.btn} onClick={handleEditUserSubmit}>Submit</button>
-                    {/* <button className={styles.btn} type='submit'>Submit</button> */}
                     </div>
                     </form>
                   </div>
@@ -612,17 +608,7 @@ const Profile = () => {
 
 
 
-                {/* <div className={styles.btns}>
-                  <button className={styles.connectBtn}>
-                    <img src="./connect.svg" className={styles.icon} />
-                    <p className={styles.btnTxt}> Connect</p>
-                  </button>
-                  <button className={styles.msgBtn}>
-                    <img src="./Union.svg" className={styles.icon} />
-                    <p className={styles.btnTxt}> Message</p>
-                  </button>
-                  <button className={styles.moreBtn}>More</button>
-                </div> */}
+ 
               </div>
             </div>
             {/* 2nd SECTION */}
@@ -634,7 +620,6 @@ const Profile = () => {
               : 
               <FiPlus onClick={openInfoModal}/>}
               </div>    
-              {/* <p className={styles.generalText}>{bio}</p> */}
              
               {bio && bio.split('\n').map((paragraph, index) => <p key={index}>{paragraph}</p>)}
             </div>
@@ -674,7 +659,6 @@ const Profile = () => {
                     <p className={styles.jobDate}>
                       {exp.startDate} - {exp.endDate}
                     </p>
-                    {/* <p className={styles.jobDesc}>{exp.description}</p> */}
                     {exp.description && exp.description.split('\n').map((paragraph, index) => <p key={index} className={styles.jobDesc}>{paragraph}</p>)}
                   </div>
                   <div className={styles.btns}>
@@ -701,8 +685,6 @@ const Profile = () => {
                 />
                 <input type='text' placeholder="Enter Company Name" name="company" className={styles.formInput}
                   onChange={e => handleInputChangeExperienceForm(e)} value={experienceFormData.company} />
-                {/* <input type='text' placeholder="Enter Date range" name="dateRange"  className={styles.formInput} 
-                onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.dateRange} /> */}
                 <p>Start Date</p>
                 <input
                   type="date"
@@ -749,8 +731,6 @@ const Profile = () => {
                 />
                 <input type='text' placeholder="Enter Company Name" name="company" className={styles.formInput}
                   onChange={e => handleInputChangeExperienceForm(e)} value={experienceFormData.company} />
-                {/* <input type='text' placeholder="Enter Date range" name="dateRange"  className={styles.formInput} 
-                onChange={e=>handleInputChangeExperienceForm(e)} value ={experienceFormData.dateRange} /> */}
                 <input
                   type="date"
                   name="startDate"
@@ -795,10 +775,6 @@ const Profile = () => {
                   </div>
                 </div>
               ))}
-              {/* <div className={styles.showPostsContainer}>
-                <p className={styles.showPosts}> Show all skills</p>
-                <img src="./Arrow.svg" className={styles.icon} />
-              </div> */}
             </div>
 
             {/* ADD SKILL MODAL */}
@@ -839,26 +815,9 @@ const Profile = () => {
               </form>
             </Modal>
 
-            {/* 6th SECTION */}
-            {/* <div className={styles.interestSection}>
-              <h6>Interests</h6>
-              <p>Companies</p>
-              {interests.map((interests, index) => (
-                <div key={index} className={styles.interestContainer}>
-                  <img
-                    className={styles.companylogo}
-                    src={interests.imageUrl}
-                  />
-                  <div className={styles.experience}>
-                    <p className={styles.job}>{interests.title}</p>
-                    <p className={styles.jobCompany}>{interests.company}</p>
-                    <button className={styles.followBtn}>Followed</button>
-                  </div>
-                </div>
-              ))}
-            </div> */}
+            
           </div>
-        {/* </div> */}
+     
         <div className={styles.others}>
           <img className={styles.background}
             src='/profbackpic.svg' />
@@ -874,7 +833,7 @@ const Profile = () => {
                 <p className={styles.job}>
                   {user.firstName} {user.lastName}
                 </p>
-                <p className={styles.jobCompany}>{user.bio}</p>
+               
                 <button className={styles.followBtn}
                   onClick={() => handleConnectClick(user.id)}
                 >
