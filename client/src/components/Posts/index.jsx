@@ -366,7 +366,7 @@ const Posts = () => {
                   <div key={index}>
                     <a href={media.url} target="_blank" rel="noopener noreferrer">
                       View PDF
-                    </a>
+                    </a> 
 
                   </div>
                 );
@@ -375,7 +375,7 @@ const Posts = () => {
                   <div key={index}>
                     <video controls width="550" height="440">
                       <source src={media.url} type="video/mp4" />
-                      Your browser does not support the video tag.
+                      Your browser does not support the uploaded video .
                     </video>
                    </div>
                 );

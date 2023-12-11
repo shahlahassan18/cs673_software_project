@@ -281,7 +281,7 @@ const Users = ({ type }) => {
         );
       } else if (type ==='requests'){
         return(
-          <div>
+          <div className={styles.requests}> 
           {requests.map((request, index) => (
           <div key={index} className={styles.user}>
                <div className={styles.imgContainer}>

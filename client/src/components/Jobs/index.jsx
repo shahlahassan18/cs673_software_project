@@ -227,7 +227,11 @@ const [logoFile, setLogoFile] = useState(null);
     }
   
     // Upload the logo first
-    const logoUrl = await handleLogoUpload(logoFile);
+    // const logoUrl = await handleLogoUpload(logoFile);
+    let logoUrl
+    if(logoFile){
+       logoUrl = await handleLogoUpload(logoFile);
+    }
   
     // Now, you can use the logoUrl when creating the job
     const jobsColRef = collection(db, "jobs");
@@ -243,7 +247,7 @@ const [logoFile, setLogoFile] = useState(null);
       requirements: requirements,
       'posted On': serverTimestamp(),
       'posted By': currentUser.uid,
-      imageUrl: logoUrl, // Add the logo URL to the job data
+      imageUrl: logoUrl || "", // Add the logo URL to the job data
       link: jobLink,
     });
   
@@ -595,6 +599,7 @@ const [showLeftProfile, setShowLeftProfile] = useState(true);
                 placeholder="Upload Company Logo"
                 className={styles.formInput}
                 name="logo"
+                required
                 // value={logoFile ? logoFile.name : ""}
                 onChange={(event) => handleLogoChange(event)}
               />
