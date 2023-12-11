@@ -75,6 +75,22 @@ const UserProfile = () => {
 
   const checkConnectionStatus = async (contactId) => {
     if (currentUser) {
+
+      // Get current user's contacts
+      const userDocRef = doc(db, "users", currentUser.uid);
+      const userDocSnapshot = await getDoc(userDocRef);
+      let contacts = [];
+      if (userDocSnapshot.exists()) {
+        const userData = userDocSnapshot.data();
+        contacts = userData.contacts || [];
+      }
+      if (contacts.includes(contactId)) {
+        setButtonText("Connected");
+        console.log("Connected by checking contacts");
+        setShowButton(false);
+        return;
+      }
+
       const connectionsQuery = query(
         collection(db, "connections"),
         where("userId", "==", currentUser.uid),
@@ -84,12 +100,13 @@ const UserProfile = () => {
   
       if (!querySnapshot.empty) {
         console.log("Connection request already exists");
-        setShowButton(false);
         if (querySnapshot.docs[0].data().status === "accepted") {
+          setShowButton(false);
           setButtonText("Connected");
           console.log("Connected");
         } else if (querySnapshot.docs[0].data().status === "requested") {
-          setButtonText("request is sent");
+          setShowButton(true);
+          setButtonText("request sent");
           console.log("Connection request already sent");
         }
       }
@@ -116,7 +133,7 @@ const UserProfile = () => {
           setButtonText("Connected");
           alert("You are already connected with this user");
         } else if (querySnapshot.docs[0].data().status === "requested") {
-          setButtonText("request is sent");
+          setButtonText("request sent");
           alert("Connection request already sent");
         }
         return;
@@ -224,11 +241,11 @@ const UserProfile = () => {
 
 
 
-                {showButton && buttonText == "Connect" && (
+                {showButton && (buttonText == "Connect" || buttonText == "request sent") && (
                 <div className={styles.btns}>
                   <button className={styles.connectBtn}>
                     <img src="/connect.svg" className={styles.icon} />
-                    <p className={styles.btnTxt} onClick={()=>handleConnectClick(userID.slice(1))}> Connect</p>
+                    <p className={styles.btnTxt} onClick={()=>handleConnectClick(userID.slice(1))}> {buttonText}</p>
                   </button>
 
                  

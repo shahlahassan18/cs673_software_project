@@ -139,7 +139,7 @@ const Login = () => {
 
     //   <Divider />
     //     <div className={styles.googleSignIn}>
-    //      <img src='/public/flat-color-icons_google.svg' alt='google logo' />
+    //      <img src='/flat-color-icons_google.svg' alt='google logo' />
     //      <button onClick={handleGoogleSignIn}> Sign in with Google</button>
     //     </div>
 
@@ -200,7 +200,7 @@ const Login = () => {
           <Divider />
 
           <div className={styles.googleSignIn}>
-            <img src="/public/flat-color-icons_google.svg" alt="google logo" />
+            <img src="/flat-color-icons_google.svg" alt="google logo" />
             <button type="button" onClick={handleGoogleSignIn} className={styles.GSignInBtn}>
               {" "}
               Sign in with Google
