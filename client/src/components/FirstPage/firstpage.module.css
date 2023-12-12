@@ -15,6 +15,7 @@
   .logoContainer {
     display: flex;
     align-items: center;
+    width: 100%;
   }
   
   .logo {
@@ -35,6 +36,7 @@
   .linksContainer {
     display: flex;
     gap: 10px;
+    width: 50%;
   }
   
   .link {
@@ -73,6 +75,10 @@ background:  lightgray 50% / cover no-repeat;
   @media screen and (max-width: 580px) {
     .logoTitle{
       display: none;
+    }
+
+    .linksContainer{
+      width: 100%;
     }
   }
   
